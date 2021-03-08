@@ -7,7 +7,7 @@
     "dev": "yarn build:live",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore .",
     "build": "tsc -p .",
-    "build:live": "nodemon --ext js,ts --exec ts-node bin/qtuminfo-node.js start"
+    "build:live": "nodemon --ext js,ts --exec ts-node bin/vipsinfo-node.ts start"
   },
   "repository": {
     "type": "git",
