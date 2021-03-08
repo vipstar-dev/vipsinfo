@@ -1,27 +1,27 @@
 {
-  "name": "qtuminfo",
+  "name": "vipsinfo",
   "private": true,
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "dev": "bin/qtuminfo-node.js start",
+    "dev": "bin/vipsinfo-node.js start",
     "lint": "eslint --ext .js . --ignore-path .gitignore"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qtumproject/qtuminfo.git"
+    "url": "git+https://github.com/vipstar-dev/vipsinfo.git"
   },
   "keywords": [
-    "qtum",
-    "qtuminfo",
-    "qtum explorer"
+    "VIPSTARCOIN",
+    "VIPSTARCOIN info",
+    "VIPSTARCOIN explorer"
   ],
-  "author": "QTUM <foundation@qtum.org>",
+  "author": "y-chan <y-chan@y-chan.dev>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/qtumproject/qtuminfo/issues"
+    "url": "https://github.com/vipstar-dev/vipsinfo/issues"
   },
-  "homepage": "https://github.com/qtumproject/qtuminfo#readme",
+  "homepage": "https://github.com/vipstar-dev/vipsinfo#readme",
   "devDependencies": {
     "babel-eslint": "^10.0.3",
     "eslint": "^6.4.0"

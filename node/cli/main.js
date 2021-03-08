@@ -35,7 +35,7 @@ liftoff.launch({cwd: process.cwd}, () => {
       let config = require(path.resolve(
         process.cwd(),
         ...cmd.config ? [cmd.config] : [],
-        'qtuminfo-node.json'
+        'vipsinfo-node.json'
       ))
       let node = new QtumNode({path: process.cwd(), config})
       await node.start()

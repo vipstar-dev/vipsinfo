@@ -20,7 +20,7 @@ class QtumNode {
     let services = await this.setupServices()
     this.#node = new Node({
       ...this.#config,
-      path: path.resolve(this.#path, 'qtuminfo-node.json'),
+      path: path.resolve(this.#path, 'vipsinfo-node.json'),
       services
     })
     this.registerExitHandlers()
