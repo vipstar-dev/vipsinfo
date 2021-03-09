@@ -1,6 +1,6 @@
 export type chainType = 'mainnet' | 'testnet' | 'regtest'
 
-interface IChain {
+export interface IChain {
   name: chainType
   type: chainType
   port: number
