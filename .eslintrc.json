@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018
   },
@@ -10,7 +10,10 @@
   "globals": {
     "BigInt": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
     "for-direction": "error",
     "getter-return": "warn",
@@ -87,7 +90,6 @@
     "no-whitespace-before-property": "warn",
     "nonblock-statement-body-position": "error",
     "object-curly-newline": "warn",
-    "object-curly-spacing": "warn",
     "one-var": ["warn", "never"],
     "operator-assignment": "warn",
     "operator-linebreak": ["warn", "before"],
@@ -126,6 +128,13 @@
     "prefer-template": "warn",
     "rest-spread-spacing": "warn",
     "template-tag-spacing": "warn",
-    "yield-star-spacing": "warn"
+    "yield-star-spacing": "warn",
+    "prettier/prettier": [
+      "error",
+      {
+        "semi": false,
+        "singleQuote": true
+      }
+    ]
   }
 }
