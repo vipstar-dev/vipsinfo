@@ -55,12 +55,12 @@ class Chain implements IChain {
     this.lastPoWBlockHeight = lastPoWBlockHeight
   }
 
-  static add(options: IChain) {
+  static add(options: IChain): void {
     let chain = new Chain(options)
     chains.set(chain.name, chain)
   }
 
-  static get(name: string) {
+  static get(name: string): IChain | undefined {
     return chains.get(name)
   }
 }
