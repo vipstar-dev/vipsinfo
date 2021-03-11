@@ -27,7 +27,8 @@
     },
     "types": [
       "@types/node",
-      "@types/liftoff"
+      "@types/liftoff",
+      "@types/lru-cache"
     ],
     /* Advanced Options */
     "resolveJsonModule": true,
