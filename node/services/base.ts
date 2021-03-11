@@ -9,7 +9,7 @@ export interface BaseConfig {
   name?: string
 }
 
-interface Subscriptions {
+export interface Subscriptions {
   [key: string]: any[]
 }
 
