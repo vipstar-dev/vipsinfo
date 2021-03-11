@@ -10,7 +10,7 @@ export interface BaseConfig {
 }
 
 interface Subscriptions {
-  [key: string]: any
+  [key: string]: any[]
 }
 
 interface IService {
