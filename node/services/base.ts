@@ -1,4 +1,4 @@
-import Node from '~/node/node'
+import Node, { Services } from '~/node/node'
 import { IChain } from '~/lib/chain'
 import Logger from '~/node/logger'
 
@@ -46,7 +46,7 @@ class Service extends EventEmitter implements IService {
     this.subscriptions = {}
   }
 
-  static get dependencies(): any[] {
+  static get dependencies(): Services[] {
     return []
   }
 
