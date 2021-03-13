@@ -28,7 +28,8 @@
     "types": [
       "@types/node",
       "@types/liftoff",
-      "@types/lru-cache"
+      "@types/lru-cache",
+      "@types/socket.io"
     ],
     /* Advanced Options */
     "resolveJsonModule": true,
