@@ -2,7 +2,7 @@ export type BufferReaderType = Buffer | null | undefined
 export type NumOrUnDef = number | undefined
 
 class BufferReader {
-  public buffer: BufferReaderType = null
+  private buffer: BufferReaderType = null
 
   constructor(buffer: Buffer) {
     this.buffer = buffer
