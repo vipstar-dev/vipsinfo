@@ -7,7 +7,7 @@
     "dev": "yarn build:live",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore .",
     "build": "tsc -p .",
-    "build:live": "nodemon --ext js,ts,json --exec ts-node bin/vipsinfo-node.ts start"
+    "build:live": "nodemon --ext js,ts,json --exec ts-node -r tsconfig-paths/register bin/vipsinfo-node.ts start"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.3"
   },
   "dependencies": {
