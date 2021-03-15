@@ -327,7 +327,7 @@ class Opcode {
     }
   }
 
-  [util.inspect.custom]() {
+  [util.inspect.custom](): string {
     return `<Opcode ${this.toString()}>`
   }
 }
