@@ -288,8 +288,8 @@ function mapReverse(): OpcodeTypes[] {
   return reverseMap
 }
 
-export const map: IOpCodes = opcodes
-export const reverseMap: OpcodeTypes[] = mapReverse()
+const map: IOpCodes = opcodes
+export const OpcodeReversedMap: OpcodeTypes[] = mapReverse()
 
 class Opcode {
   private readonly code: number | null = null
@@ -307,7 +307,7 @@ class Opcode {
   }
 
   toString(): OpcodeTypes {
-    return reverseMap[this.code !== null ? this.code : 0]
+    return OpcodeReversedMap[this.code !== null ? this.code : 0]
   }
 
   isSmallInt(): boolean {
@@ -332,4 +332,4 @@ class Opcode {
   }
 }
 
-export default Opcode
+export default Object.assign(Opcode, map)
