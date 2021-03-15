@@ -86,7 +86,7 @@ class Script {
   }
 
   toString(): string {
-    let chunks: (string | number)[] = this.chunks.map(
+    let chunks: (string | number | undefined)[] = this.chunks.map(
       ({ code, buffer }: ScriptChunk) => {
         if (buffer) {
           return buffer.toString('hex')
