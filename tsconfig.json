@@ -26,6 +26,7 @@
       ]
     },
     "types": [
+      "@types/ethereumjs-abi",
       "@types/node",
       "@types/liftoff",
       "@types/lru-cache",

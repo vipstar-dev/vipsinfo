@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/vipstar-dev/vipsinfo#readme",
   "devDependencies": {
+    "@types/ethereumjs-abi": "^0.6.3",
     "@types/liftoff": "^2.5.0",
     "@types/lru-cache": "^5.1.0",
     "@types/node": "^14.14.32",
