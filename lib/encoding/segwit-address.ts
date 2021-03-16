@@ -12,7 +12,7 @@ export class InvalidSegwitAddressError extends Error {
 }
 
 function convertBits(
-  data: number[],
+  data: Buffer | number[],
   fromBits: number,
   toBits: number,
   padding: boolean
@@ -44,7 +44,7 @@ function convertBits(
 }
 
 export class SegwitAddress {
-  static encode(hrp: string, version: number, program: number[]): string {
+  static encode(hrp: string, version: number, program: Buffer): string {
     let dataBuffer: Buffer | null = convertBits(program, 8, 5, true)
     let dataArray: number[] = []
     if (dataBuffer !== null) {
