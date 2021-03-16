@@ -291,7 +291,14 @@ function mapReverse(): OpcodeTypes[] {
 const map: IOpCodes = opcodes
 export const OpcodeReversedMap: OpcodeTypes[] = mapReverse()
 
-class Opcode {
+export interface IOpcode {
+  toBuffer(): Buffer
+  toString(): OpcodeTypes
+  isSmallInt(): boolean
+  toSmallInt(): number | undefined
+}
+
+class Opcode implements IOpcode {
   private readonly code: number | null = null
 
   constructor(arg: number | OpcodeTypes) {
