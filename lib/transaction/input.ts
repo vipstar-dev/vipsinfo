@@ -2,7 +2,17 @@ import util from 'util'
 import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
 
-class Input {
+export interface IInput {
+  prevTxId: Buffer | undefined
+  outputIndex: number | undefined
+  scriptSig: Buffer | undefined
+  sequence: number | undefined
+  witness: number[]
+  toBuffer(): Buffer
+  toBufferWriter(writer: BufferWriter): void
+}
+
+class Input implements IInput {
   public prevTxId: Buffer | undefined
   public outputIndex: number | undefined
   public scriptSig: Buffer | undefined
