@@ -7,7 +7,7 @@ export interface IInput {
   outputIndex: number | undefined
   scriptSig: Buffer | undefined
   sequence: number | undefined
-  witness: number[]
+  witness: (Buffer | undefined)[]
   toBuffer(): Buffer
   toBufferWriter(writer: BufferWriter): void
 }
@@ -17,7 +17,7 @@ class Input implements IInput {
   public outputIndex: number | undefined
   public scriptSig: Buffer | undefined
   public sequence: number | undefined
-  public witness: number[]
+  public witness: (Buffer | undefined)[]
 
   constructor({
     prevTxId,
@@ -30,7 +30,7 @@ class Input implements IInput {
     outputIndex: number | undefined
     scriptSig: Buffer | undefined
     sequence: number | undefined
-    witness?: number[]
+    witness?: Buffer[]
   }) {
     this.prevTxId = prevTxId
     this.outputIndex = outputIndex
@@ -58,12 +58,7 @@ class Input implements IInput {
   }
 
   toBufferWriter(writer: BufferWriter): void {
-    if (
-      this.prevTxId &&
-      this.outputIndex &&
-      this.scriptSig &&
-      this.sequence
-    ) {
+    if (this.prevTxId && this.outputIndex && this.scriptSig && this.sequence) {
       writer.write(Buffer.from(this.prevTxId).reverse())
       writer.writeUInt32LE(this.outputIndex)
       writer.writeVarLengthBuffer(this.scriptSig)
