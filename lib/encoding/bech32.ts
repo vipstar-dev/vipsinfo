@@ -75,7 +75,7 @@ export class Bech32 {
     return this.polymod(Bech32.hrpExpand(hrp).concat(data)) === 1
   }
 
-  static decode(bechString: string) {
+  static decode(bechString: string): { hrp: string; data: number[] } {
     let hasLower: boolean = false
     let hasUpper: boolean = false
     for (let p = 0; p < bechString.length; ++p) {
