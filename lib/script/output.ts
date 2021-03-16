@@ -161,7 +161,7 @@ class OutputScript extends Script implements IOutputScript {
   }
 }
 
-function parseNumberChunk(chunk: ScriptChunk) {
+function parseNumberChunk(chunk: ScriptChunk): number | undefined {
   let code = new Opcode(chunk.code)
   if (code.isSmallInt()) {
     return code.toSmallInt()
