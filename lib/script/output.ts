@@ -1,6 +1,6 @@
 import secp256k1 from 'secp256k1'
 import Opcode, { OpcodeReversedMap } from '@/lib/script/opcode'
-import Script, { ScriptChunk } from '@/lib/script'
+import Script, { ScriptChunk, IScript } from '@/lib/script'
 import BufferWriter from '@/lib/encoding/buffer-writer'
 
 export type OutputTypes =
@@ -34,7 +34,77 @@ const TYPES: { [key in OutputTypes]: string } = {
   CONTRACT: 'call',
 }
 
-class OutputScript extends Script {
+export interface IOutputScript extends IScript {
+  type: string
+  isStandard(): boolean
+}
+
+export interface IPublicKeyOutputScript extends IOutputScript {
+  publicKey: Buffer | undefined
+}
+
+export interface IPublicKeyHashOutputScript extends IOutputScript {
+  publicKeyHash: Buffer | undefined
+}
+
+export interface IScriptHashOutputScript extends IOutputScript {
+  scriptHash: Buffer | undefined
+}
+
+export interface IMultisigOutputScript extends IOutputScript {
+  publicKeys: (Buffer | undefined)[]
+  signaturesRequired: number | undefined
+}
+
+export interface IDataOutputScript extends IOutputScript {
+  buffer: Buffer | undefined
+}
+
+export interface IWitnessV0KeyHashOutputScript extends IOutputScript {
+  publicKeyHash: Buffer | undefined
+}
+
+export interface IWitnessV0ScriptHashOut extends IOutputScript {
+  scriptHash: Buffer | undefined
+}
+
+export interface IEVMContractCreateScript extends IOutputScript {
+  gasLimit: number | undefined
+  gasPrice: number | undefined
+  byteCode: Buffer | undefined
+}
+
+export interface IEVMContractCreateBySenderScript extends IOutputScript {
+  senderType: number | undefined
+  senderData: Buffer | undefined
+  signature: Buffer | undefined
+  gasLimit: number | undefined
+  gasPrice: number | undefined
+  byteCode: Buffer | undefined
+}
+
+export interface IEVMContractCallScript extends IOutputScript {
+  gasLimit: number | undefined
+  gasPrice: number | undefined
+  byteCode: Buffer | undefined
+  contract: Buffer | undefined
+}
+
+export interface IEVMContractCallBySenderScript extends IOutputScript {
+  senderType: number | undefined
+  senderData: Buffer | undefined
+  signature: Buffer | undefined
+  gasLimit: number | undefined
+  gasPrice: number | undefined
+  byteCode: Buffer | undefined
+  contract: Buffer | undefined
+}
+
+export interface IContractOutputScript extends IOutputScript {
+  contract: Buffer | undefined
+}
+
+class OutputScript extends Script implements IOutputScript {
   static fromBuffer(buffer: Buffer): OutputScript {
     if (buffer[0] === Opcode.OP_RETURN) {
       return new DataOutputScript([
@@ -117,7 +187,9 @@ function buildNumberChunk(n: number): ScriptChunk {
   return Script.buildChunk(Buffer.from(list))
 }
 
-export class PublicKeyOutputScript extends OutputScript {
+export class PublicKeyOutputScript
+  extends OutputScript
+  implements IPublicKeyOutputScript {
   public publicKey: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -146,7 +218,9 @@ export class PublicKeyOutputScript extends OutputScript {
   }
 }
 
-export class PublicKeyHashOutputScript extends OutputScript {
+export class PublicKeyHashOutputScript
+  extends OutputScript
+  implements IPublicKeyHashOutputScript {
   public publicKeyHash: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -181,7 +255,9 @@ export class PublicKeyHashOutputScript extends OutputScript {
   }
 }
 
-export class ScriptHashOutputScript extends OutputScript {
+export class ScriptHashOutputScript
+  extends OutputScript
+  implements IScriptHashOutputScript {
   public scriptHash: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -212,7 +288,9 @@ export class ScriptHashOutputScript extends OutputScript {
   }
 }
 
-export class MultisigOutputScript extends OutputScript {
+export class MultisigOutputScript
+  extends OutputScript
+  implements IMultisigOutputScript {
   public publicKeys: (Buffer | undefined)[]
   public signaturesRequired: number | undefined
 
@@ -266,7 +344,9 @@ export class MultisigOutputScript extends OutputScript {
   }
 }
 
-export class DataOutputScript extends OutputScript {
+export class DataOutputScript
+  extends OutputScript
+  implements IDataOutputScript {
   public buffer: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -298,7 +378,9 @@ export class DataOutputScript extends OutputScript {
   }
 }
 
-export class WitnessV0KeyHashOutputScript extends OutputScript {
+export class WitnessV0KeyHashOutputScript
+  extends OutputScript
+  implements IWitnessV0KeyHashOutputScript {
   public publicKeyHash: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -327,7 +409,9 @@ export class WitnessV0KeyHashOutputScript extends OutputScript {
   }
 }
 
-export class WitnessV0ScriptHashOut extends OutputScript {
+export class WitnessV0ScriptHashOut
+  extends OutputScript
+  implements IWitnessV0ScriptHashOut {
   public scriptHash: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
@@ -356,7 +440,9 @@ export class WitnessV0ScriptHashOut extends OutputScript {
   }
 }
 
-export class EVMContractCreateScript extends OutputScript {
+export class EVMContractCreateScript
+  extends OutputScript
+  implements IEVMContractCreateScript {
   public gasLimit: number | undefined
   public gasPrice: number | undefined
   public byteCode: Buffer | undefined
@@ -409,7 +495,9 @@ export class EVMContractCreateScript extends OutputScript {
   }
 }
 
-export class EVMContractCreateBySenderScript extends OutputScript {
+export class EVMContractCreateBySenderScript
+  extends OutputScript
+  implements IEVMContractCreateBySenderScript {
   public senderType: number | undefined
   public senderData: Buffer | undefined
   public signature: Buffer | undefined
@@ -483,7 +571,9 @@ export class EVMContractCreateBySenderScript extends OutputScript {
   }
 }
 
-export class EVMContractCallScript extends OutputScript {
+export class EVMContractCallScript
+  extends OutputScript
+  implements IEVMContractCallScript {
   public gasLimit: number | undefined
   public gasPrice: number | undefined
   public byteCode: Buffer | undefined
@@ -542,7 +632,9 @@ export class EVMContractCallScript extends OutputScript {
   }
 }
 
-export class EVMContractCallBySenderScript extends OutputScript {
+export class EVMContractCallBySenderScript
+  extends OutputScript
+  implements IEVMContractCallBySenderScript {
   public senderType: number | undefined
   public senderData: Buffer | undefined
   public signature: Buffer | undefined
@@ -622,7 +714,9 @@ export class EVMContractCallBySenderScript extends OutputScript {
   }
 }
 
-export class ContractOutputScript extends OutputScript {
+export class ContractOutputScript
+  extends OutputScript
+  implements IContractOutputScript {
   public contract: Buffer | undefined
 
   constructor(chunks: ScriptChunk[]) {
