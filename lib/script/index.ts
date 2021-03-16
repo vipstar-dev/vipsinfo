@@ -19,7 +19,15 @@ export interface ScriptChunk {
   buffer?: Buffer
 }
 
-class Script {
+export interface IScript {
+  chunks: ScriptChunk[]
+  toBuffer(): Buffer
+  toBufferWriter(writer: BufferWriter): void
+  toString(): string
+  isEmpty(): boolean
+}
+
+class Script implements IScript {
   public chunks: ScriptChunk[]
 
   constructor(chunks: ScriptChunk[]) {
