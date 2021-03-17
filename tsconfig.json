@@ -16,6 +16,7 @@
     "esModuleInterop": true,
     "noImplicitThis": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [
