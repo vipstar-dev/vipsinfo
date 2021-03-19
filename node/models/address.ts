@@ -5,8 +5,9 @@ import {
   PrimaryKey,
   AutoIncrement,
   DataType,
-  Unique,
+  Unique, HasOne,
 } from 'sequelize-typescript'
+import { Block } from '@/node/models/block'
 
 /* eslint-disable camelcase */
 const addressTypes: { [key: string]: number } = {
@@ -34,6 +35,7 @@ const addressTypeMap: { [key: number]: string } = {
 export default class Address extends Model<Address> {
   @PrimaryKey
   @AutoIncrement
+  @HasOne(() => Block, { as: 'minedBlocks', foreignKey: 'minerId' })
   @Column(DataType.BIGINT.UNSIGNED)
   _id!: bigint
 

@@ -7,8 +7,10 @@ import {
   DataType,
   Index,
   Unique,
+  HasOne,
 } from 'sequelize-typescript'
 import { FindOptions } from 'sequelize'
+import { Block } from '@/node/models/block'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Header extends Model<Header> {
@@ -17,6 +19,7 @@ export default class Header extends Model<Header> {
   hash!: Buffer
 
   @PrimaryKey
+  @HasOne(() => Block, 'height')
   @Column(DataType.INTEGER.UNSIGNED)
   height!: number
 
