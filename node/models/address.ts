@@ -6,7 +6,6 @@ import {
   AutoIncrement,
   DataType,
   Unique,
-  Length,
 } from 'sequelize-typescript'
 
 /* eslint-disable camelcase */
