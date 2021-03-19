@@ -142,7 +142,7 @@ CREATE TABLE `header` (
   `stake_prev_transaction_id` binary(32) NOT NULL,
   `stake_output_index` int(10) unsigned NOT NULL,
   `signature` blob NOT NULL,
-  `chainwork` binary(32) NOT NULL,
+  `_chainwork` binary(32) NOT NULL,
   PRIMARY KEY (`height`),
   UNIQUE KEY `hash` (`hash`),
   KEY `timestamp` (`timestamp`)
