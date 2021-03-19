@@ -1,6 +1,6 @@
 CREATE TABLE `address` (
   `_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `type` tinyint(3) unsigned NOT NULL,
+  `_type` tinyint(3) unsigned NOT NULL,
   `data` varbinary(32) NOT NULL,
   `string` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `create_height` int(10) unsigned NOT NULL,
