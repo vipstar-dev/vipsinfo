@@ -4,6 +4,7 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
+  DataType,
   Unique,
   Length,
 } from 'sequelize-typescript'
@@ -34,11 +35,11 @@ const addressTypeMap: { [key: number]: string } = {
 export default class Address extends Model<Address> {
   @PrimaryKey
   @AutoIncrement
-  @Column
+  @Column(DataType.BIGINT.UNSIGNED)
   _id!: bigint
 
   @Unique('address')
-  @Column
+  @Column(DataType.INTEGER.UNSIGNED)
   _type!: number
 
   get type(): string | null {
@@ -53,15 +54,13 @@ export default class Address extends Model<Address> {
   }
 
   @Unique('address')
-  @Length({ max: 32 })
-  @Column
-  data!: string
+  @Column(DataType.STRING(32).BINARY)
+  data!: Buffer
 
-  @Length({ max: 64 })
-  @Column
+  @Column(DataType.STRING(64))
   string!: string
 
-  @Column
+  @Column(DataType.INTEGER.UNSIGNED)
   createHeight!: number
 
   getType(type: number): string | null {
