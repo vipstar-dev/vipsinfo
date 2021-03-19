@@ -55,7 +55,7 @@ export default class Address extends Model<Address> {
   @Unique('address')
   @Length({ max: 32 })
   @Column
-  data!: Buffer
+  data!: string
 
   @Length({ max: 64 })
   @Column
