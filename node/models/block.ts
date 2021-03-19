@@ -6,10 +6,12 @@ import {
   DataType,
   Unique,
   HasOne,
+  HasMany,
   BelongsTo,
 } from 'sequelize-typescript'
 import Header from '@/node/models/header'
 import Address from '@/node/models/address'
+import { Transaction } from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Block extends Model<Block> {
@@ -19,6 +21,7 @@ export class Block extends Model<Block> {
 
   @PrimaryKey
   @BelongsTo(() => Header, 'height')
+  @HasMany(() => Transaction, { as: 'transactions', foreignKey: 'blockHeight' })
   @Column(DataType.INTEGER.UNSIGNED)
   height!: number
 
