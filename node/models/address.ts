@@ -53,11 +53,11 @@ export default class Address extends Model<Address> {
   }
 
   @Unique('address')
-  @Length({ min: 32, max: 32 })
+  @Length({ max: 32 })
   @Column
   data!: Buffer
 
-  @Length({ min: 64, max: 64 })
+  @Length({ max: 64 })
   @Column
   string!: string
 
