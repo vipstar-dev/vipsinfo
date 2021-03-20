@@ -1,13 +1,14 @@
 import {
-  Table,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
   Model,
   PrimaryKey,
-  DataType,
+  Table,
   Unique,
-  BelongsTo,
-  ForeignKey,
 } from 'sequelize-typescript'
+
 import { Transaction } from '@/node/models/transaction'
 import { TransactionOutput } from '@/node/models/transaction-output'
 

@@ -1,15 +1,15 @@
-import Sequelize from 'sequelize'
 import {
-  Table,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
   Model,
   PrimaryKey,
-  DataType,
-  BelongsTo,
-  ForeignKey,
+  Table,
 } from 'sequelize-typescript'
-import { Transaction } from '@/node/models/transaction'
+
 import Address from '@/node/models/address'
+import { Transaction } from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class BalanceChange extends Model<BalanceChange> {

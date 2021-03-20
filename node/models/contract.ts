@@ -1,16 +1,17 @@
 import {
-  Table,
+  AllowNull,
+  BelongsTo,
   Column,
+  DataType,
+  Default,
+  ForeignKey,
+  HasMany,
+  HasOne,
   Model,
   PrimaryKey,
-  DataType,
-  HasOne,
-  HasMany,
-  BelongsTo,
-  ForeignKey,
-  AllowNull,
-  Default,
+  Table,
 } from 'sequelize-typescript'
+
 import { Qrc20, Qrc20Balance, Qrc721, Qrc721Token } from '@/node/models/token'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

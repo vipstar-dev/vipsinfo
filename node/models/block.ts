@@ -1,17 +1,18 @@
 import {
-  Table,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
   Model,
   PrimaryKey,
-  DataType,
+  Table,
   Unique,
-  HasOne,
-  HasMany,
-  BelongsTo,
-  ForeignKey,
 } from 'sequelize-typescript'
-import Header from '@/node/models/header'
+
 import Address from '@/node/models/address'
+import Header from '@/node/models/header'
 import { Transaction } from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

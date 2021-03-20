@@ -1,19 +1,20 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
+  Index,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  DataType,
+  Table,
   Unique,
-  HasMany,
-  BelongsTo,
-  Index,
-  ForeignKey,
-  HasOne,
 } from 'sequelize-typescript'
-import { Block } from '@/node/models/block'
+
 import { BalanceChange } from '@/node/models/balance-change'
+import { Block } from '@/node/models/block'
 import { ContractSpend, GasRefund } from '@/node/models/contract-transaction'
 import { EvmReceipt } from '@/node/models/transaction-receipt'
 

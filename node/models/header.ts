@@ -1,15 +1,16 @@
+import { FindOptions } from 'sequelize'
 import {
-  Table,
   Column,
+  DataType,
+  Default,
+  ForeignKey,
+  HasOne,
   Model,
   PrimaryKey,
-  Default,
-  DataType,
+  Table,
   Unique,
-  HasOne,
-  ForeignKey,
 } from 'sequelize-typescript'
-import { FindOptions } from 'sequelize'
+
 import { Block } from '@/node/models/block'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

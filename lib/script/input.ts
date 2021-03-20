@@ -1,7 +1,7 @@
-import Opcode, { IOpcode, OpcodeReversedMap } from '@/lib/script/opcode'
-import Script, { IScript, ScriptChunk, InvalidScriptError } from '@/lib/script'
-import OutputScript, { IOutputScript } from '@/lib/script/output'
 import BufferWriter from '@/lib/encoding/buffer-writer'
+import Script, { InvalidScriptError, IScript, ScriptChunk } from '@/lib/script'
+import Opcode, { IOpcode, OpcodeReversedMap } from '@/lib/script/opcode'
+import OutputScript, { IOutputScript } from '@/lib/script/output'
 
 export type InputTypes =
   | 'UNKNOWN'

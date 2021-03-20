@@ -1,9 +1,9 @@
 import {
-  Table,
   Column,
+  DataType,
   Model,
   PrimaryKey,
-  DataType,
+  Table,
 } from 'sequelize-typescript'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

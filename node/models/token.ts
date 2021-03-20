@@ -1,13 +1,14 @@
 import {
-  Table,
+  AllowNull,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
   Model,
   PrimaryKey,
-  DataType,
-  BelongsTo,
-  ForeignKey,
-  AllowNull,
+  Table,
 } from 'sequelize-typescript'
+
 import { Contract } from '@/node/models/contract'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

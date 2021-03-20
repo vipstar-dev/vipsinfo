@@ -1,17 +1,16 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsTo,
   Column,
+  DataType,
+  ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  DataType,
+  Table,
   Unique,
-  HasMany,
-  BelongsTo,
-  Index,
-  ForeignKey,
-  HasOne,
 } from 'sequelize-typescript'
+
 import { Transaction } from '@/node/models/transaction'
 
 /* eslint-disable camelcase */

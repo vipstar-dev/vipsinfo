@@ -1,9 +1,11 @@
 import util from 'util'
+
+import { IChain } from '@/lib/chain'
 import { hash160 } from '@/lib/crypto/hash'
 import {
   Base58Check,
-  InvalidBase58Error,
   InvalidBase58ChecksumError,
+  InvalidBase58Error,
 } from '@/lib/encoding/base58'
 import SegwitAddress, {
   InvalidSegwitAddressError,
@@ -21,7 +23,6 @@ import OutputScript, {
   IWitnessV0KeyHashOutputScript,
   IWitnessV0ScriptHashOut,
 } from '@/lib/script/output'
-import { IChain } from '@/lib/chain'
 
 export type AddressTypes =
   | 'PAY_TO_PUBLIC_KEY_HASH'

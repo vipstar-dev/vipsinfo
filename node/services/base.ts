@@ -1,6 +1,6 @@
-import Node, { Services } from '~/node/node'
-import { IChain } from '~/lib/chain'
-import Logger from '~/node/logger'
+import { IChain } from '@/lib/chain'
+import Logger from '@/node/logger'
+import Node, { Services } from '@/node/node'
 
 const EventEmitter = require('events')
 

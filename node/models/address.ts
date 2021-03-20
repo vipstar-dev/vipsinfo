@@ -1,17 +1,18 @@
 import {
-  Table,
-  Column,
-  Model,
-  PrimaryKey,
   AutoIncrement,
-  DataType,
-  Unique,
-  HasOne,
   // ForeignKey,
   BelongsTo,
+  Column,
+  DataType,
+  HasOne,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
 } from 'sequelize-typescript'
-import { Block } from '@/node/models/block'
+
 import { BalanceChange } from '@/node/models/balance-change'
+import { Block } from '@/node/models/block'
 
 /* eslint-disable camelcase */
 const addressTypes: { [key: string]: number } = {
