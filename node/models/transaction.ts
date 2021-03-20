@@ -9,10 +9,11 @@ import {
   HasMany,
   BelongsTo,
   Index,
-  ForeignKey,
+  ForeignKey, HasOne,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
 import { BalanceChange } from '@/node/models/balance-change'
+import { ContractSpend, GasRefund } from '@/node/models/contract-transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Transaction extends Model<Transaction> {
@@ -59,6 +60,15 @@ export class Transaction extends Model<Transaction> {
 
   @HasMany(() => BalanceChange)
   balanceChanges!: BalanceChange[]
+
+  @HasMany(() => GasRefund)
+  refunds!: GasRefund[]
+
+  @HasOne(() => ContractSpend, 'sourceId')
+  contractSpendSource!: ContractSpend
+
+  @HasMany(() => ContractSpend, 'destId')
+  contractSpendDests!: ContractSpend[]
 }
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })

@@ -6,10 +6,11 @@ import {
   AllowNull,
   DataType,
   BelongsTo,
-  ForeignKey,
+  ForeignKey, HasOne,
 } from 'sequelize-typescript'
 import { Transaction } from '@/node/models/transaction'
 import Address from '~/node/models/address'
+import {GasRefund} from "~/node/models/contract-transaction";
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class TransactionOutput extends Model<TransactionOutput> {
@@ -49,6 +50,9 @@ export class TransactionOutput extends Model<TransactionOutput> {
 
   @BelongsTo(() => Transaction)
   transaction!: Transaction
+
+  @HasOne(() => GasRefund)
+  refund!: GasRefund
 }
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
