@@ -9,7 +9,8 @@ import {
   HasMany,
   BelongsTo,
   Index,
-  ForeignKey, HasOne,
+  ForeignKey,
+  HasOne,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
 import { BalanceChange } from '@/node/models/balance-change'
