@@ -5,7 +5,6 @@ import {
   PrimaryKey,
   Default,
   DataType,
-  Index,
   Unique,
   HasOne,
   ForeignKey,
@@ -46,12 +45,13 @@ export default class Header extends Model<Header> {
   @Column(DataType.STRING(32).BINARY)
   hashStateRoot!: Buffer
 
-  @Index('hash_utxo_root')
-  @Column(DataType.STRING(32).BINARY)
+  @Column({ type: DataType.STRING(32).BINARY, field: 'hash_utxo_root' })
   hashUTXORoot!: Buffer
 
-  @Index('stake_prev_transaction_id')
-  @Column(DataType.STRING(32).BINARY)
+  @Column({
+    type: DataType.STRING(32).BINARY,
+    field: 'stake_prev_transaction_id',
+  })
   stakePrevTxId!: Buffer
 
   @Column(DataType.INTEGER.UNSIGNED)
