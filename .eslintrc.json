@@ -1,4 +1,5 @@
 {
+  "plugins": ["simple-import-sort"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018
@@ -20,6 +21,15 @@
       {
         "semi": false,
         "singleQuote": true
+      }
+    ],
+    "simple-import-sort/imports": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "./", "../", "~/"
+        ]
       }
     ]
   }
