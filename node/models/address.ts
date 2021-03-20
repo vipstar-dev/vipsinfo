@@ -7,7 +7,8 @@ import {
   DataType,
   Unique,
   HasOne,
-  ForeignKey,
+  // ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
 import { BalanceChange } from '@/node/models/balance-change'
@@ -66,10 +67,18 @@ export default class Address extends Model<Address> {
   @Column(DataType.INTEGER.UNSIGNED)
   createHeight!: number
 
+  /*
+  This is code whose original I(y-chan) reproduced which was written by JavaScript.
+  But I thought this code was wrong...
   @ForeignKey(() => Block)
   minerId!: bigint
 
   @HasOne(() => Block)
+  minedBlocks!: Block
+   */
+
+  // I think that true code which this code author wanted to write.
+  @BelongsTo(() => Block)
   minedBlocks!: Block
 
   @HasOne(() => BalanceChange)
