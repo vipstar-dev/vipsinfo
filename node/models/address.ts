@@ -5,7 +5,9 @@ import {
   PrimaryKey,
   AutoIncrement,
   DataType,
-  Unique, HasOne,
+  Unique,
+  HasOne,
+  ForeignKey,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
 
@@ -62,6 +64,9 @@ export default class Address extends Model<Address> {
 
   @Column(DataType.INTEGER.UNSIGNED)
   createHeight!: number
+
+  @ForeignKey(() => Block)
+  minerId!: bigint
 
   @HasOne(() => Block)
   minedBlocks!: Block
