@@ -10,6 +10,7 @@ import {
   ForeignKey,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
+import { BalanceChange } from '@/node/models/balance-change'
 
 /* eslint-disable camelcase */
 const addressTypes: { [key: string]: number } = {
@@ -70,6 +71,9 @@ export default class Address extends Model<Address> {
 
   @HasOne(() => Block)
   minedBlocks!: Block
+
+  @HasOne(() => BalanceChange)
+  balanceChanges!: BalanceChange
 
   getType(type: number): string | null {
     return addressTypeMap[type] || null

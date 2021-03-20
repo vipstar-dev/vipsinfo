@@ -12,6 +12,7 @@ import {
   ForeignKey,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
+import { BalanceChange } from '@/node/models/balance-change'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Transaction extends Model<Transaction> {
@@ -55,6 +56,9 @@ export class Transaction extends Model<Transaction> {
 
   @HasMany(() => Witness, { sourceKey: 'id' })
   witnesses!: Witness[]
+
+  @HasMany(() => BalanceChange)
+  balanceChanges!: BalanceChange[]
 }
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
