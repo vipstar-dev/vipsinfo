@@ -11,6 +11,7 @@ import {
   AllowNull,
   Default,
 } from 'sequelize-typescript'
+import { Qrc20, Qrc20Balance, Qrc721, Qrc721Token } from '@/node/models/token'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Contract extends Model<Contract> {
@@ -40,6 +41,18 @@ export class Contract extends Model<Contract> {
 
   @HasMany(() => ContractTag)
   tag!: ContractTag[]
+
+  @HasOne(() => Qrc20)
+  qrc20!: Qrc20
+
+  @HasMany(() => Qrc20Balance)
+  qrc20Balances!: Qrc20Balance[]
+
+  @HasOne(() => Qrc721)
+  qrc721!: Qrc721
+
+  @HasMany(() => Qrc721Token)
+  qrc721Tokens!: Qrc721Token[]
 }
 
 Table({ freezeTableName: true, underscored: true, timestamps: false })

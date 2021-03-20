@@ -153,7 +153,7 @@ CREATE TABLE `qrc20` (
   `name` blob NOT NULL,
   `symbol` blob NOT NULL,
   `decimals` tinyint(3) unsigned NOT NULL,
-  `total_supply` binary(32) NOT NULL,
+  `_total_supply` binary(32) NOT NULL,
   `version` blob,
   PRIMARY KEY (`contract_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
@@ -161,7 +161,7 @@ CREATE TABLE `qrc20` (
 CREATE TABLE `qrc20_balance` (
   `contract_address` binary(20) NOT NULL,
   `address` binary(20) NOT NULL,
-  `balance` binary(32) NOT NULL,
+  `_balance` binary(32) NOT NULL,
   PRIMARY KEY (`contract_address`,`address`),
   KEY `rich_list` (`contract_address`,`balance` DESC) USING BTREE,
   KEY `address` (`address`) USING BTREE
