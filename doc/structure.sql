@@ -74,7 +74,7 @@ CREATE TABLE `evm_receipt` (
   `output_index` int(10) unsigned NOT NULL,
   `block_height` int(10) unsigned NOT NULL,
   `index_in_block` int(10) unsigned NOT NULL,
-  `sender_type` tinyint(3) unsigned NOT NULL,
+  `_sender_type` tinyint(3) unsigned NOT NULL,
   `sender_data` varbinary(32) NOT NULL,
   `gas_used` int(10) unsigned NOT NULL,
   `contract_address` binary(20) NOT NULL,

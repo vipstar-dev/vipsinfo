@@ -15,6 +15,7 @@ import {
 import { Block } from '@/node/models/block'
 import { BalanceChange } from '@/node/models/balance-change'
 import { ContractSpend, GasRefund } from '@/node/models/contract-transaction'
+import { EvmReceipt } from '@/node/models/transaction-receipt'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Transaction extends Model<Transaction> {
@@ -70,6 +71,9 @@ export class Transaction extends Model<Transaction> {
 
   @HasMany(() => ContractSpend, 'destId')
   contractSpendDests!: ContractSpend[]
+
+  @HasMany(() => EvmReceipt)
+  evmReceipts!: EvmReceipt[]
 }
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
