@@ -8,6 +8,7 @@ import {
   Index,
   Unique,
   HasOne,
+  ForeignKey,
 } from 'sequelize-typescript'
 import { FindOptions } from 'sequelize'
 import { Block } from '@/node/models/block'
@@ -19,7 +20,7 @@ export default class Header extends Model<Header> {
   hash!: Buffer
 
   @PrimaryKey
-  @HasOne(() => Block, 'height')
+  @ForeignKey(() => Block)
   @Column(DataType.INTEGER.UNSIGNED)
   height!: number
 
@@ -61,6 +62,9 @@ export default class Header extends Model<Header> {
 
   @Column(DataType.STRING(32).BINARY)
   _chainwork!: Buffer
+
+  @HasOne(() => Block)
+  block!: Block
 
   get chainwork(): bigint {
     return BigInt(`0x${this.getDataValue('_chainwork').toString('hex')}`)

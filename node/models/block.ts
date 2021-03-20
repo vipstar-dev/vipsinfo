@@ -8,6 +8,7 @@ import {
   HasOne,
   HasMany,
   BelongsTo,
+  ForeignKey,
 } from 'sequelize-typescript'
 import Header from '@/node/models/header'
 import Address from '@/node/models/address'
@@ -20,8 +21,7 @@ export class Block extends Model<Block> {
   hash!: Buffer
 
   @PrimaryKey
-  @BelongsTo(() => Header, 'height')
-  @HasMany(() => Transaction, { as: 'transactions', foreignKey: 'blockHeight' })
+  @ForeignKey(() => Header)
   @Column(DataType.INTEGER.UNSIGNED)
   height!: number
 
@@ -31,7 +31,7 @@ export class Block extends Model<Block> {
   @Column(DataType.INTEGER.UNSIGNED)
   weight!: number
 
-  @HasOne(() => Address, { as: 'miner', foreignKey: 'minerId' })
+  @ForeignKey(() => Address)
   @Column(DataType.BIGINT.UNSIGNED)
   minerId!: bigint
 
@@ -40,4 +40,13 @@ export class Block extends Model<Block> {
 
   @Column(DataType.INTEGER.UNSIGNED)
   contractTransactionsCount!: number
+
+  @BelongsTo(() => Header)
+  header!: Header
+
+  @HasOne(() => Address)
+  miner!: Address
+
+  @HasMany(() => Transaction)
+  transactions!: Transaction[]
 }

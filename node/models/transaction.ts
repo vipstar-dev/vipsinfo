@@ -9,6 +9,7 @@ import {
   HasMany,
   BelongsTo,
   Index,
+  ForeignKey,
 } from 'sequelize-typescript'
 import { Block } from '@/node/models/block'
 
@@ -21,11 +22,6 @@ export class Transaction extends Model<Transaction> {
   _id!: bigint
 
   @Unique
-  @HasMany(() => Witness, {
-    as: 'witnesses',
-    foreignKey: 'transactionId',
-    sourceKey: 'id',
-  })
   @Column(DataType.STRING(32).BINARY)
   id!: Buffer
 
@@ -41,7 +37,7 @@ export class Transaction extends Model<Transaction> {
   @Column(DataType.INTEGER.UNSIGNED)
   lockTime!: number
 
-  @BelongsTo(() => Block, { as: 'block', foreignKey: 'blockHeight' })
+  @ForeignKey(() => Block)
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
 
@@ -53,15 +49,18 @@ export class Transaction extends Model<Transaction> {
 
   @Column(DataType.INTEGER.UNSIGNED)
   weight!: number
+
+  @BelongsTo(() => Block)
+  block!: Block
+
+  @HasMany(() => Witness, { sourceKey: 'id' })
+  witnesses!: Witness[]
 }
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export class Witness extends Model<Witness> {
   @PrimaryKey
-  @BelongsTo(() => Transaction, {
-    foreignKey: 'transactionId',
-    targetKey: 'id',
-  })
+  @ForeignKey(() => Transaction)
   @Column(DataType.STRING(32).BINARY)
   transactionId!: Buffer
 
@@ -75,4 +74,7 @@ export class Witness extends Model<Witness> {
 
   @Column(DataType.BLOB)
   script!: Buffer
+
+  @BelongsTo(() => Transaction, { targetKey: 'id' })
+  transaction!: Transaction
 }

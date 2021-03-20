@@ -35,7 +35,6 @@ const addressTypeMap: { [key: number]: string } = {
 export default class Address extends Model<Address> {
   @PrimaryKey
   @AutoIncrement
-  @HasOne(() => Block, { as: 'minedBlocks', foreignKey: 'minerId' })
   @Column(DataType.BIGINT.UNSIGNED)
   _id!: bigint
 
@@ -63,6 +62,9 @@ export default class Address extends Model<Address> {
 
   @Column(DataType.INTEGER.UNSIGNED)
   createHeight!: number
+
+  @HasOne(() => Block)
+  minedBlocks!: Block
 
   getType(type: number): string | null {
     return addressTypeMap[type] || null
