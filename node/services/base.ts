@@ -1,9 +1,9 @@
+import EventEmitter from 'events'
+
 import { IChain } from '@/lib/chain'
 import { IBus } from '@/node/bus'
 import { ILogger } from '@/node/logger'
 import Node, { Services } from '@/node/node'
-
-const EventEmitter = require('events')
 
 export interface BaseConfig {
   node?: Node
