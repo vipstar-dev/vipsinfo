@@ -21,7 +21,7 @@ export interface IService {
   logger: Logger | undefined
   subscriptions: Subscriptions
   APIMethods: any[]
-  publishEvents: (any | Event)[]
+  publishEvents: Event[]
   routePrefix: any
   start(): void
   stop(): void
@@ -33,10 +33,10 @@ export interface IService {
   unsubscribe(name: string, emitter: any): void
 }
 
-interface Event {
+export interface Event {
   name: string
-  subscribe: () => void
-  unsubscribe: () => void
+  subscribe: (emitter: any) => void
+  unsubscribe: (emitter: any) => void
 }
 
 class Service extends EventEmitter implements IService {
@@ -65,14 +65,20 @@ class Service extends EventEmitter implements IService {
     return []
   }
 
-  get publishEvents(): (any | Event)[] {
+  get publishEvents(): Event[] {
     if (!this.subscriptions) {
       return []
     }
     return Object.keys(this.subscriptions).map((name: string) => ({
       name: `${this.name}/${name}`,
-      subscribe: this.subscribe.bind(this, name),
-      unsubscribe: this.unsubscribe.bind(this, name),
+      // subscribe: this.subscribe.bind(this, name),
+      // unsubscribe: this.unsubscribe.bind(this, name),
+      subscribe: (emitter: any) => {
+        this.subscribe(name, emitter)
+      },
+      unsubscribe: (emitter: any) => {
+        this.unsubscribe(name, emitter)
+      },
     }))
   }
 
