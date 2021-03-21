@@ -7,7 +7,7 @@ interface LoggerConstructor {
 type colorTypes = 'blue' | 'red' | 'green' | 'yellow'
 type levelTypes = 'info' | 'error' | 'debug' | 'warn'
 
-interface ILogger extends LoggerConstructor {
+export interface ILogger extends LoggerConstructor {
   formatting: boolean
   info(...args: (number | string)[]): void
   warn(...args: (number | string)[]): void
