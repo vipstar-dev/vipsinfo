@@ -23,6 +23,12 @@ export interface IService {
   APIMethods: any[]
   publishEvents: (any | Event)[]
   routePrefix: any
+  start(): void
+  stop(): void
+  onHeaders(): void
+  onBlock(): void
+  onSynced(): void
+  onReorg(): void
   subscribe(name: string, emitter: any): void
   unsubscribe(name: string, emitter: any): void
 }
