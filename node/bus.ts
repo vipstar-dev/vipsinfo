@@ -6,7 +6,7 @@ export interface BusConstructor {
   node: Node
 }
 
-export interface IBus {
+export interface IBus extends EventEmitter {
   subscribe(name: string, ...args: string[]): void
   unsubscribe(name: string, ...args: string[]): void
   close(): void

@@ -14,7 +14,7 @@ export interface Subscriptions {
   [key: string]: IBus[]
 }
 
-export interface IService {
+export interface IService extends EventEmitter {
   options: BaseConfig
   node: Node | undefined
   name: string | undefined
