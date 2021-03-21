@@ -13,13 +13,19 @@ export interface Subscriptions {
   [key: string]: any[]
 }
 
-interface IService {
+export interface IService {
   options: BaseConfig
   node: Node | undefined
   name: string | undefined
   chain: IChain | undefined
   logger: Logger | undefined
   subscriptions: Subscriptions
+  dependencies: Services[]
+  APIMethods: any[]
+  publishEvents: (any | Event)[]
+  routePrefix: any
+  subscribe(name: string, emitter: any): void
+  unsubscribe(name: string, emitter: any): void
 }
 
 interface Event {
@@ -46,7 +52,7 @@ class Service extends EventEmitter implements IService {
     this.subscriptions = {}
   }
 
-  static get dependencies(): Services[] {
+  get dependencies(): Services[] {
     return []
   }
 
@@ -54,7 +60,7 @@ class Service extends EventEmitter implements IService {
     return []
   }
 
-  get publishEvents(): any[] | Event[] {
+  get publishEvents(): (any | Event)[] {
     if (!this.subscriptions) {
       return []
     }
@@ -65,7 +71,7 @@ class Service extends EventEmitter implements IService {
     }))
   }
 
-  get routePrefix() {
+  get routePrefix(): any {
     return null
   }
 
@@ -81,7 +87,7 @@ class Service extends EventEmitter implements IService {
 
   async onReorg() {}
 
-  subscribe(name: string, emitter: any) {
+  subscribe(name: string, emitter: any): void {
     let subscription = this.subscriptions[name]
     subscription.push(emitter)
     this.logger?.info(
@@ -92,7 +98,7 @@ class Service extends EventEmitter implements IService {
     )
   }
 
-  unsubscribe(name: string, emitter: any) {
+  unsubscribe(name: string, emitter: any): void {
     let subscription = this.subscriptions[name]
     let index = subscription.indexOf(emitter)
     if (index >= 0) {
