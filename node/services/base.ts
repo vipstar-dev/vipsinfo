@@ -20,7 +20,6 @@ export interface IService {
   chain: IChain | undefined
   logger: Logger | undefined
   subscriptions: Subscriptions
-  dependencies: Services[]
   APIMethods: any[]
   publishEvents: (any | Event)[]
   routePrefix: any
@@ -52,7 +51,7 @@ class Service extends EventEmitter implements IService {
     this.subscriptions = {}
   }
 
-  get dependencies(): Services[] {
+  static get dependencies(): Services[] {
     return []
   }
 
