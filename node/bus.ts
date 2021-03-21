@@ -20,24 +20,24 @@ class Bus extends EventEmitter implements IBus {
     this.node = node
   }
 
-  subscribe(name: string, ...args: string[]): void {
+  subscribe(name: string): void {
     if (this.node) {
       for (let service of this.node.services.values()) {
         for (let event of service.publishEvents) {
           if (name === event.name) {
-            event.subscribe(this, ...args)
+            event.subscribe(this)
           }
         }
       }
     }
   }
 
-  unsubscribe(name: string, ...args: string[]): void {
+  unsubscribe(name: string): void {
     if (this.node) {
       for (let service of this.node.services.values()) {
         for (let event of service.publishEvents) {
           if (name === event.name) {
-            event.unsubscribe(this, ...args)
+            event.unsubscribe(this)
           }
         }
       }

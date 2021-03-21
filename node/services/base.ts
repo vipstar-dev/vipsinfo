@@ -1,5 +1,6 @@
 import { IChain } from '@/lib/chain'
-import Logger from '@/node/logger'
+import { IBus } from '@/node/bus'
+import { ILogger } from '@/node/logger'
 import Node, { Services } from '@/node/node'
 
 const EventEmitter = require('events')
@@ -10,7 +11,7 @@ export interface BaseConfig {
 }
 
 export interface Subscriptions {
-  [key: string]: any[]
+  [key: string]: IBus[]
 }
 
 export interface IService {
@@ -18,7 +19,7 @@ export interface IService {
   node: Node | undefined
   name: string | undefined
   chain: IChain | undefined
-  logger: Logger | undefined
+  logger: ILogger | undefined
   subscriptions: Subscriptions
   APIMethods: any[]
   publishEvents: Event[]
@@ -35,17 +36,17 @@ export interface IService {
 
 export interface Event {
   name: string
-  subscribe: (emitter: any) => void
-  unsubscribe: (emitter: any) => void
+  subscribe: (emitter: IBus) => void
+  unsubscribe: (emitter: IBus) => void
 }
 
 class Service extends EventEmitter implements IService {
-  options: BaseConfig
-  node: Node | undefined
-  name: string | undefined
-  chain: IChain | undefined
-  logger: Logger | undefined
-  subscriptions: Subscriptions
+  public options: BaseConfig
+  public node: Node | undefined
+  public name: string | undefined
+  public chain: IChain | undefined
+  public logger: ILogger | undefined
+  public subscriptions: Subscriptions = {}
 
   constructor(options: BaseConfig) {
     super()
@@ -54,7 +55,6 @@ class Service extends EventEmitter implements IService {
     this.name = options.name
     this.chain = options.node?.chain
     this.logger = options.node?.logger
-    this.subscriptions = {}
   }
 
   static get dependencies(): Services[] {
@@ -73,10 +73,10 @@ class Service extends EventEmitter implements IService {
       name: `${this.name}/${name}`,
       // subscribe: this.subscribe.bind(this, name),
       // unsubscribe: this.unsubscribe.bind(this, name),
-      subscribe: (emitter: any) => {
+      subscribe: (emitter: IBus) => {
         this.subscribe(name, emitter)
       },
-      unsubscribe: (emitter: any) => {
+      unsubscribe: (emitter: IBus) => {
         this.unsubscribe(name, emitter)
       },
     }))
@@ -98,7 +98,7 @@ class Service extends EventEmitter implements IService {
 
   async onReorg() {}
 
-  subscribe(name: string, emitter: any): void {
+  subscribe(name: string, emitter: IBus): void {
     let subscription = this.subscriptions[name]
     subscription.push(emitter)
     this.logger?.info(
@@ -109,7 +109,7 @@ class Service extends EventEmitter implements IService {
     )
   }
 
-  unsubscribe(name: string, emitter: any): void {
+  unsubscribe(name: string, emitter: IBus): void {
     let subscription = this.subscriptions[name]
     let index = subscription.indexOf(emitter)
     if (index >= 0) {
