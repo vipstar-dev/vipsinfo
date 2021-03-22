@@ -32,20 +32,25 @@ export interface RpcClientConfig {
   disableAgent?: boolean
 }
 
+export interface QtumPpcRequest {
+  jsonrpc?: string
+  method: string
+  params: string[]
+  id: number
+}
+
+export interface QtumPpcResponse {
+  result?: object
+  error?: string
+}
+
 class RpcClient {
   private readonly host: string = '127.0.0.1'
   private readonly port: number = 3889
   private user: string = 'user'
   private password: string = 'password'
   private protocol: typeof http | typeof https | null = null
-  public batchedCalls:
-    | {
-        jsonrpc: string
-        method: string
-        params: any[]
-        id: number
-      }[]
-    | null = null
+  public batchedCalls: QtumPpcRequest[] | null = null
   private readonly disableAgent: boolean = false
   private readonly log: loggerObject | null = null
   public rejectUnauthorized: undefined
@@ -70,7 +75,9 @@ class RpcClient {
     this.generateRPCMethods()
   }
 
-  rpc(_request: object) {
+  rpc(
+    _request: QtumPpcRequest | QtumPpcRequest[]
+  ): Promise<object | undefined> | Promise<object | undefined>[] {
     let request: string = JSON.stringify(_request)
     let auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
       'base64'
@@ -109,17 +116,19 @@ class RpcClient {
             reject(exceededError)
           } else {
             try {
-              let parsedBuffer = JSON.parse(Buffer.concat(buffer).toString())
+              let parsedBuffer:
+                | QtumPpcResponse
+                | QtumPpcResponse[] = JSON.parse(
+                Buffer.concat(buffer).toString()
+              )
               if (Array.isArray(parsedBuffer)) {
-                resolve(
-                  parsedBuffer.map((result) => {
-                    if (result.error) {
-                      return Promise.reject(result.error)
-                    } else {
-                      return Promise.resolve(result.result)
-                    }
-                  })
-                )
+                parsedBuffer.map((result: QtumPpcResponse) => {
+                  if (result.error) {
+                    return Promise.reject(result.error)
+                  } else {
+                    return Promise.resolve(result.result)
+                  }
+                })
               } else if (parsedBuffer.error) {
                 reject(parsedBuffer.error)
               } else {
@@ -226,4 +235,4 @@ function getRandomId(): number {
   return Math.floor(Math.random() * 100000)
 }
 
-module.exports = RpcClient
+export default RpcClient
