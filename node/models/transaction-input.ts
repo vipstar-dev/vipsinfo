@@ -12,25 +12,37 @@ import Address from '@/node/models/address'
 import Transaction from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class BalanceChange extends Model<BalanceChange> {
+export default class TransactionInput extends Model<TransactionInput> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)
   transactionId!: bigint
 
+  @PrimaryKey
+  @Column(DataType.INTEGER.UNSIGNED)
+  inputIndex!: number
+
+  @Column({ type: DataType.BLOB('medium'), field: 'scriptsig' })
+  scriptSig!: Buffer
+
+  @Column(DataType.INTEGER.UNSIGNED)
+  sequence!: number
+
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
 
-  @Column(DataType.BIGINT.UNSIGNED)
-  indexInBlock!: number
-
-  @PrimaryKey
-  @ForeignKey(() => Address)
-  @Column(DataType.INTEGER.UNSIGNED)
-  addressId!: number
-
   @Column(DataType.BIGINT)
   value!: bigint
+
+  @ForeignKey(() => Address)
+  @Column(DataType.BIGINT.UNSIGNED)
+  addressId!: bigint
+
+  @Column(DataType.BIGINT.UNSIGNED)
+  outputId!: bigint
+
+  @Column(DataType.INTEGER.UNSIGNED)
+  outputIndex!: number
 
   @BelongsTo(() => Transaction)
   transaction!: Transaction

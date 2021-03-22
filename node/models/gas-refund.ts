@@ -9,11 +9,11 @@ import {
   Unique,
 } from 'sequelize-typescript'
 
-import { Transaction } from '@/node/models/transaction'
-import { TransactionOutput } from '@/node/models/transaction-output'
+import Transaction from '@/node/models/transaction'
+import TransactionOutput from '@/node/models/transaction-output'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class GasRefund extends Model<GasRefund> {
+export default class GasRefund extends Model<GasRefund> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)
@@ -37,22 +37,4 @@ export class GasRefund extends Model<GasRefund> {
 
   @BelongsTo(() => TransactionOutput)
   refundTo!: TransactionOutput
-}
-
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class ContractSpend extends Model<ContractSpend> {
-  @PrimaryKey
-  @ForeignKey(() => Transaction)
-  @Column(DataType.BIGINT.UNSIGNED)
-  sourceId!: bigint
-
-  @ForeignKey(() => Transaction)
-  @Column(DataType.BIGINT.UNSIGNED)
-  destId!: bigint
-
-  @BelongsTo(() => Transaction, 'sourceId')
-  sourceTransaction!: Transaction
-
-  @BelongsTo(() => Transaction, 'destId')
-  destTransaction!: Transaction
 }

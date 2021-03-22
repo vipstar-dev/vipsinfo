@@ -11,11 +11,11 @@ import {
   Unique,
 } from 'sequelize-typescript'
 
-import { BalanceChange } from '@/node/models/balance-change'
-import { Block } from '@/node/models/block'
+import BalanceChange from '@/node/models/balance-change'
+import Block from '@/node/models/block'
 
 /* eslint-disable camelcase */
-const addressTypes: { [key: string]: number } = {
+export const addressTypes: { [key: string]: number } = {
   pubkeyhash: 1,
   scripthash: 2,
   witness_v0_keyhash: 3,
@@ -26,7 +26,7 @@ const addressTypes: { [key: string]: number } = {
 }
 /* eslint-enable camelcase*/
 
-const addressTypeMap: { [key: number]: string } = {
+export const addressTypeMap: { [key: number]: string } = {
   1: 'pubkeyhash',
   2: 'scripthash',
   3: 'witness_v0_keyhash',

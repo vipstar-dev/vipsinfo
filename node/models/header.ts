@@ -11,7 +11,7 @@ import {
   Unique,
 } from 'sequelize-typescript'
 
-import { Block } from '@/node/models/block'
+import Block from '@/node/models/block'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Header extends Model<Header> {

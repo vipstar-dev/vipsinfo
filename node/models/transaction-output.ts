@@ -10,12 +10,11 @@ import {
   Table,
 } from 'sequelize-typescript'
 
-import Address from '@/node/models/address'
-import { GasRefund } from '@/node/models/contract-transaction'
-import { Transaction } from '@/node/models/transaction'
+import GasRefund from '@/node/models/gas-refund'
+import Transaction from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class TransactionOutput extends Model<TransactionOutput> {
+export default class TransactionOutput extends Model<TransactionOutput> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)
@@ -55,62 +54,4 @@ export class TransactionOutput extends Model<TransactionOutput> {
 
   @HasOne(() => GasRefund)
   refund!: GasRefund
-}
-
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class TransactionInput extends Model<TransactionInput> {
-  @PrimaryKey
-  @ForeignKey(() => Transaction)
-  @Column(DataType.BIGINT.UNSIGNED)
-  transactionId!: bigint
-
-  @PrimaryKey
-  @Column(DataType.INTEGER.UNSIGNED)
-  inputIndex!: number
-
-  @Column({ type: DataType.BLOB('medium'), field: 'scriptsig' })
-  scriptSig!: Buffer
-
-  @Column(DataType.INTEGER.UNSIGNED)
-  sequence!: number
-
-  @Column(DataType.INTEGER.UNSIGNED)
-  blockHeight!: number
-
-  @Column(DataType.BIGINT)
-  value!: bigint
-
-  @ForeignKey(() => Address)
-  @Column(DataType.BIGINT.UNSIGNED)
-  addressId!: bigint
-
-  @Column(DataType.BIGINT.UNSIGNED)
-  outputId!: bigint
-
-  @Column(DataType.INTEGER.UNSIGNED)
-  outputIndex!: number
-
-  @BelongsTo(() => Transaction)
-  transaction!: Transaction
-
-  @BelongsTo(() => Address)
-  address!: Address
-}
-
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class TransactionOutputMapping extends Model<TransactionOutputMapping> {
-  @Column({ type: DataType.STRING(32), field: '_id' })
-  _id!: string
-
-  @Column({ type: DataType.STRING(32).BINARY, field: 'input_transaction_id' })
-  inputTxId!: Buffer
-
-  @Column(DataType.INTEGER.UNSIGNED)
-  inputIndex!: number
-
-  @Column({ type: DataType.STRING(32).BINARY, field: 'output_transaction_id' })
-  outputTxId!: Buffer
-
-  @Column(DataType.INTEGER.UNSIGNED)
-  outputIndex!: number
 }

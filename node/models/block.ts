@@ -13,10 +13,10 @@ import {
 
 import Address from '@/node/models/address'
 import Header from '@/node/models/header'
-import { Transaction } from '@/node/models/transaction'
+import Transaction from '@/node/models/transaction'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class Block extends Model<Block> {
+export default class Block extends Model<Block> {
   @Unique
   @Column(DataType.STRING(32).BINARY)
   hash!: Buffer

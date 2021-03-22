@@ -13,13 +13,15 @@ import {
   Unique,
 } from 'sequelize-typescript'
 
-import { BalanceChange } from '@/node/models/balance-change'
-import { Block } from '@/node/models/block'
-import { ContractSpend, GasRefund } from '@/node/models/contract-transaction'
-import { EvmReceipt } from '@/node/models/transaction-receipt'
+import BalanceChange from '@/node/models/balance-change'
+import Block from '@/node/models/block'
+import ContractSpend from '@/node/models/contract-spend'
+import GasRefund from '@/node/models/gas-refund'
+import EvmReceipt from '@/node/models/evm-receipt'
+import Witness from '@/node/models/witness'
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class Transaction extends Model<Transaction> {
+export default class Transaction extends Model<Transaction> {
   @PrimaryKey
   @AutoIncrement
   @Index('_id')
@@ -75,26 +77,4 @@ export class Transaction extends Model<Transaction> {
 
   @HasMany(() => EvmReceipt)
   evmReceipts!: EvmReceipt[]
-}
-
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
-export class Witness extends Model<Witness> {
-  @PrimaryKey
-  @ForeignKey(() => Transaction)
-  @Column(DataType.STRING(32).BINARY)
-  transactionId!: Buffer
-
-  @PrimaryKey
-  @Column(DataType.INTEGER.UNSIGNED)
-  inputIndex!: number
-
-  @PrimaryKey
-  @Column(DataType.INTEGER.UNSIGNED)
-  witnessIndex!: number
-
-  @Column(DataType.BLOB)
-  script!: Buffer
-
-  @BelongsTo(() => Transaction, { targetKey: 'id' })
-  transaction!: Transaction
 }
