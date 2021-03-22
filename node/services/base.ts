@@ -21,7 +21,7 @@ export interface IService extends EventEmitter {
   chain: IChain | undefined
   logger: ILogger | undefined
   subscriptions: Subscriptions
-  APIMethods: any[]
+  APIMethods: object
   publishEvents: Event[]
   routePrefix: any
   start(): void
@@ -61,8 +61,8 @@ class Service extends EventEmitter implements IService {
     return []
   }
 
-  get APIMethods(): any[] {
-    return []
+  get APIMethods(): object {
+    return {}
   }
 
   get publishEvents(): Event[] {
