@@ -11,7 +11,7 @@ export interface FeeFilterMessageOptions extends MessageOptions {
 
 export interface IFeeFilterMessage extends FeeFilterMessageOptions, IMessage {}
 
-class FeeFilterMessage extends Message {
+class FeeFilterMessage extends Message implements IFeeFilterMessage {
   public feeRate: bigint
 
   constructor({ feeRate, ...options }: FeeFilterMessageOptions) {
