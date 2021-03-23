@@ -73,4 +73,4 @@ class GetHeadersMessage extends Message implements IGetHeadersMessage {
   }
 }
 
-module.exports = GetHeadersMessage
+export default GetHeadersMessage
