@@ -11,6 +11,7 @@ export interface AddressData {
   services: bigint
   ip: Ipv6Address
   port: number | undefined
+  timestamp?: number
 }
 
 export interface Inventory {
