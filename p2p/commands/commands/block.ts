@@ -17,6 +17,12 @@ class BlockMessage extends Message implements IBlockMessage {
     this.block = block
   }
 
+  static fromBuffer(payload: Buffer, options: BlockMessageOptions) {
+    let message = new BlockMessage(options)
+    message.payload = payload
+    return message
+  }
+
   get payload(): Buffer {
     return this.block.toBuffer()
   }

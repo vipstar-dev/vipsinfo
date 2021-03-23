@@ -19,6 +19,12 @@ class FeeFilterMessage extends Message {
     this.feeRate = feeRate
   }
 
+  static fromBuffer(payload: Buffer, options: FeeFilterMessageOptions) {
+    let message = new FeeFilterMessage(options)
+    message.payload = payload
+    return message
+  }
+
   get payload(): Buffer {
     let writer = new BufferWriter()
     writer.writeUInt64LE(this.feeRate)
