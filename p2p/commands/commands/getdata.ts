@@ -21,7 +21,10 @@ class GetDataMessage extends Message implements IGetDataMessage {
     this.inventories = inventories
   }
 
-  static fromBuffer(payload: Buffer, options: GetDataMessageOptions) {
+  static fromBuffer(
+    payload: Buffer,
+    options: GetDataMessageOptions
+  ): GetDataMessage {
     let message = new GetDataMessage(options)
     message.payload = payload
     return message

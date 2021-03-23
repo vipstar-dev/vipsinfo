@@ -29,7 +29,10 @@ class GetBlocksMessage extends Message implements IGetBlocksMessage {
     this.stop = stop || Buffer.alloc(32)
   }
 
-  static fromBuffer(payload: Buffer, options: GetBlocksMessageOptions) {
+  static fromBuffer(
+    payload: Buffer,
+    options: GetBlocksMessageOptions
+  ): GetBlocksMessage {
     let message = new GetBlocksMessage(options)
     message.payload = payload
     return message

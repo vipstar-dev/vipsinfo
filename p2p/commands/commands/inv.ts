@@ -24,7 +24,7 @@ class InvMessage extends Message implements IInvMessage {
     this.inventories = inventories
   }
 
-  static fromBuffer(payload: Buffer, options: InvMessageOptions) {
+  static fromBuffer(payload: Buffer, options: InvMessageOptions): InvMessage {
     let message = new InvMessage(options)
     message.payload = payload
     return message

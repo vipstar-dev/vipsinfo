@@ -19,7 +19,10 @@ class FeeFilterMessage extends Message implements IFeeFilterMessage {
     this.feeRate = feeRate
   }
 
-  static fromBuffer(payload: Buffer, options: FeeFilterMessageOptions) {
+  static fromBuffer(
+    payload: Buffer,
+    options: FeeFilterMessageOptions
+  ): FeeFilterMessage {
     let message = new FeeFilterMessage(options)
     message.payload = payload
     return message

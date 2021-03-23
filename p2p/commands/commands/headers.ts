@@ -20,7 +20,10 @@ class HeadersMessage extends Message implements IHeadersMessage {
     this.headers = headers
   }
 
-  static fromBuffer(payload: Buffer, options: HeadersMessageOptions) {
+  static fromBuffer(
+    payload: Buffer,
+    options: HeadersMessageOptions
+  ): HeadersMessage {
     let message = new HeadersMessage(options)
     message.payload = payload
     return message

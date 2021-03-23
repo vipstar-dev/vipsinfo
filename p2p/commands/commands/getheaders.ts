@@ -29,7 +29,10 @@ class GetHeadersMessage extends Message implements IGetHeadersMessage {
     this.stop = stop || Buffer.alloc(32)
   }
 
-  static fromBuffer(payload: Buffer, options: GetHeadersMessageOptions) {
+  static fromBuffer(
+    payload: Buffer,
+    options: GetHeadersMessageOptions
+  ): GetHeadersMessage {
     let message = new GetHeadersMessage(options)
     message.payload = payload
     return message

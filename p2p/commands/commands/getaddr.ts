@@ -5,7 +5,7 @@ class GetAddrMessage extends Message {
     super('getaddr', options)
   }
 
-  static fromBuffer(payload: Buffer, options: MessageOptions) {
+  static fromBuffer(payload: Buffer, options: MessageOptions): GetAddrMessage {
     let message = new GetAddrMessage(options)
     message.payload = payload
     return message

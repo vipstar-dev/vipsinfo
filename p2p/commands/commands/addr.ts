@@ -21,7 +21,7 @@ class AddrMessage extends Message implements IAddrMessage {
     this.addresses = addresses
   }
 
-  static fromBuffer(payload: Buffer, options: AddrMessageOptions) {
+  static fromBuffer(payload: Buffer, options: AddrMessageOptions): AddrMessage {
     let message = new AddrMessage(options)
     message.payload = payload
     return message
