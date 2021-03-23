@@ -5,6 +5,7 @@ import Chain, { chainType, IChain } from '@/lib/chain'
 import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
 import Base, { BaseConfig, Event, IService } from '@/node/services/base'
+import { DbConfig } from '@/node/services/db'
 import { ServerConfig } from '@/node/services/server'
 
 export type Services =
@@ -16,19 +17,6 @@ export type Services =
   | 'contract'
   | 'mempool'
   | 'server'
-
-interface DbConfig extends BaseConfig {
-  mysql: {
-    uri: string
-  }
-  rpc: {
-    protocol: string
-    host: string
-    port: number
-    user: string
-    password: string
-  }
-}
 
 interface P2pConfig extends BaseConfig {
   peers: [
