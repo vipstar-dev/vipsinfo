@@ -6,8 +6,18 @@ import {
   Table,
 } from 'sequelize-typescript'
 
+export interface EvmReceiptMappingModelAttributes {
+  transactionId: bigint
+  outputIndex: number
+  indexInBlock: number
+  gasUsed: number
+  contractAddress: Buffer
+  excepted: string
+  exceptedMessage: string
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class EvmReceiptMapping extends Model<EvmReceiptMapping> {
+export default class EvmReceiptMapping extends Model<EvmReceiptMappingModelAttributes> {
   @PrimaryKey
   @Column(DataType.BIGINT.UNSIGNED)
   transactionId!: bigint

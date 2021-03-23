@@ -13,8 +13,23 @@ import {
 import GasRefund from '@/node/models/gas-refund'
 import Transaction from '@/node/models/transaction'
 
+export interface TransactionOutputModelAttributes {
+  transactionId: bigint
+  outputIndex: number
+  scriptPubkey: Buffer
+  blockHeight: number
+  value: bigint
+  addressId: bigint
+  isStake: boolean
+  inputId: bigint
+  inputIndex: number
+  inputHeight: number
+  transaction: Transaction
+  refund: GasRefund
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class TransactionOutput extends Model<TransactionOutput> {
+export default class TransactionOutput extends Model<TransactionOutputModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

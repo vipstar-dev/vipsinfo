@@ -13,8 +13,37 @@ import {
 
 import Block from '@/node/models/block'
 
+export interface HeaderModelAttributes {
+  hash: Buffer
+  height: number
+  version: number
+  prevHash: Buffer
+  merkleRoot: Buffer
+  timestamp: number
+  bits: number
+  nonce: number
+  hashStateRoot: Buffer
+  hashUTXORoot: Buffer
+  stakePrevTxId: Buffer
+  stakeOutputIndex: number
+  signature: Buffer
+  _chainwork: Buffer
+  block: Block
+  chainwork: bigint
+}
+
+export interface HeaderCreationAttributes extends HeaderModelAttributes {
+  findByHeight(height: number, options: FindOptions): Promise<Header | null>
+  findByHash(hash: Buffer, options: FindOptions): Promise<Header | null>
+  isProofOfStake(): boolean
+  difficulty: number
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Header extends Model<Header> {
+export default class Header extends Model<
+  HeaderModelAttributes,
+  HeaderCreationAttributes
+> {
   @Unique
   @Column(DataType.STRING(32).BINARY)
   hash!: Buffer

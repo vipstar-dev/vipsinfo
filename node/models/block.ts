@@ -15,8 +15,21 @@ import Address from '@/node/models/address'
 import Header from '@/node/models/header'
 import Transaction from '@/node/models/transaction'
 
+export interface BlockModelAttributes {
+  hash: Buffer
+  height: number
+  size: number
+  weight: number
+  minerId: bigint
+  transactionsCount: number
+  contractTransactionsCount: number
+  header: Header
+  miner: Address
+  transactions: Transaction[]
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Block extends Model<Block> {
+export default class Block extends Model<BlockModelAttributes> {
   @Unique
   @Column(DataType.STRING(32).BINARY)
   hash!: Buffer

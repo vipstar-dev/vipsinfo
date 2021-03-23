@@ -11,8 +11,22 @@ import {
 import Address from '@/node/models/address'
 import Transaction from '@/node/models/transaction'
 
+export interface TransactionInputModelAttributes {
+  transactionId: bigint
+  inputIndex: number
+  scriptSig: Buffer
+  sequence: number
+  blockHeight: number
+  value: bigint
+  addressId: bigint
+  outputId: bigint
+  outputIndex: number
+  transaction: Transaction
+  address: Address
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class TransactionInput extends Model<TransactionInput> {
+export default class TransactionInput extends Model<TransactionInputModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

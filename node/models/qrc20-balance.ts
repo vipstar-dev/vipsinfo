@@ -10,8 +10,16 @@ import {
 
 import Contract from '@/node/models/contract'
 
+export interface Qrc20BalanceModelAttributes {
+  contractAddress: Buffer
+  address: Buffer
+  _balance: Buffer
+  balance: bigint | null
+  contract: Contract
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Qrc20Balance extends Model<Qrc20Balance> {
+export default class Qrc20Balance extends Model<Qrc20BalanceModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Contract)
   @Column(DataType.STRING(32).BINARY)

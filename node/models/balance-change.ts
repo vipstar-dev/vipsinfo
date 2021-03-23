@@ -11,8 +11,18 @@ import {
 import Address from '@/node/models/address'
 import Transaction from '@/node/models/transaction'
 
+export interface BalanceChangeModelAttributes {
+  transactionId: bigint
+  blockHeight: number
+  indexInBlock: number
+  addressId: number
+  value: bigint
+  transaction: Transaction
+  address: Address
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class BalanceChange extends Model<BalanceChange> {
+export default class BalanceChange extends Model<BalanceChangeModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

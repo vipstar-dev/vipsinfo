@@ -10,8 +10,16 @@ import {
 
 import Transaction from '@/node/models/transaction'
 
+export interface WitnessModelAttributes {
+  transactionId: Buffer
+  inputIndex: number
+  witnessIndex: number
+  script: Buffer
+  transaction: Transaction
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Witness extends Model<Witness> {
+export default class Witness extends Model<WitnessModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.STRING(32).BINARY)

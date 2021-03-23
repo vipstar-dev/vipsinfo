@@ -10,8 +10,15 @@ import {
 
 import Contract from '@/node/models/contract'
 
+export interface ContractTagModelAttributes {
+  _id: bigint
+  contractAddress: Buffer
+  tag: string
+  contract: Contract
+}
+
 Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class ContractTag extends Model<ContractTag> {
+export default class ContractTag extends Model<ContractTagModelAttributes> {
   @PrimaryKey
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })
   _id!: bigint

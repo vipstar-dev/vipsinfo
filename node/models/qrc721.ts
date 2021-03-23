@@ -10,8 +10,17 @@ import {
 
 import Contract from '@/node/models/contract'
 
+export interface Qrc721ModelAttributes {
+  contractAddress: Buffer
+  name: Buffer
+  symbol: Buffer
+  _totalSupply: Buffer
+  totalSupply: bigint | null
+  contract: Contract
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Qrc721 extends Model<Qrc721> {
+export default class Qrc721 extends Model<Qrc721ModelAttributes> {
   @PrimaryKey
   @ForeignKey(() => Contract)
   @Column(DataType.STRING(20).BINARY)

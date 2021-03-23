@@ -16,12 +16,32 @@ import {
 import BalanceChange from '@/node/models/balance-change'
 import Block from '@/node/models/block'
 import ContractSpend from '@/node/models/contract-spend'
-import GasRefund from '@/node/models/gas-refund'
 import EvmReceipt from '@/node/models/evm-receipt'
+import GasRefund from '@/node/models/gas-refund'
 import Witness from '@/node/models/witness'
 
+export interface TransactionModelAttributes {
+  _id: bigint
+  id: Buffer
+  hash: Buffer
+  version: number
+  flag: number
+  lockTime: number
+  blockHeight: number
+  indexInBlock: number
+  size: number
+  weight: number
+  block: Block
+  witnesses: Witness[]
+  balanceChanges: BalanceChange[]
+  refunds: GasRefund[]
+  contractSpendSource: ContractSpend
+  contractSpendDests: ContractSpend[]
+  evmReceipts: EvmReceipt[]
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Transaction extends Model<Transaction> {
+export default class Transaction extends Model<TransactionModelAttributes> {
   @PrimaryKey
   @AutoIncrement
   @Index('_id')

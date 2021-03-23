@@ -36,8 +36,27 @@ export const addressTypeMap: { [key: number]: string } = {
   0x82: 'x86_contract',
 }
 
+export interface AddressModelAttributes {
+  _id: bigint
+  _type: number
+  type: string | null
+  data: Buffer
+  string: string
+  createHeight: number
+  minedBlocks: Block
+  balanceChanges: BalanceChange
+}
+
+export interface AddressCreationAttributes extends AddressModelAttributes {
+  getType(type: number): string | null
+  parseType(type: string): number
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Address extends Model<Address> {
+export default class Address extends Model<
+  AddressModelAttributes,
+  AddressCreationAttributes
+> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT.UNSIGNED)

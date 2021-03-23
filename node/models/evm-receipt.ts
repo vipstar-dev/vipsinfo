@@ -15,8 +15,25 @@ import { addressTypeMap, addressTypes } from '@/node/models/address'
 import EvmReceiptLog from '@/node/models/evm-receipt-log'
 import Transaction from '@/node/models/transaction'
 
+export interface EvmReceiptModelAttributes {
+  _id: bigint
+  transactionId: bigint
+  outputIndex: number
+  blockHeight: number
+  indexInBlock: number
+  _senderType: number
+  senderType: string | null
+  senderData: Buffer
+  gasUsed: number
+  contractAddress: Buffer
+  excepted: string
+  exceptedMessage: string
+  transaction: Transaction
+  logs: EvmReceiptLog[]
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class EvmReceipt extends Model<EvmReceipt> {
+export default class EvmReceipt extends Model<EvmReceiptModelAttributes> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })

@@ -11,8 +11,22 @@ import {
 
 import EvmReceipt from '@/node/models/evm-receipt'
 
+export interface EvmReceiptLogModelAttributes {
+  _id: bigint
+  receiptId: bigint
+  logIndex: number
+  blockHeight: number
+  address: string
+  topic1: string
+  topic2: string
+  topic3: string
+  topic4: string
+  data: Buffer
+  receipt: EvmReceipt
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class EvmReceiptLog extends Model<EvmReceiptLog> {
+export default class EvmReceiptLog extends Model<EvmReceiptLogModelAttributes> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })

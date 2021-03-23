@@ -17,8 +17,23 @@ import Qrc20Balance from '@/node/models/qrc20-balance'
 import Qrc721 from '@/node/models/qrc721'
 import Qrc721Token from '@/node/models/qrc721-token'
 
+export interface ContractModelAttributes {
+  address: Buffer
+  addressString: string
+  vm: string[]
+  type: string[]
+  bytecodeSha256sum: Buffer
+  description: string
+  code: ContractCode
+  tag: ContractTag[]
+  qrc20: Qrc20
+  qrc20Balances: Qrc20Balance[]
+  qrc721: Qrc721
+  qrc721Tokens: Qrc721Token[]
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Contract extends Model<Contract> {
+export default class Contract extends Model<ContractModelAttributes> {
   @PrimaryKey
   @Column(DataType.STRING(20).BINARY)
   address!: Buffer

@@ -6,8 +6,14 @@ import {
   Table,
 } from 'sequelize-typescript'
 
+export interface TipModelAttributes {
+  service: string
+  height: number
+  hash: Buffer
+}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Tip extends Model<Tip> {
+export default class Tip extends Model<TipModelAttributes> {
   @PrimaryKey
   @Column(DataType.STRING)
   service!: string
