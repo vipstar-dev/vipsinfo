@@ -12,6 +12,7 @@ export interface IChain {
   evm: number
   genesis: Buffer
   lastPoWBlockHeight: number
+  dnsSeeds?: string[]
 }
 
 const chains: Map<string, IChain> = new Map()
@@ -28,6 +29,7 @@ class Chain implements IChain {
   evm: number
   genesis: Buffer
   lastPoWBlockHeight: number
+  dnsSeeds: string[]
 
   constructor({
     name,
@@ -41,6 +43,7 @@ class Chain implements IChain {
     evm,
     genesis,
     lastPoWBlockHeight,
+    dnsSeeds,
   }: IChain) {
     this.name = name
     this.type = type
@@ -53,6 +56,7 @@ class Chain implements IChain {
     this.evm = evm
     this.genesis = genesis
     this.lastPoWBlockHeight = lastPoWBlockHeight
+    this.dnsSeeds = dnsSeeds || []
   }
 
   static add(options: IChain): void {
