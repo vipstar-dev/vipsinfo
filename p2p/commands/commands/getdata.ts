@@ -1,6 +1,9 @@
 import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
-import Message, {IMessage, MessageOptions} from '@/p2p/commands/commands/message'
+import Message, {
+  IMessage,
+  MessageOptions,
+} from '@/p2p/commands/commands/message'
 import {
   Inventory,
   parseInventories,
