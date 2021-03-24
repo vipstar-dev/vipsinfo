@@ -18,9 +18,9 @@ export const status: { [key: string]: string } = {
 }
 
 export interface PeerConstructor {
-  socket: Socket
-  host: string
-  port: number
+  socket?: Socket
+  host?: string
+  port?: number
   chain: IChain
 }
 
