@@ -4,22 +4,25 @@ import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
 import { InventoryConstructor } from '@/p2p/commands/inventory'
 
-export interface Ipv6Address {
-  v6: string
+export interface IpAddress {
+  v4?: string
+  v6?: string
 }
 
 export interface AddressData {
+  id?: string
   services: bigint
-  ip: Ipv6Address
+  ip: IpAddress
   port: number | undefined
   timestamp?: number
+  retryTime?: number
 }
 
 export function getNonce(): Buffer {
   return randomBytes(8)
 }
 
-export function parseIP(reader: BufferReader): Ipv6Address {
+export function parseIP(reader: BufferReader): IpAddress {
   let ipv6: (string | undefined)[] = []
   for (let i = 0; i < 8; ++i) {
     let word = reader.read(2)
@@ -28,9 +31,11 @@ export function parseIP(reader: BufferReader): Ipv6Address {
   return { v6: ipv6.join(':') }
 }
 
-export function writeIP(writer: BufferWriter, ip: Ipv6Address) {
-  for (let word of ip.v6.split(':')) {
-    writer.write(Buffer.from(word, 'hex'))
+export function writeIP(writer: BufferWriter, ip: IpAddress) {
+  if (ip.v6) {
+    for (let word of ip.v6.split(':')) {
+      writer.write(Buffer.from(word, 'hex'))
+    }
   }
 }
 
