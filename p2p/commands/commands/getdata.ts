@@ -8,20 +8,24 @@ import {
   parseInventories,
   writeInventories,
 } from '@/p2p/commands/commands/utils'
-import { InventoryConstructor } from '@/p2p/commands/inventory'
+import Inventory, { InventoryConstructor } from '@/p2p/commands/inventory'
 
 export interface GetDataMessageOptions extends MessageOptions {
-  inventories: InventoryConstructor[]
+  inventories?: InventoryConstructor[]
 }
 
-export interface IGetDataMessage extends GetDataMessageOptions, IMessage {}
+export interface IGetDataMessage extends GetDataMessageOptions, IMessage {
+  forTransaction(data: Buffer): GetDataMessage
+  forBlock(data: Buffer): GetDataMessage
+  forFilteredBlock(data: Buffer): GetDataMessage
+}
 
 class GetDataMessage extends Message implements IGetDataMessage {
   public inventories: InventoryConstructor[]
 
   constructor({ inventories, ...options }: GetDataMessageOptions) {
     super('getdata', options)
-    this.inventories = inventories
+    this.inventories = inventories || []
   }
 
   static fromBuffer(
@@ -31,6 +35,27 @@ class GetDataMessage extends Message implements IGetDataMessage {
     let message = new GetDataMessage(options)
     message.payload = payload
     return message
+  }
+
+  forTransaction(data: Buffer): GetDataMessage {
+    return new GetDataMessage({
+      inventories: [Inventory.forTransaction(data)],
+      chain: this.chain,
+    })
+  }
+
+  forBlock(data: Buffer): GetDataMessage {
+    return new GetDataMessage({
+      inventories: [Inventory.forBlock(data)],
+      chain: this.chain,
+    })
+  }
+
+  forFilteredBlock(data: Buffer): GetDataMessage {
+    return new GetDataMessage({
+      inventories: [Inventory.forFilteredBlock(data)],
+      chain: this.chain,
+    })
   }
 
   get payload(): Buffer {

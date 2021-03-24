@@ -17,19 +17,19 @@ export const codes: { [key: string]: number } = {
 }
 
 export interface RejectMessageOptions extends MessageOptions {
-  message: string
-  code: number
-  reason: string
-  data: Buffer
+  message?: string
+  code?: number
+  reason?: string
+  data?: Buffer
 }
 
 export interface IRejectMessage extends RejectMessageOptions, IMessage {}
 
 class RejectMessage extends Message implements IRejectMessage {
-  public message: string
-  public code: number
-  public reason: string
-  public data: Buffer
+  public message: string | undefined
+  public code: number | undefined
+  public reason: string | undefined
+  public data: Buffer | undefined
 
   constructor({
     message,
@@ -56,10 +56,12 @@ class RejectMessage extends Message implements IRejectMessage {
 
   get payload(): Buffer {
     let writer = new BufferWriter()
-    writer.writeVarLengthBuffer(Buffer.from(this.message, 'ascii'))
-    writer.writeUInt8(this.code)
-    writer.writeVarLengthBuffer(Buffer.from(this.reason, 'ascii'))
-    writer.write(this.data)
+    if (this.message && this.code && this.reason && this.data) {
+      writer.writeVarLengthBuffer(Buffer.from(this.message, 'ascii'))
+      writer.writeUInt8(this.code)
+      writer.writeVarLengthBuffer(Buffer.from(this.reason, 'ascii'))
+      writer.write(this.data)
+    }
     return writer.toBuffer()
   }
 

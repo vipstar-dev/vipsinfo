@@ -6,7 +6,7 @@ import Message, {
 import { getNonce } from '@/p2p/commands/commands/utils'
 
 export interface PingMessageOptions extends MessageOptions {
-  nonce: Buffer
+  nonce?: Buffer
 }
 
 export interface IPingMessage extends PingMessageOptions, IMessage {}

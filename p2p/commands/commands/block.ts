@@ -5,13 +5,14 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface BlockMessageOptions extends MessageOptions {
-  block: IBlock
+  block?: IBlock
 }
 
 export interface IBlockMessage extends BlockMessageOptions, IMessage {}
 
 class BlockMessage extends Message implements IBlockMessage {
-  public block: IBlock
+  public block: IBlock | undefined
+
   constructor({ block, ...options }: BlockMessageOptions) {
     super('block', options)
     this.block = block
@@ -27,7 +28,7 @@ class BlockMessage extends Message implements IBlockMessage {
   }
 
   get payload(): Buffer {
-    return this.block.toBuffer()
+    return this.block?.toBuffer() || Buffer.alloc(0)
   }
 
   set payload(payload: Buffer) {

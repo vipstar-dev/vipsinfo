@@ -6,26 +6,26 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface GetBlocksMessageOptions extends MessageOptions {
-  protocolVersion: number
-  starts: Buffer[]
+  protocolVersion?: number
+  starts?: Buffer[]
   stop?: Buffer
 }
 
 export interface IGetBlocksMessage extends IMessage {
-  version: number
+  version?: number
   starts: Buffer[]
   stop: Buffer
 }
 
 class GetBlocksMessage extends Message implements IGetBlocksMessage {
-  public version: number
+  public version: number | undefined
   public starts: Buffer[]
   public stop: Buffer
 
   constructor({ starts, stop, ...options }: GetBlocksMessageOptions) {
     super('getblocks', options)
     this.version = options.protocolVersion
-    this.starts = starts
+    this.starts = starts || []
     this.stop = stop || Buffer.alloc(32)
   }
 

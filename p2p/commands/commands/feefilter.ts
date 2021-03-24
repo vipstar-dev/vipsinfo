@@ -6,13 +6,13 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface FeeFilterMessageOptions extends MessageOptions {
-  feeRate: bigint
+  feeRate?: bigint
 }
 
 export interface IFeeFilterMessage extends FeeFilterMessageOptions, IMessage {}
 
 class FeeFilterMessage extends Message implements IFeeFilterMessage {
-  public feeRate: bigint
+  public feeRate: bigint | undefined
 
   constructor({ feeRate, ...options }: FeeFilterMessageOptions) {
     super('feefilter', options)
@@ -30,7 +30,9 @@ class FeeFilterMessage extends Message implements IFeeFilterMessage {
 
   get payload(): Buffer {
     let writer = new BufferWriter()
-    writer.writeUInt64LE(this.feeRate)
+    if (this.feeRate) {
+      writer.writeUInt64LE(this.feeRate)
+    }
     return writer.toBuffer()
   }
 

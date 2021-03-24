@@ -5,13 +5,13 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface TxMessageOptions extends MessageOptions {
-  transaction: Transaction
+  transaction?: Transaction
 }
 
 export interface ITxMessage extends TxMessageOptions, IMessage {}
 
 class TxMessage extends Message implements ITxMessage {
-  public transaction: Transaction
+  public transaction: Transaction | undefined
 
   constructor({ transaction, ...options }: TxMessageOptions) {
     super('tx', options)
@@ -19,7 +19,7 @@ class TxMessage extends Message implements ITxMessage {
   }
 
   get payload(): Buffer {
-    return this.transaction.toBuffer()
+    return this.transaction?.toBuffer() || Buffer.alloc(0)
   }
 
   set payload(payload: Buffer) {

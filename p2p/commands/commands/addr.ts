@@ -8,7 +8,7 @@ import { AddressData } from '@/p2p/commands/commands/utils'
 import { parseAddress, writeAddress } from '@/p2p/commands/commands/utils'
 
 export interface AddrMessageOptions extends MessageOptions {
-  addresses: AddressData[]
+  addresses?: AddressData[]
 }
 
 export interface IAddrMessage extends AddrMessageOptions, IMessage {}
@@ -18,7 +18,7 @@ class AddrMessage extends Message implements IAddrMessage {
 
   constructor({ addresses = [], ...options }: AddrMessageOptions) {
     super('addr', options)
-    this.addresses = addresses
+    this.addresses = addresses || []
   }
 
   static fromBuffer(payload: Buffer, options: AddrMessageOptions): AddrMessage {

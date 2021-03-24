@@ -7,7 +7,7 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface HeadersMessageOptions extends MessageOptions {
-  headers: Header[]
+  headers?: Header[]
 }
 
 export interface IHeadersMessage extends HeadersMessageOptions, IMessage {}
@@ -17,7 +17,7 @@ class HeadersMessage extends Message implements IHeadersMessage {
 
   constructor({ headers, ...options }: HeadersMessageOptions) {
     super('headers', options)
-    this.headers = headers
+    this.headers = headers || []
   }
 
   static fromBuffer(

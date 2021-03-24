@@ -13,13 +13,13 @@ import {
 import packageInfo from '@/package.json'
 
 export interface VersionMessageOptions extends MessageOptions {
-  protocolVersion: number
-  services: bigint
-  nonce: Buffer
-  timestamp: number
-  subversion: string
-  startHeight: number
-  relay: boolean
+  protocolVersion?: number
+  services?: bigint
+  nonce?: Buffer
+  timestamp?: number
+  subversion?: string
+  startHeight?: number
+  relay?: boolean
 }
 
 export interface IVersionMessage extends IMessage {

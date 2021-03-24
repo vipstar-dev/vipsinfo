@@ -6,26 +6,26 @@ import Message, {
 } from '@/p2p/commands/commands/message'
 
 export interface GetHeadersMessageOptions extends MessageOptions {
-  protocolVersion: number
-  starts: Buffer[]
+  protocolVersion?: number
+  starts?: Buffer[]
   stop?: Buffer
 }
 
 export interface IGetHeadersMessage extends IMessage {
-  version: number
+  version?: number
   starts: Buffer[]
   stop: Buffer
 }
 
 class GetHeadersMessage extends Message implements IGetHeadersMessage {
-  public version: number
+  public version: number | undefined
   public starts: Buffer[]
   public stop: Buffer
 
   constructor({ starts, stop, ...options }: GetHeadersMessageOptions) {
     super('getheaders', options)
     this.version = options.protocolVersion
-    this.starts = starts
+    this.starts = starts || []
     this.stop = stop || Buffer.alloc(32)
   }
 
@@ -40,7 +40,9 @@ class GetHeadersMessage extends Message implements IGetHeadersMessage {
 
   get payload(): Buffer {
     let writer = new BufferWriter()
-    writer.writeUInt32LE(this.version)
+    if (this.version) {
+      writer.writeUInt32LE(this.version)
+    }
     writer.writeVarintNumber(this.starts.length)
     for (let start of this.starts) {
       writer.write(Buffer.from(start).reverse())
