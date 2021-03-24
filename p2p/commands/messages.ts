@@ -1,13 +1,12 @@
 import { IChain } from '@/lib'
 import { sha256d } from '@/lib/crypto/hash'
+import BufferReader from '@/lib/encoding/buffer-reader'
 import messageList, {
   CommandNames,
   Commands,
-  CommandsTypes,
   MessageOptionsType,
-  MessageOptionsTypes,
 } from '@/p2p/commands/commands'
-import AddrMessage, { AddrMessageOptions } from '@/p2p/commands/commands/addr'
+import AddrMessage from '@/p2p/commands/commands/addr'
 import BlockMessage from '@/p2p/commands/commands/block'
 import FeeFilterMessage from '@/p2p/commands/commands/feefilter'
 import GetAddrMessage from '@/p2p/commands/commands/getaddr'
@@ -26,7 +25,6 @@ import SendHeadersMessage from '@/p2p/commands/commands/sendheaders'
 import TxMessage from '@/p2p/commands/commands/tx'
 import VerackMessage from '@/p2p/commands/commands/verack'
 import VersionMessage from '@/p2p/commands/commands/version'
-import Inventory from '@/p2p/commands/inventory'
 
 const MINIMUM_LENGTH = 20
 const PAYLOAD_START = 16
@@ -138,37 +136,47 @@ class Messages {
     }
   }
 
-  parseBuffer(buffer: Buffer) {
+  parseBuffer(reader: BufferReader) {
     if (
-      buffer.length < MINIMUM_LENGTH ||
-      !this._discardUntilNextMessage(buffer)
+      Number(reader.length) < MINIMUM_LENGTH ||
+      !this._discardUntilNextMessage(reader)
     ) {
       return
     }
-    let payloadLength = buffer.slice(PAYLOAD_START).readUInt32LE(0)
-    let messageLength = payloadLength + 24
-    if (buffer.length < messageLength) {
+    let payloadLength = reader.slice(PAYLOAD_START)?.readUInt32LE(0)
+    let messageLength = Number(payloadLength) + 24
+    if (Number(reader.length) < messageLength) {
       return
     }
-    let command: CommandNames = buffer
+    let command: CommandNames = reader
       .slice(4, 16)
-      .toString('ascii')
+      ?.toString('ascii')
       .replace(/\0+$/, '') as CommandNames
-    let checksum = buffer.slice(20, 24)
-    let payload = buffer.slice(24, messageLength)
-    // buffer.skip(messageLength)
-    if (Buffer.compare(checksum, sha256d(payload).slice(0, 4)) === 0) {
-      return this._buildFromBuffer(command, payload)
+    let checksum = reader.slice(20, 24)
+    let payload = reader.slice(24, messageLength)
+    reader.skip(messageLength)
+    if (
+      Buffer.compare(
+        checksum || Buffer.alloc(0),
+        sha256d(payload || Buffer.alloc(0)).slice(0, 4)
+      ) === 0
+    ) {
+      return this._buildFromBuffer(command, payload || Buffer.alloc(0))
     }
   }
 
-  _discardUntilNextMessage(buffer: Buffer) {
+  _discardUntilNextMessage(reader: BufferReader) {
     for (let i = 0; ; ++i) {
-      if (Buffer.compare(buffer.slice(0, 4), this.chain.networkMagic) === 0) {
-        // buffer.skip(i)
+      if (
+        Buffer.compare(
+          reader.slice(0, 4) || Buffer.alloc(0),
+          this.chain.networkMagic
+        ) === 0
+      ) {
+        reader.skip(i)
         return true
-      } else if (i > buffer.length - 4) {
-        // buffer.skip(i)
+      } else if (i > Number(reader.length) - 4) {
+        reader.skip(i)
         return false
       }
     }
