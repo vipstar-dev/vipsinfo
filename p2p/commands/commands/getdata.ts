@@ -5,19 +5,19 @@ import Message, {
   MessageOptions,
 } from '@/p2p/commands/commands/message'
 import {
-  Inventory,
   parseInventories,
   writeInventories,
 } from '@/p2p/commands/commands/utils'
+import { InventoryConstructor } from '@/p2p/commands/inventory'
 
 export interface GetDataMessageOptions extends MessageOptions {
-  inventories: Inventory[]
+  inventories: InventoryConstructor[]
 }
 
 export interface IGetDataMessage extends GetDataMessageOptions, IMessage {}
 
 class GetDataMessage extends Message implements IGetDataMessage {
-  public inventories: Inventory[]
+  public inventories: InventoryConstructor[]
 
   constructor({ inventories, ...options }: GetDataMessageOptions) {
     super('getdata', options)

@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto'
 
 import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
+import { InventoryConstructor } from '@/p2p/commands/inventory'
 
 export interface Ipv6Address {
   v6: string
@@ -12,11 +13,6 @@ export interface AddressData {
   ip: Ipv6Address
   port: number | undefined
   timestamp?: number
-}
-
-export interface Inventory {
-  type: number | undefined
-  data: Buffer | undefined
 }
 
 export function getNonce(): Buffer {
@@ -55,8 +51,8 @@ export function writeAddress(writer: BufferWriter, address: AddressData): void {
   }
 }
 
-export function parseInventories(reader: BufferReader): Inventory[] {
-  let inventories: Inventory[] = []
+export function parseInventories(reader: BufferReader): InventoryConstructor[] {
+  let inventories: InventoryConstructor[] = []
   let count = reader.readVarintNumber()
   if (count) {
     for (let i = 0; i < count; ++i) {
@@ -70,7 +66,7 @@ export function parseInventories(reader: BufferReader): Inventory[] {
 
 export function writeInventories(
   writer: BufferWriter,
-  inventories: Inventory[]
+  inventories: InventoryConstructor[]
 ): void {
   writer.writeVarintNumber(inventories.length)
   for (let inventory of inventories) {
