@@ -6,8 +6,8 @@ import { ILogger } from '@/node/logger'
 import Node, { Services } from '@/node/node'
 
 export interface BaseConfig {
-  node?: Node
-  name?: string
+  node: Node
+  name: string
 }
 
 export interface Subscriptions {
@@ -42,10 +42,10 @@ export interface Event {
 
 class Service extends EventEmitter implements IService {
   public options: BaseConfig
-  public node: Node | undefined
-  public name: string | undefined
-  public chain: IChain | undefined
-  public logger: ILogger | undefined
+  public node: Node
+  public name: string
+  public chain: IChain
+  public logger: ILogger
   public subscriptions: Subscriptions = {}
 
   constructor(options: BaseConfig) {
@@ -53,8 +53,8 @@ class Service extends EventEmitter implements IService {
     this.options = options
     this.node = options.node
     this.name = options.name
-    this.chain = options.node?.chain
-    this.logger = options.node?.logger
+    this.chain = options.node.chain
+    this.logger = options.node.logger
   }
 
   static get dependencies(): Services[] {
