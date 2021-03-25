@@ -64,8 +64,8 @@ class Chain implements IChain {
     chains.set(chain.name, chain)
   }
 
-  static get(name: string): IChain | undefined {
-    return chains.get(name)
+  static get(name: chainType): IChain {
+    return chains.get(name) as IChain
   }
 }
 
