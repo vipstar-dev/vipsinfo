@@ -11,7 +11,7 @@ export interface IInventory {
   toBufferWriter(writer: BufferWriter): void
 }
 
-export const types: { [kwy: string]: number } = {
+export const types: { [key: string]: number } = {
   ERROR: 0,
   TRANSACTION: 1,
   BLOCK: 2,
