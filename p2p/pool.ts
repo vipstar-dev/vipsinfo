@@ -7,6 +7,7 @@ import messageList from '@/p2p/commands/commands'
 import { AddressData } from '@/p2p/commands/commands/utils'
 import Peer, { status as PeerStatus } from '@/p2p/peer'
 import ErrnoException = NodeJS.ErrnoException
+import Message from '@/p2p/commands/commands/message'
 
 const MAX_CONNECTED_PEERS = 8
 const RETRY_SECONDS = 30
@@ -128,7 +129,7 @@ class Pool extends EventEmitter {
     peer.on('disconnect', () => this.emit('peerdisconnect', peer, address))
     peer.on('ready', () => this.emit('peerready', peer, address))
     for (let event of messageList) {
-      peer.on(event, (message: AddressData) =>
+      peer.on(event, (message: Message) =>
         this.emit(`peer${event}`, peer, message)
       )
     }
