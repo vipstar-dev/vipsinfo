@@ -30,8 +30,6 @@ export interface HeaderModelAttributes {
   _chainwork: Buffer
   block: Block
   chainwork: bigint
-  findByHeight(height: number, options: FindOptions): Promise<Header | null>
-  findByHash(hash: Buffer, options: FindOptions): Promise<Header | null>
   isProofOfStake(): boolean
   difficulty: number
 }
@@ -39,12 +37,7 @@ export interface HeaderModelAttributes {
 export interface HeaderCreationAttributes
   extends Optional<
     HeaderModelAttributes,
-    | '_chainwork'
-    | 'block'
-    | 'findByHash'
-    | 'findByHeight'
-    | 'isProofOfStake'
-    | 'difficulty'
+    '_chainwork' | 'block' | 'isProofOfStake' | 'difficulty'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -115,14 +108,17 @@ export default class Header extends Model<
     )
   }
 
-  findByHeight(
+  static findByHeight<M extends Header>(
     height: number,
     options: FindOptions = {}
   ): Promise<Header | null> {
     return Header.findOne({ where: { height }, ...options })
   }
 
-  findByHash(hash: Buffer, options: FindOptions = {}): Promise<Header | null> {
+  static findByHash<M extends Header>(
+    hash: Buffer,
+    options: FindOptions = {}
+  ): Promise<Header | null> {
     return Header.findOne({ where: { hash }, ...options })
   }
 
