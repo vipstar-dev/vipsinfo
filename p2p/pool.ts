@@ -11,7 +11,7 @@ import ErrnoException = NodeJS.ErrnoException
 const MAX_CONNECTED_PEERS = 8
 const RETRY_SECONDS = 30
 
-interface PoolConstructor {
+export interface PoolConstructor {
   chain: IChain
   addresses?: AddressData[]
   dnsSeed?: boolean
