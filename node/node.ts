@@ -6,6 +6,7 @@ import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
 import Base, { BaseConfig, Event, IService } from '@/node/services/base'
 import { DbConfig } from '@/node/services/db'
+import { P2pConfig } from '@/node/services/p2p'
 import { ServerConfig } from '@/node/services/server'
 
 export type Services =
@@ -17,18 +18,6 @@ export type Services =
   | 'contract'
   | 'mempool'
   | 'server'
-
-interface P2pConfig extends BaseConfig {
-  peers: [
-    {
-      ip: {
-        v4: string
-        v6: string
-      }
-      port: number
-    }
-  ]
-}
 
 type ServiceConfigType = BaseConfig | DbConfig | P2pConfig | ServerConfig
 
