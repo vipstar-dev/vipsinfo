@@ -65,7 +65,7 @@ interface NodeConfig extends ServiceAnyConfig {
 class Node extends EventEmitter {
   private readonly configPath: string
   public logger: ILogger
-  public chain: IChain | undefined
+  public chain: IChain
   public unloadedServices: ServiceObject[]
   public services: Map<string, IService>
   public stopping: boolean = false
