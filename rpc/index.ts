@@ -8,7 +8,7 @@ type loggersConfig = 'none' | 'normal' | 'debug'
 type loggerPattern = 'info' | 'warn' | 'error' | 'debug'
 
 type loggerObject = {
-  [key in loggerPattern]: Function
+  [key in loggerPattern]: (...args: (string | number | undefined)[]) => void
 }
 
 const loggers: {
@@ -35,7 +35,7 @@ export interface RpcClientConfig {
 export interface QtumPpcRequest {
   jsonrpc?: string
   method: string
-  params: string[]
+  params: (string | number | boolean | object)[]
   id: number
 }
 
@@ -43,6 +43,76 @@ export interface QtumPpcResponse {
   result?: object
   error?: string
 }
+
+interface rpcMethods {
+  callcontract: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<object | string | number | undefined> | void
+  estimatesmartfee: (
+    ...args: string[]
+  ) => Promise<object | string | number | undefined> | void
+  getcontractcode: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<object | string | number | undefined> | void
+  getdgpinfo: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<object | string | number | undefined> | void
+  getstorage: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<object | string | number | undefined> | void
+  gettransactionreceipt: (args: {
+    toString: () => string
+  }) => Promise<object | string | number | undefined> | void
+  listcontracts: (
+    ...args: string[]
+  ) => Promise<object | string | number | undefined> | void
+  sendrawtransaction: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<object | string | number | undefined> | void
+}
+
+export type callTypes = 'str' | 'int' | 'float' | 'bool' | 'obj'
+
+type strConvert = (arg: { toString: () => string }) => string
+type intConvert = (arg: string) => number
+type floatConvert = (arg: string) => number
+type boolConvert = (arg: string | number | boolean) => boolean
+type objConvert = (arg: string | object) => object
+
+export type typeConvertFunctions =
+  | strConvert
+  | intConvert
+  | floatConvert
+  | boolConvert
+  | objConvert
+
+export interface typeConvert {
+  str: strConvert
+  int: intConvert
+  float: floatConvert
+  bool: boolConvert
+  obj: objConvert
+}
+
+export type callspecTypes =
+  | 'callcontract'
+  | 'estimatesmartfee'
+  | 'getcontractcode'
+  | 'getdgpinfo'
+  | 'getstorage'
+  | 'gettransactionreceipt'
+  | 'listcontracts'
+  | 'sendrawtransaction'
 
 class RpcClient {
   private readonly host: string = '127.0.0.1'
@@ -55,7 +125,7 @@ class RpcClient {
   private readonly log: loggerObject | null = null
   public rejectUnauthorized: undefined
   public httpOptions: object = {}
-  private rpcMethods: { [key: string]: Function } = {}
+  private rpcMethods: Partial<rpcMethods> = {}
 
   constructor({
     host = '127.0.0.1',
@@ -77,7 +147,9 @@ class RpcClient {
 
   rpc(
     _request: QtumPpcRequest | QtumPpcRequest[]
-  ): Promise<object | undefined> | Promise<object | undefined>[] {
+  ):
+    | Promise<object | string | number | undefined>
+    | Promise<object | string | number | undefined>[] {
     let request: string = JSON.stringify(_request)
     let auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
       'base64'
@@ -137,7 +209,7 @@ class RpcClient {
             } catch (err) {
               if (this.log) {
                 this.log.error(err.stack)
-                this.log.error(buffer)
+                this.log.error(buffer.toString())
                 this.log.error(`HTTP Status code: ${res.statusCode}`)
               }
               reject(
@@ -172,32 +244,42 @@ class RpcClient {
 
   generateRPCMethods() {
     let self = this
-    function createRPCMethod(methodName: string, argMap: Function[]) {
-      return function (...args: any[]) {
-        for (let i = 0; i < args.length; i++) {
-          if (argMap[i]) {
-            args[i] = argMap[i](args[i])
+    function createRPCMethod(
+      methodName: string,
+      baseArgs: callTypes[]
+    ): (
+      ...args: (string | { toString: () => string })[]
+    ) => Promise<object | string | number | undefined> | void {
+      let fixedArgs: (string | number | boolean | object)[] = []
+      return function (...args: { toString: () => string }[] | string[]) {
+        if (baseArgs === ['int', 'int'] || baseArgs === ['int']) {
+          for (let i = 0; i < args.length; i++) {
+            fixedArgs[i] = types.int(args[i] as string)
+          }
+        } else {
+          for (let i = 0; i < args.length; i++) {
+            fixedArgs[i] = types.str(args[i] as { toString: () => string })
           }
         }
         if (self.batchedCalls) {
           self.batchedCalls.push({
             jsonrpc: '2.0',
             method: methodName,
-            params: args,
+            params: fixedArgs,
             id: getRandomId(),
           })
         } else {
           return self.rpc({
             method: methodName,
-            params: args,
+            params: fixedArgs,
             id: getRandomId(),
-          })
+          }) as Promise<object | string | number | undefined>
         }
       }
     }
 
-    let types: { [key: string]: Function } = {
-      str: (arg: { toString: () => any }) => arg.toString(),
+    let types: typeConvert = {
+      str: (arg: { toString: () => string }) => arg.toString(),
       int: (arg: string) => Number.parseFloat(arg),
       float: (arg: string) => Number.parseFloat(arg),
       bool: (arg: string | number | boolean) =>
@@ -206,29 +288,21 @@ class RpcClient {
     }
 
     for (let [key, value] of Object.entries(callspec)) {
-      let _spec = value.split(' ')
-      let spec: Function[] = []
-      for (let i = 0; i < _spec.length; ++i) {
-        if (types[_spec[i]]) {
-          spec[i] = types[_spec[i]]
-        } else {
-          spec[i] = types.str
-        }
-      }
-      self.rpcMethods[key] = createRPCMethod(key, spec)
+      let spec: callTypes[] = value.split(' ') as callTypes[]
+      self.rpcMethods[key as callspecTypes] = createRPCMethod(key, spec)
     }
   }
 }
 
-const callspec: { [key: string]: string } = {
-  callcontract: '',
+const callspec: { [key in callspecTypes]: string } = {
+  callcontract: 'str',
   estimatesmartfee: 'int',
-  getcontractcode: '',
-  getdgpinfo: '',
-  getstorage: '',
-  gettransactionreceipt: '',
+  getcontractcode: 'str',
+  getdgpinfo: 'str',
+  getstorage: 'str',
+  gettransactionreceipt: 'str',
   listcontracts: 'int int',
-  sendrawtransaction: '',
+  sendrawtransaction: 'str',
 }
 
 function getRandomId(): number {
