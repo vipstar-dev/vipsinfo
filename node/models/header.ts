@@ -1,4 +1,4 @@
-import { FindOptions } from 'sequelize'
+import { FindOptions, Optional } from 'sequelize'
 import {
   Column,
   DataType,
@@ -30,14 +30,22 @@ export interface HeaderModelAttributes {
   _chainwork: Buffer
   block: Block
   chainwork: bigint
-}
-
-export interface HeaderCreationAttributes extends HeaderModelAttributes {
   findByHeight(height: number, options: FindOptions): Promise<Header | null>
   findByHash(hash: Buffer, options: FindOptions): Promise<Header | null>
   isProofOfStake(): boolean
   difficulty: number
 }
+
+export interface HeaderCreationAttributes
+  extends Optional<
+    HeaderModelAttributes,
+    | '_chainwork'
+    | 'block'
+    | 'findByHash'
+    | 'findByHeight'
+    | 'isProofOfStake'
+    | 'difficulty'
+  > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Header extends Model<

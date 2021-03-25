@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -28,8 +29,14 @@ export interface BlockModelAttributes {
   transactions: Transaction[]
 }
 
+export interface BlockCreationAttributes
+  extends Optional<BlockModelAttributes, 'header' | 'miner' | 'transactions'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Block extends Model<BlockModelAttributes> {
+export default class Block extends Model<
+  BlockModelAttributes,
+  BlockCreationAttributes
+> {
   @Unique
   @Column(DataType.STRING(32).BINARY)
   hash!: Buffer

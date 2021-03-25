@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -17,8 +18,14 @@ export interface Qrc721TokenModelAttributes {
   contract: Contract
 }
 
+export interface Qrc721TokenCreationAttributes
+  extends Optional<Qrc721TokenModelAttributes, 'contract'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Qrc721Token extends Model<Qrc721TokenModelAttributes> {
+export default class Qrc721Token extends Model<
+  Qrc721TokenModelAttributes,
+  Qrc721TokenCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Contract)
   @Column(DataType.STRING(20).BINARY)

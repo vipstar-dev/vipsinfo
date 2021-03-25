@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AutoIncrement,
   // ForeignKey,
@@ -45,12 +46,12 @@ export interface AddressModelAttributes {
   createHeight: number
   minedBlocks: Block
   balanceChanges: BalanceChange
-}
-
-export interface AddressCreationAttributes extends AddressModelAttributes {
   getType(type: number): string | null
   parseType(type: string): number
 }
+
+export interface AddressCreationAttributes
+  extends Optional<AddressModelAttributes, '_type' | 'getType' | 'parseType'> {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Address extends Model<

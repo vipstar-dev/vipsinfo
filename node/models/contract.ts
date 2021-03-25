@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AllowNull,
   Column,
@@ -32,8 +33,17 @@ export interface ContractModelAttributes {
   qrc721Tokens: Qrc721Token[]
 }
 
+export interface ContractCreationAttributes
+  extends Optional<
+    ContractModelAttributes,
+    'code' | 'tag' | 'qrc20' | 'qrc20Balances' | 'qrc721' | 'qrc721Tokens'
+  > {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Contract extends Model<ContractModelAttributes> {
+export default class Contract extends Model<
+  ContractModelAttributes,
+  ContractCreationAttributes
+> {
   @PrimaryKey
   @Column(DataType.STRING(20).BINARY)
   address!: Buffer

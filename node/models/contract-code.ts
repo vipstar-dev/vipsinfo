@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AllowNull,
   BelongsTo,
@@ -19,8 +20,14 @@ export interface ContractCodeModelAttributes {
   contract: Contract
 }
 
+export interface ContractCodeCreationAttributes
+  extends Optional<ContractCodeModelAttributes, 'contract'> {}
+
 Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class ContractCode extends Model<ContractCodeModelAttributes> {
+export default class ContractCode extends Model<
+  ContractCodeModelAttributes,
+  ContractCodeCreationAttributes
+> {
   @PrimaryKey
   @Column(DataType.STRING(20).BINARY)
   sha256sum!: Buffer

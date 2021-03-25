@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -21,8 +22,14 @@ export interface BalanceChangeModelAttributes {
   address: Address
 }
 
+export interface BalanceChangeCreationAttributes
+  extends Optional<BalanceChangeModelAttributes, 'transaction' | 'address'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class BalanceChange extends Model<BalanceChangeModelAttributes> {
+export default class BalanceChange extends Model<
+  BalanceChangeModelAttributes,
+  BalanceChangeCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

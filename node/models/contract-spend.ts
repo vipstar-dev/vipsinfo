@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -17,8 +18,17 @@ export interface ContractSpendModelAttributes {
   destTransaction: Transaction
 }
 
+export interface ContractSpendCreationAttributes
+  extends Optional<
+    ContractSpendModelAttributes,
+    'sourceTransaction' | 'destTransaction'
+  > {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class ContractSpend extends Model<ContractSpendModelAttributes> {
+export default class ContractSpend extends Model<
+  ContractSpendModelAttributes,
+  ContractSpendCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

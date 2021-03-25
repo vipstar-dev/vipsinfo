@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -17,8 +18,14 @@ export interface ContractTagModelAttributes {
   contract: Contract
 }
 
+export interface ContractTagCreationAttributes
+  extends Optional<ContractTagModelAttributes, 'contract'> {}
+
 Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class ContractTag extends Model<ContractTagModelAttributes> {
+export default class ContractTag extends Model<
+  ContractTagModelAttributes,
+  ContractTagCreationAttributes
+> {
   @PrimaryKey
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })
   _id!: bigint

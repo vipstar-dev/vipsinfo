@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AutoIncrement,
   BelongsTo,
@@ -40,12 +41,26 @@ export interface TransactionModelAttributes {
   evmReceipts: EvmReceipt[]
 }
 
+export interface TransactionCreationAttributes
+  extends Optional<
+    TransactionModelAttributes,
+    | 'block'
+    | 'witnesses'
+    | 'balanceChanges'
+    | 'refunds'
+    | 'contractSpendSource'
+    | 'contractSpendDests'
+    | 'evmReceipts'
+  > {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Transaction extends Model<TransactionModelAttributes> {
+export default class Transaction extends Model<
+  TransactionModelAttributes,
+  TransactionCreationAttributes
+> {
   @PrimaryKey
   @AutoIncrement
-  @Index('_id')
-  @Column(DataType.BIGINT.UNSIGNED)
+  @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })
   _id!: bigint
 
   @Unique

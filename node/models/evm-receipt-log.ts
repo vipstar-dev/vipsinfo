@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AutoIncrement,
   BelongsTo,
@@ -25,8 +26,14 @@ export interface EvmReceiptLogModelAttributes {
   receipt: EvmReceipt
 }
 
+export interface EvmReceiptLogCreationAttributes
+  extends Optional<EvmReceiptLogModelAttributes, 'receipt'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class EvmReceiptLog extends Model<EvmReceiptLogModelAttributes> {
+export default class EvmReceiptLog extends Model<
+  EvmReceiptLogModelAttributes,
+  EvmReceiptLogCreationAttributes
+> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })

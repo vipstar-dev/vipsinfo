@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -18,8 +19,14 @@ export interface Qrc20BalanceModelAttributes {
   contract: Contract
 }
 
+export interface Qrc20BalanceCreationAttributes
+  extends Optional<Qrc20BalanceModelAttributes, '_balance' | 'contract'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Qrc20Balance extends Model<Qrc20BalanceModelAttributes> {
+export default class Qrc20Balance extends Model<
+  Qrc20BalanceModelAttributes,
+  Qrc20BalanceCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Contract)
   @Column(DataType.STRING(32).BINARY)

@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -12,7 +13,7 @@ import {
 import Transaction from '@/node/models/transaction'
 import TransactionOutput from '@/node/models/transaction-output'
 
-interface GasRefundModelAttributes {
+export interface GasRefundModelAttributes {
   transactionId: bigint
   outputIndex: number
   refundId: bigint
@@ -21,8 +22,14 @@ interface GasRefundModelAttributes {
   refundTo: TransactionOutput
 }
 
+export interface GasRefundCreationAttributes
+  extends Optional<GasRefundModelAttributes, 'transaction' | 'refundTo'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class GasRefund extends Model<GasRefundModelAttributes> {
+export default class GasRefund extends Model<
+  GasRefundModelAttributes,
+  GasRefundCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

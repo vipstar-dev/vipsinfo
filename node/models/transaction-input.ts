@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -25,8 +26,17 @@ export interface TransactionInputModelAttributes {
   address: Address
 }
 
+export interface TransactionInputCreationAttributes
+  extends Optional<
+    TransactionInputModelAttributes,
+    'transaction' | 'address'
+  > {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class TransactionInput extends Model<TransactionInputModelAttributes> {
+export default class TransactionInput extends Model<
+  TransactionInputModelAttributes,
+  TransactionInputCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

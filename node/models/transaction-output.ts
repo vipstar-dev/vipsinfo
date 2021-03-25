@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   AllowNull,
   BelongsTo,
@@ -28,8 +29,17 @@ export interface TransactionOutputModelAttributes {
   refund: GasRefund
 }
 
+export interface TransactionOutputCreationAttributes
+  extends Optional<
+    TransactionOutputModelAttributes,
+    'transaction' | 'refund'
+  > {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class TransactionOutput extends Model<TransactionOutputModelAttributes> {
+export default class TransactionOutput extends Model<
+  TransactionOutputModelAttributes,
+  TransactionOutputCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.BIGINT.UNSIGNED)

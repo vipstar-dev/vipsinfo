@@ -1,3 +1,4 @@
+import { Optional } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -18,8 +19,14 @@ export interface WitnessModelAttributes {
   transaction: Transaction
 }
 
+export interface WitnessCreationAttributes
+  extends Optional<WitnessModelAttributes, 'transaction'> {}
+
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
-export default class Witness extends Model<WitnessModelAttributes> {
+export default class Witness extends Model<
+  WitnessModelAttributes,
+  WitnessCreationAttributes
+> {
   @PrimaryKey
   @ForeignKey(() => Transaction)
   @Column(DataType.STRING(32).BINARY)
