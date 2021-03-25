@@ -13,7 +13,7 @@ const RETRY_SECONDS = 30
 
 export interface PoolConstructor {
   chain: IChain
-  addresses?: AddressData[]
+  addresses?: Partial<AddressData>[]
   dnsSeed?: boolean
   maxSize?: number
 }
