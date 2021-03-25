@@ -1,15 +1,17 @@
-export interface IAsyncQueue {
+export type errCallback = (...err: (string | number)[]) => void
+
+export interface IAsyncQueue<T> {
   length: number
-  push(data: any, callback: any): void
+  push(data: T, callback: errCallback): void
   process(): void
 }
 
-class AsyncQueue implements IAsyncQueue {
-  private fn: Function | null = null
-  private waiting: { data: any; callback: any }[] = []
+class AsyncQueue<T, K> implements IAsyncQueue<T> {
+  private fn: ((K: T) => Promise<void>) | null = null
+  private waiting: { data: T; callback: errCallback }[] = []
   private running: boolean = false
 
-  constructor(fn: Function) {
+  constructor(fn: (K: T) => Promise<void>) {
     this.fn = fn
   }
 
@@ -17,7 +19,7 @@ class AsyncQueue implements IAsyncQueue {
     return this.waiting.length
   }
 
-  push(data: any, callback: any): void {
+  push(data: T, callback: errCallback): void {
     this.waiting.push({ data, callback })
     if (!this.running) {
       this.process()
@@ -26,15 +28,18 @@ class AsyncQueue implements IAsyncQueue {
 
   process(): void {
     this.running = true
-    let { data, callback }: any = this.waiting.pop()
-    this.fn?.(data).then((data: any) => {
-      callback(null, data)
-      if (this.waiting.length) {
-        this.process()
-      } else {
-        this.running = false
-      }
-    }, callback)
+    let wating = this.waiting.pop()
+    if (wating) {
+      let { data, callback } = wating
+      this.fn?.(data).then((data: any) => {
+        callback(String(null), data)
+        if (this.waiting.length) {
+          this.process()
+        } else {
+          this.running = false
+        }
+      }, callback)
+    }
   }
 
   static sql(strings: string[], ...args: sqlArgs[]): string {
