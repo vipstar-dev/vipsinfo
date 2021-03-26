@@ -5,7 +5,9 @@ import Chain, { chainType, IChain } from '@/lib/chain'
 import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
 import Base, { BaseConfig, Event, IService } from '@/node/services/base'
+import { BlockAPIMethods } from '@/node/services/block'
 import { DBAPIMethods, DbConfig } from '@/node/services/db'
+import { HeaderAPIMethods } from '@/node/services/header'
 import { P2PAPIMethods, P2pConfig } from '@/node/services/p2p'
 import { ServerConfig } from '@/node/services/server'
 
@@ -57,7 +59,11 @@ interface NodeConfig extends ServiceAnyConfig {
   path: string
 }
 
-interface AddedMethods extends P2PAPIMethods, DBAPIMethods {}
+interface AddedMethods
+  extends P2PAPIMethods,
+    DBAPIMethods,
+    HeaderAPIMethods,
+    BlockAPIMethods {}
 
 class Node extends EventEmitter {
   private readonly configPath: string
