@@ -5,8 +5,8 @@ import Chain, { chainType, IChain } from '@/lib/chain'
 import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
 import Base, { BaseConfig, Event, IService } from '@/node/services/base'
-import { DbConfig } from '@/node/services/db'
-import { P2pConfig } from '@/node/services/p2p'
+import { DBAPIMethods, DbConfig } from '@/node/services/db'
+import { P2PAPIMethods, P2pConfig } from '@/node/services/p2p'
 import { ServerConfig } from '@/node/services/server'
 
 export type Services =
@@ -57,6 +57,8 @@ interface NodeConfig extends ServiceAnyConfig {
   path: string
 }
 
+interface AddedMethods extends P2PAPIMethods, DBAPIMethods {}
+
 class Node extends EventEmitter {
   private readonly configPath: string
   public logger: ILogger
@@ -64,7 +66,7 @@ class Node extends EventEmitter {
   public unloadedServices: ServiceObject[]
   public services: Map<Services, IService>
   public stopping: boolean = false
-  public addedMethods: { [key: string]: Function } = {}
+  public addedMethods: Partial<AddedMethods> = {}
 
   constructor(config: NodeConfig) {
     super()
@@ -158,7 +160,7 @@ class Node extends EventEmitter {
       for (let [name, method] of Object.entries(service.APIMethods)) {
         assert(!methodNames.has(name), `API method name conflicts: ${name}`)
         methodNames.add(name)
-        this.addedMethods[name] = method
+        this.addedMethods[name as keyof AddedMethods] = method
         // this[name] = method
       }
     }
