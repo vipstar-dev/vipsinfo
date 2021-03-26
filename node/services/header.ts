@@ -17,10 +17,43 @@ const MAX_CHAINWORK = BigInt(1) << BigInt(256)
 const STARTING_CHAINWORK = BigInt(0x10001)
 
 export interface HeaderAPIMethods {
-  getBestHeight: () => any
+  getBestHeight: () => number | undefined
 }
 
-interface IHeaderService extends IService {}
+export interface IHeaderService extends IService, HeaderAPIMethods {
+  _adjustTipBackToCheckpoint(): void
+  _setGenesisBlock(): Promise<void>
+  _startHeaderSubscription(): void
+  _queueBlock(block: BlockModel): void
+  _processBlocks(block: BlockModel): Promise<void>
+  _persistHeader(block: BlockModel): Promise<void>
+  _syncBlock(block: BlockModel): Promise<void>
+  _onHeader(header: HeaderCreationAttributes): void
+  _onHeaders(headers: HeaderModel[]): Promise<void>
+  _handleError(...err: (string | number)[]): void
+  _onHeadersSave(): Promise<void>
+  _stopHeaderSubscription(): void
+  _startBlockSubscription(): void
+  _syncComplete: boolean
+  _detectReorg(block: BlockModel): boolean
+  _handleReorg(block: BlockModel): Promise<void>
+  _onBestHeight(height: number): void
+  _startSync(): void
+  _removeAllSubscriptions(): void
+  _logProcess(): void
+  _getP2PHeaders(hash: Buffer): void
+  _sync(): void
+  getEndHash(
+    tip: ITip,
+    blockCount: number
+  ): Promise<{ targetHash: Buffer; endHash: Buffer | null } | void>
+  getLastHeader(): HeaderModel | HeaderCreationAttributes | undefined
+  _adjustHeadersForCheckpointTip(): Promise<void>
+  _getChainwork(
+    header: HeaderCreationAttributes,
+    prevHeader: HeaderModel | HeaderCreationAttributes
+  ): bigint
+}
 
 class HeaderService extends Service implements IHeaderService {
   private p2p: IP2PService | undefined
@@ -455,7 +488,7 @@ class HeaderService extends Service implements IHeaderService {
     return this.lastHeader
   }
 
-  async _adjustHeadersForCheckpointTip() {
+  async _adjustHeadersForCheckpointTip(): Promise<void> {
     this.logger.info(
       'Header Service: getting last header synced at height:',
       this.tip?.height
