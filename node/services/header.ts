@@ -90,6 +90,9 @@ class HeaderService extends Service implements IHeaderService {
   }
 
   get APIMethods(): HeaderAPIMethods {
+    /*
+    return {getBestHeight: this.getBestHeight.bind(this)}
+     */
     return { getBestHeight: this.getBestHeight.bind(this) }
   }
 

@@ -112,6 +112,16 @@ class P2PService extends Service implements IP2PService {
   }
 
   get APIMethods(): P2PAPIMethods {
+    /*
+    return {
+      clearInventoryCache: this.clearInventoryCache.bind(this),
+      getP2PBlock: this.getP2PBlock.bind(this),
+      getHeaders: this.getHeaders.bind(this),
+      getMempool: this.getMempool.bind(this),
+      getConnections: this.getConnections.bind(this),
+      sendRawTransaction: this.sendRawTransaction.bind(this)
+    }
+     */
     return {
       clearInventoryCache: () => this.clearInventoryCache(),
       getP2PBlock: ({
