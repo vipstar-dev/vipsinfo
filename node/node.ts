@@ -27,12 +27,18 @@ export interface ServiceObject {
   module?: typeof Base
 }
 
-export interface ServicesConfig {
+type ServicesConfigBase = {
+  [key in Services]?: BaseConfig
+}
+
+export type ServicesConfig = ServicesConfigBase & {
   db?: DbConfig
   p2p?: P2pConfig
   server?: ServerConfig
-  [key: string]: any
 }
+
+export type ServiceByName = { [key in Services]?: IService }
+export type ServiceObjectByName = { [key in Services]?: ServiceObject }
 
 export interface ConfigFile {
   version: string
@@ -56,7 +62,7 @@ class Node extends EventEmitter {
   public logger: ILogger
   public chain: IChain
   public unloadedServices: ServiceObject[]
-  public services: Map<string, IService>
+  public services: Map<Services, IService>
   public stopping: boolean = false
   public addedMethods: { [key: string]: Function } = {}
 
@@ -91,18 +97,18 @@ class Node extends EventEmitter {
 
   static getServiceOrder(services: ServiceObject[]): ServiceObject[] {
     let names: Services[] = []
-    let servicesByName: ServicesConfig = {}
+    let servicesByName: ServiceObjectByName = {}
     for (let service of services) {
       names.push(service.name)
       servicesByName[service.name] = service
     }
     let stack: ServiceObject[] = []
-    let stackNames: Set<string> = new Set()
-    function addToStack(names: Services[] | undefined): void {
-      if (names) {
-        for (let name of names) {
-          let service: ServiceObject = servicesByName[name]
-          addToStack(service.module?.dependencies)
+    let stackNames: Set<Services> = new Set()
+    function addToStack(names: Services[]): void {
+      for (let name of names) {
+        let service: ServiceObject | undefined = servicesByName[name]
+        if (service) {
+          addToStack(service.module?.dependencies || [])
           if (!stackNames.has(name)) {
             stack.push(service)
             stackNames.add(name)
@@ -114,22 +120,24 @@ class Node extends EventEmitter {
     return stack
   }
 
-  getServicesByOrder(): ServiceObject[] {
-    let names: string[] = []
-    let servicesByName: ServicesConfig = {}
+  getServicesByOrder(): IService[] {
+    let names: Services[] = []
+    let servicesByName: ServiceByName = {}
     for (let [name, service] of this.services) {
       names.push(name)
       servicesByName[name] = service
     }
-    let stack: ServiceObject[] = []
-    let stackNames = new Set()
-    function addToStack(names: string[]) {
+    let stack: IService[] = []
+    let stackNames: Set<Services> = new Set()
+    function addToStack(names: Services[]) {
       for (let name of names) {
-        let service = servicesByName[name]
-        addToStack(service.constructor.dependencies)
-        if (!stackNames.has(name)) {
-          stack.push(service)
-          stackNames.add(name)
+        let service: IService | undefined = servicesByName[name]
+        if (service) {
+          addToStack(service.dependencies)
+          if (!stackNames.has(name)) {
+            stack.push(service)
+            stackNames.add(name)
+          }
         }
       }
     }
