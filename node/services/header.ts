@@ -46,7 +46,7 @@ export interface IHeaderService extends IService, HeaderAPIMethods {
   getEndHash(
     tip: ITip,
     blockCount: number
-  ): Promise<{ targetHash: Buffer; endHash: Buffer | null } | void>
+  ): Promise<{ targetHash: Buffer; endHash: Buffer | undefined } | void>
   getLastHeader(): HeaderModel | HeaderCreationAttributes | undefined
   _adjustHeadersForCheckpointTip(): Promise<void>
   _getChainwork(
@@ -452,7 +452,7 @@ class HeaderService extends Service implements IHeaderService {
   async getEndHash(
     tip: ITip,
     blockCount: number
-  ): Promise<{ targetHash: Buffer; endHash: Buffer | null } | void> {
+  ): Promise<{ targetHash: Buffer; endHash: Buffer | undefined } | void> {
     assert(
       blockCount >= 1,
       'Header Service: block count to getEndHash must be at least 1'
@@ -482,7 +482,7 @@ class HeaderService extends Service implements IHeaderService {
         })
       ).map((header: Pick<HeaderModel, 'hash'>) => header.hash)
       let index = numResultsNeeded - 1
-      let endHash = index <= 0 || !results[index] ? null : results[index]
+      let endHash = index <= 0 || !results[index] ? undefined : results[index]
       return { targetHash: results[0], endHash }
     }
   }
