@@ -23,6 +23,7 @@ import HeadersMessage from '@/p2p/commands/commands/headers'
 import InvMessage from '@/p2p/commands/commands/inv'
 import TxMessage from '@/p2p/commands/commands/tx'
 import { AddressData } from '@/p2p/commands/commands/utils'
+import RpcClient from '@/rpc'
 
 export interface P2pConfig extends BaseConfig {
   peers: AddressData[]
@@ -204,13 +205,19 @@ class P2PService extends Service implements IP2PService {
   }
 
   async sendRawTransaction(data: Buffer): Promise<Buffer | undefined> {
-    let id:
-      | string
-      | undefined = await this.node?.addedMethods
-      .getRpcClient()
-      .rpcMethods.sendrawtransaction(data.toString('hex'))
-    if (id) {
-      return Buffer.from(id, 'hex')
+    let rpcClient:
+      | RpcClient
+      | undefined = this.node?.addedMethods.getRpcClient?.()
+    if (rpcClient && rpcClient.rpcMethods.sendrawtransaction) {
+      let id:
+        | string
+        | undefined = (await rpcClient.rpcMethods.sendrawtransaction(
+        data.toString('hex')
+      )) as string | undefined
+
+      if (id) {
+        return Buffer.from(id, 'hex')
+      }
     }
   }
 

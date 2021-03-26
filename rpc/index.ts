@@ -125,7 +125,7 @@ class RpcClient {
   private readonly log: loggerObject | null = null
   public rejectUnauthorized: undefined
   public httpOptions: object = {}
-  private rpcMethods: Partial<rpcMethods> = {}
+  public rpcMethods: Partial<rpcMethods> = {}
 
   constructor({
     host = '127.0.0.1',
