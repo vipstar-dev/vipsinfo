@@ -69,7 +69,7 @@ export interface P2PAPIMethods {
   }: {
     blockHash: Buffer
     filter: BlockFilter
-  }) => Promise<unknown>
+  }) => Promise<IBlock>
   getHeaders: (filter: BlockFilter) => void
   getMempool: () => void
   getConnections: () => number | undefined

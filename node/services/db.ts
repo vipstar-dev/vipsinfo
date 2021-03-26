@@ -1,4 +1,4 @@
-import { ModelCtor, Optional } from 'sequelize'
+import { ModelCtor } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
 import Header from '@/lib/block/header'
@@ -31,7 +31,7 @@ export interface IDBService extends IService, DBAPIMethods {
   APIMethods: DBAPIMethods
 }
 
-export interface ITip extends Optional<TipModelAttributes, 'service'> {}
+export interface ITip extends Omit<TipModelAttributes, 'service'> {}
 
 export interface DBAPIMethods {
   getRpcClient: () => Rpc
