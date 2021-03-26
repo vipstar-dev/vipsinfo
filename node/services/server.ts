@@ -33,11 +33,13 @@ class ServerService extends Service {
   async start() {
     // this.bus = this.node?.openBus({ remoteAddress: 'localhost-server' })
     this.bus = this.node?.openBus()
-    this.bus?.on('block/block', () => this._onBlock(this))
+    this.bus?.on('block/block', (block: ITip) => this._onBlock(block))
     this.bus?.subscribe('block/block')
-    this.bus?.on('block/reorg', () => this._onReorg(this))
+    this.bus?.on('block/reorg', (block: ITip) => this._onReorg(block))
     this.bus?.subscribe('block/reorg')
-    this.bus?.on('mempool/transaction', () => this._onMempoolTransaction(this))
+    this.bus?.on('mempool/transaction', (transaction: { id: Buffer }) =>
+      this._onMempoolTransaction(transaction)
+    )
     this.bus?.subscribe('mempool/transaction')
 
     this.io = socketio(this.options.port || 3001, { serveClient: false })
@@ -60,7 +62,7 @@ class ServerService extends Service {
     this.io?.sockets.emit('reorg', { hash: block.hash, height: block.height })
   }
 
-  _onMempoolTransaction(transaction: { id: Buffer | undefined }): void {
+  _onMempoolTransaction(transaction: { id: Buffer }): void {
     this.io?.sockets.emit('mempool-transaction', transaction.id)
   }
 }
