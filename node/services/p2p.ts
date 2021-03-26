@@ -77,8 +77,8 @@ export interface P2PAPIMethods {
 }
 
 export interface BlockFilter {
-  startHash: Buffer
-  endHash: Buffer
+  startHash?: Buffer
+  endHash?: Buffer
 }
 
 class P2PService extends Service implements IP2PService {
@@ -453,7 +453,10 @@ class P2PService extends Service implements IP2PService {
   }
 
   _setResourceFilter(filter: BlockFilter): Partial<GetHeadersMessageOptions> {
-    return { starts: [filter.startHash], stop: filter.endHash || 0 }
+    return {
+      starts: filter.startHash ? [filter.startHash] : [],
+      stop: filter.endHash,
+    }
   }
 }
 
