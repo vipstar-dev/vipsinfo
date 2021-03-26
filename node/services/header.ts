@@ -480,7 +480,7 @@ class HeaderService extends Service implements IHeaderService {
           },
           attributes: ['hash'],
         })
-      ).map((header) => header.hash)
+      ).map((header: Pick<HeaderModel, 'hash'>) => header.hash)
       let index = numResultsNeeded - 1
       let endHash = index <= 0 || !results[index] ? null : results[index]
       return { targetHash: results[0], endHash }
