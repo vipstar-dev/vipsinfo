@@ -102,8 +102,12 @@ class P2PService extends Service implements IP2PService {
       options.blockCacheCount || new LRU({ max: 10, maxAge: 5 * 60 * 1000 })
   }
 
-  get dependencies(): Services[] {
+  static get dependencies(): Services[] {
     return ['db']
+  }
+
+  get dependencies(): Services[] {
+    return P2PService.dependencies
   }
 
   get APIMethods(): P2PAPIMethods {

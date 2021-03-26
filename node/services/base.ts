@@ -21,6 +21,7 @@ export interface IService extends EventEmitter {
   chain: IChain | undefined
   logger: ILogger | undefined
   subscriptions: Subscriptions
+  dependencies: Services[]
   APIMethods: object
   publishEvents: Event[]
   routePrefix: any
@@ -59,6 +60,10 @@ class Service extends EventEmitter implements IService {
 
   static get dependencies(): Services[] {
     return []
+  }
+
+  get dependencies(): Services[] {
+    return Service.dependencies
   }
 
   get APIMethods(): object {

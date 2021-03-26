@@ -26,6 +26,10 @@ class ServerService extends Service {
     return ['block', 'mempool']
   }
 
+  get dependencies(): Services[] {
+    return ServerService.dependencies
+  }
+
   async start() {
     // this.bus = this.node?.openBus({ remoteAddress: 'localhost-server' })
     this.bus = this.node?.openBus()
