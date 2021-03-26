@@ -25,14 +25,14 @@ export interface IService extends EventEmitter {
   APIMethods: object
   publishEvents: Event[]
   routePrefix: any
-  start(): void
-  stop(): void
-  onHeaders(): void
-  onBlock(): void
-  onSynced(): void
-  onReorg(): void
-  subscribe(name: string, emitter: any): void
-  unsubscribe(name: string, emitter: any): void
+  start(): Promise<void>
+  stop(): Promise<void>
+  onHeaders(): Promise<void>
+  onBlock(): Promise<void>
+  onSynced(): Promise<void>
+  onReorg(): Promise<void>
+  subscribe(name: string, emitter: IBus): void
+  unsubscribe(name: string, emitter: IBus): void
 }
 
 export interface Event {
