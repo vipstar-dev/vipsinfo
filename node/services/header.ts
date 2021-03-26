@@ -7,7 +7,7 @@ import BlockModel from '@/node/models/block'
 import HeaderModel, { HeaderCreationAttributes } from '@/node/models/header'
 import { Services } from '@/node/node'
 import Service, { BaseConfig, IService } from '@/node/services/base'
-import { ITip } from '@/node/services/block'
+import { ITip } from '@/node/services/db'
 import { IP2PService } from '@/node/services/p2p'
 import AsyncQueue from '@/node/utils'
 

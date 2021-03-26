@@ -3,7 +3,7 @@ import socketio from 'socket.io'
 import { IBus } from '@/node/bus'
 import { Services } from '@/node/node'
 import Service, { BaseConfig } from '@/node/services/base'
-import { IBlock } from '@/node/services/block'
+import { ITip } from '@/node/services/db'
 
 export interface ServerConfig extends BaseConfig {
   port: number
@@ -52,11 +52,11 @@ class ServerService extends Service {
     socket.emit('tip', this.node?.addedMethods.getBlockTip)
   }
 
-  _onBlock(block: IBlock): void {
+  _onBlock(block: ITip): void {
     this.io?.sockets.emit('block', { hash: block.hash, height: block.height })
   }
 
-  _onReorg(block: IBlock): void {
+  _onReorg(block: ITip): void {
     this.io?.sockets.emit('reorg', { hash: block.hash, height: block.height })
   }
 

@@ -1,4 +1,4 @@
-import { ModelCtor } from 'sequelize'
+import { ModelCtor, Optional } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
 import Header from '@/lib/block/header'
@@ -18,18 +18,20 @@ import Qrc20Balance from '@/node/models/qrc20-balance'
 import Qrc721 from '@/node/models/qrc721'
 import Qrc721Token from '@/node/models/qrc721-token'
 import Tip from '@/node/models/tip'
+import { TipModelAttributes } from '@/node/models/tip'
 import Transaction from '@/node/models/transaction'
 import TransactionInput from '@/node/models/transaction-input'
 import TransactionOutput from '@/node/models/transaction-output'
 import TransactionOutputMapping from '@/node/models/transaction-output-mapping'
 import Witness from '@/node/models/witness'
 import Service, { BaseConfig, IService } from '@/node/services/base'
-import { ITip } from '@/node/services/block'
 import Rpc, { RpcClientConfig } from '@/rpc'
 
 export interface IDBService extends IService, DBAPIMethods {
   APIMethods: DBAPIMethods
 }
+
+export interface ITip extends Optional<TipModelAttributes, 'service'> {}
 
 export interface DBAPIMethods {
   getRpcClient: () => Rpc
