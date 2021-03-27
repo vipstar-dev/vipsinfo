@@ -106,7 +106,22 @@ export interface IContractOutputScript extends IOutputScript {
 }
 
 class OutputScript extends Script implements IOutputScript {
-  static fromBuffer(buffer: Buffer): OutputScript {
+  static fromBuffer(
+    buffer: Buffer
+  ):
+    | IOutputScript
+    | IDataOutputScript
+    | IPublicKeyOutputScript
+    | IPublicKeyHashOutputScript
+    | IScriptHashOutputScript
+    | IMultisigOutputScript
+    | IWitnessV0KeyHashOutputScript
+    | IWitnessV0ScriptHashOut
+    | IEVMContractCreateScript
+    | IEVMContractCreateBySenderScript
+    | IEVMContractCallScript
+    | IEVMContractCallBySenderScript
+    | IContractOutputScript {
     if (buffer[0] === Opcode.OP_RETURN) {
       return new DataOutputScript([
         { code: Opcode.OP_RETURN, buffer: buffer.slice(1) },
