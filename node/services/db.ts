@@ -7,6 +7,7 @@ import BalanceChange from '@/node/models/balance-change'
 import Block from '@/node/models/block'
 import Contract from '@/node/models/contract'
 import ContractCode from '@/node/models/contract-code'
+import ContractSpend from '@/node/models/contract-spend'
 import ContractTag from '@/node/models/contract-tag'
 import EvmReceipt from '@/node/models/evm-receipt'
 import EvmReceiptLog from '@/node/models/evm-receipt-log'
@@ -60,6 +61,7 @@ export type ModelTypes =
   | Block
   | Contract
   | ContractCode
+  | ContractSpend
   | ContractTag
   | EvmReceipt
   | EvmReceiptLog
@@ -83,6 +85,7 @@ export type StringModelTypes =
   | 'block'
   | 'contract'
   | 'contract_code'
+  | 'contract_spend'
   | 'contract_tag'
   | 'evm_receipt'
   | 'evm_receipt_log'
@@ -167,6 +170,8 @@ class DBService extends Service implements IDBService {
         return Contract.scope()
       case 'contract_code':
         return ContractCode.scope()
+      case 'contract_spend':
+        return ContractSpend.scope()
       case 'contract_tag':
         return ContractTag.scope()
       case 'evm_receipt':
@@ -235,6 +240,7 @@ class DBService extends Service implements IDBService {
         Block,
         Contract,
         ContractCode,
+        ContractSpend,
         ContractTag,
         EvmReceipt,
         EvmReceiptLog,
