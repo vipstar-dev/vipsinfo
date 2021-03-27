@@ -4,7 +4,10 @@ import { IChain } from '@/lib/chain'
 import { IBus } from '@/node/bus'
 import { ILogger } from '@/node/logger'
 import Node, { Services } from '@/node/node'
-import { BlockObject } from '@/node/services/block'
+import {
+  BlockObjectFromIBlock,
+  BlockObjectFromModel,
+} from '@/node/services/block'
 
 export interface BaseConfig {
   node: Node
@@ -29,7 +32,7 @@ export interface IService extends EventEmitter {
   start(): Promise<void>
   stop(): Promise<void>
   onHeaders(): Promise<void>
-  onBlock(block: BlockObject): Promise<void>
+  onBlock(block: BlockObjectFromModel | BlockObjectFromIBlock): Promise<void>
   onSynced(): Promise<void>
   onReorg(height: number): Promise<void>
   subscribe(name: string, emitter: IBus): void
@@ -98,7 +101,7 @@ class Service extends EventEmitter implements IService {
 
   async onHeaders() {}
 
-  async onBlock(block: BlockObject) {}
+  async onBlock(block: BlockObjectFromModel | BlockObjectFromIBlock) {}
 
   async onSynced() {}
 

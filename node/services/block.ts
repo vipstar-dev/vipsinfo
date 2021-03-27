@@ -2,7 +2,7 @@ import assert from 'assert'
 import LRU from 'lru-cache'
 import Sequelize, { ModelCtor, Optional } from 'sequelize'
 
-import Block from '@/lib/block/block'
+import Block, { IBlock } from '@/lib/block/block'
 import { IBus } from '@/node/bus'
 import BlockModel, { BlockCreationAttributes } from '@/node/models/block'
 import HeaderModel from '@/node/models/header'
@@ -46,7 +46,7 @@ interface IBlockService extends IService, BlockAPIMethods {
   _resetTip(): Promise<void>
   _loadRecentBlockHashes(): Promise<void>
   _getTimeSinceLastBlock(): Promise<string | void>
-  _queueBlock(block: BlockModel): void
+  _queueBlock(block: IBlock): void
   _onReorg(blocks: ITip[]): Promise<void>
   _removeAllSubscriptions(): void
   _onHeaders(): Promise<void>
@@ -55,12 +55,14 @@ interface IBlockService extends IService, BlockAPIMethods {
   _findBlocksToRemove(commonHeader: ITip): Promise<ITip[]>
   _handleReorg(): Promise<void>
   _processReorg(blocksToRemove: ITip[]): Promise<void>
-  _onBlock(rawBlock: BlockObject): Promise<void>
-  _processBlock(block: BlockObject): Promise<void>
-  _saveBlock(rawBlock: BlockObject): Promise<void>
+  _onBlock(rawBlock: BlockObjectFromIBlock): Promise<void>
+  _processBlock(block: BlockObjectFromIBlock): Promise<void>
+  _saveBlock(rawBlock: BlockObjectFromModel): Promise<void>
   _handleError(...err: (string | number)[]): void
-  _syncBlock(block: BlockObject): Promise<void>
-  __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined>
+  _syncBlock(block: BlockObjectFromModel | BlockObjectFromIBlock): Promise<void>
+  __onBlock(
+    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
+  ): Promise<BlockModel | undefined>
   _setTip(tip: ITip): Promise<void>
   _logSynced(): Promise<void>
   _onSynced(): Promise<void>
@@ -69,8 +71,12 @@ interface IBlockService extends IService, BlockAPIMethods {
   _logProgress(): void
 }
 
-export interface BlockObject
+export interface BlockObjectFromModel
   extends Optional<BlockCreationAttributes, 'height'> {}
+
+export interface BlockObjectFromIBlock extends IBlock {
+  height?: number
+}
 
 class BlockService extends Service implements IBlockService {
   public subscriptions: BlockSubscriptions = {
@@ -91,7 +97,7 @@ class BlockService extends Service implements IBlockService {
   private readonly reorgToBlock: number | false
   private reorging: boolean = false
   private tipResetNeeded: boolean = false
-  private blockProcessor: AsyncQueue<BlockObject, 'block'> | undefined
+  private blockProcessor: AsyncQueue<IBlock, 'block'> | undefined
   private bus: IBus | undefined
   private subscribedBlock: boolean = false
   private reportInterval: Timeout | undefined
@@ -224,7 +230,7 @@ class BlockService extends Service implements IBlockService {
     ) {
       tip = undefined
     }
-    this.blockProcessor = new AsyncQueue((block: BlockObject) =>
+    this.blockProcessor = new AsyncQueue((block: IBlock) =>
       this._onBlock(block)
     )
     // this.bus = this.node.openBus({ remoteAddress: 'localhost-block' })
@@ -296,7 +302,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  _queueBlock(block: BlockModel): void {
+  _queueBlock(block: IBlock): void {
     ++this.blocksInQueue
     this.blockProcessor?.push(block, async (...err: (string | number)[]) => {
       if (err) {
@@ -384,7 +390,7 @@ class BlockService extends Service implements IBlockService {
     if (!this.subscribedBlock && this.bus) {
       this.subscribedBlock = true
       this.logger.info('Block Service: starting p2p block subscription')
-      this.bus.on('p2p/block', (block: BlockModel) => this._queueBlock(block))
+      this.bus.on('p2p/block', (block: IBlock) => this._queueBlock(block))
       this.bus.subscribe('p2p/block')
     }
   }
@@ -521,7 +527,7 @@ class BlockService extends Service implements IBlockService {
     )
   }
 
-  async _onBlock(rawBlock: BlockObject): Promise<void> {
+  async _onBlock(rawBlock: BlockObjectFromIBlock): Promise<void> {
     if (this.reorging) {
       this.processingBlock = false
       return
@@ -547,7 +553,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _processBlock(block: BlockObject): Promise<void> {
+  async _processBlock(block: BlockObjectFromIBlock): Promise<void> {
     if (this.node.stopping) {
       this.processingBlock = false
       return
@@ -564,7 +570,9 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _saveBlock(rawBlock: BlockObject): Promise<void> {
+  async _saveBlock(
+    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
+  ): Promise<void> {
     if (!('height' in rawBlock) && this.tip) {
       rawBlock.height = this.tip.height + 1
     }
@@ -598,7 +606,9 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _syncBlock(block: BlockObject): Promise<void> {
+  async _syncBlock(
+    block: BlockObjectFromModel | BlockObjectFromIBlock
+  ): Promise<void> {
     if (this.getBlocksTimer) {
       clearTimeout(this.getBlocksTimer)
     }
@@ -620,7 +630,9 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined> {
+  async __onBlock(
+    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
+  ): Promise<BlockModel | undefined> {
     let header: Pick<
       HeaderModel,
       'height' | 'stakePrevTxId' | 'stakeOutputIndex' | 'isProofOfStake'
@@ -655,8 +667,11 @@ class BlockService extends Service implements IBlockService {
       size: rawBlock.size,
       weight: rawBlock.weight,
       minerId,
-      transactionsCount: rawBlock.transactionsCount,
-      contractTransactionsCount: rawBlock.contractTransactionsCount,
+      transactionsCount:
+        (rawBlock as BlockObjectFromModel).transactionsCount ||
+        (rawBlock as BlockObjectFromIBlock).transactions.length,
+      contractTransactionsCount:
+        (rawBlock as BlockObjectFromModel).contractTransactionsCount || 0,
     })
   }
 
@@ -719,9 +734,9 @@ class BlockService extends Service implements IBlockService {
           clearInterval(this.reportInterval)
         }
         if (this.tip.height === 0) {
-          let genesisBlock = (Block.fromBuffer(
+          let genesisBlock = Block.fromBuffer(
             this.chain.genesis
-          ) as unknown) as BlockObject
+          ) as BlockObjectFromIBlock
           genesisBlock.height = 0
           await this._saveBlock(genesisBlock)
         }
@@ -771,7 +786,7 @@ class BlockService extends Service implements IBlockService {
               filter: { startHash: this.tip.hash, endHash },
               blockHash: targetHash,
             })
-            await this._syncBlock((block as unknown) as BlockObject)
+            await this._syncBlock(block as BlockObjectFromIBlock)
           }
         }
       }
