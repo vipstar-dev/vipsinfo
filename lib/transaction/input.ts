@@ -3,7 +3,7 @@ import util from 'util'
 import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
 
-export interface IInput {
+export interface ITransactionInput {
   prevTxId: Buffer | undefined
   outputIndex: number | undefined
   scriptSig: Buffer | undefined
@@ -13,7 +13,7 @@ export interface IInput {
   toBufferWriter(writer: BufferWriter): void
 }
 
-class Input implements IInput {
+class Input implements ITransactionInput {
   public prevTxId: Buffer | undefined
   public outputIndex: number | undefined
   public scriptSig: Buffer | undefined

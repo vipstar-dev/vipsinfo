@@ -4,7 +4,7 @@ import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
 import OutputScript, { IOutputScript } from '@/lib/script/output'
 
-export interface IOutput {
+export interface ITransactionOutput {
   value: bigint | undefined
   scriptPubKey: IOutputScript | undefined
   toBuffer(): Buffer
@@ -12,7 +12,7 @@ export interface IOutput {
   isEmpty(): boolean | undefined
 }
 
-class Output implements IOutput {
+class Output implements ITransactionOutput {
   public value: bigint | undefined
   public scriptPubKey: IOutputScript | undefined
 

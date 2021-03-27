@@ -3,14 +3,14 @@ import util from 'util'
 import { sha256d } from '@/lib/crypto/hash'
 import BufferReader from '@/lib/encoding/buffer-reader'
 import BufferWriter from '@/lib/encoding/buffer-writer'
-import Input, { IInput } from '@/lib/transaction/input'
-import Output, { IOutput } from '@/lib/transaction/output'
+import Input, { ITransactionInput } from '@/lib/transaction/input'
+import Output, { ITransactionOutput } from '@/lib/transaction/output'
 
 export interface TransactionConstructor {
   version: number | undefined
   flag: number | undefined
-  inputs: (IInput | undefined)[]
-  outputs: (IOutput | undefined)[]
+  inputs: (ITransactionInput | undefined)[]
+  outputs: (ITransactionOutput | undefined)[]
   lockTime: number | undefined
 }
 
@@ -30,8 +30,8 @@ export interface ITransaction extends TransactionConstructor {
 class Transaction implements ITransaction {
   public version: number | undefined
   public flag: number | undefined
-  public inputs: (IInput | undefined)[]
-  public outputs: (IOutput | undefined)[]
+  public inputs: (ITransactionInput | undefined)[]
+  public outputs: (ITransactionOutput | undefined)[]
   public lockTime: number | undefined
   private _id: Buffer | null = null
   private _hash: Buffer | null = null
@@ -74,9 +74,9 @@ class Transaction implements ITransaction {
 
   static fromBufferReader(reader: BufferReader): Transaction {
     let version: number | undefined = reader.readInt32LE()
-    let inputs: IInput[] = []
+    let inputs: ITransactionInput[] = []
     let flag: number | undefined = 0
-    let outputs: IOutput[] = []
+    let outputs: ITransactionOutput[] = []
     let lockTime: number | undefined
     let inputCount: number = reader.readVarintNumber() || 0
     if (!inputCount) {
