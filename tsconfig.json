@@ -30,6 +30,7 @@
       "@types/liftoff",
       "@types/lru-cache",
       "@types/socket.io",
+      "@types/uuid",
       "@types/validator"
     ],
     /* Advanced Options */
