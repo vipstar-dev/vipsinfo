@@ -7,7 +7,6 @@ import {
   ForeignKey,
   HasMany,
   HasOne,
-  Index,
   Model,
   PrimaryKey,
   Table,
@@ -19,6 +18,8 @@ import Block from '@/node/models/block'
 import ContractSpend from '@/node/models/contract-spend'
 import EvmReceipt from '@/node/models/evm-receipt'
 import GasRefund from '@/node/models/gas-refund'
+import TransactionInput from '@/node/models/transaction-input'
+import TransactionOutput from '@/node/models/transaction-output'
 import Witness from '@/node/models/witness'
 
 export interface TransactionModelAttributes {
@@ -32,6 +33,8 @@ export interface TransactionModelAttributes {
   indexInBlock: number
   size: number
   weight: number
+  inputs: TransactionInput[]
+  outputs: TransactionOutput[]
   block: Block
   witnesses: Witness[]
   balanceChanges: BalanceChange[]
@@ -45,6 +48,8 @@ export interface TransactionCreationAttributes
   extends Optional<
     TransactionModelAttributes,
     | '_id'
+    | 'inputs'
+    | 'outputs'
     | 'block'
     | 'witnesses'
     | 'balanceChanges'
@@ -92,6 +97,12 @@ export default class Transaction extends Model<
 
   @Column(DataType.INTEGER.UNSIGNED)
   weight!: number
+
+  @HasMany(() => TransactionInput)
+  inputs!: TransactionInput[]
+
+  @HasMany(() => TransactionOutput)
+  outputs!: TransactionOutput[]
 
   @BelongsTo(() => Block)
   block!: Block
