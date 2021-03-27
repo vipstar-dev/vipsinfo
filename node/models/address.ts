@@ -46,15 +46,10 @@ export interface AddressModelAttributes {
   createHeight: number
   minedBlocks: Block
   balanceChanges: BalanceChange
-  getType(type: number): string | null
-  parseType(type: string): number
 }
 
 export interface AddressCreationAttributes
-  extends Optional<
-    AddressModelAttributes,
-    '_id' | '_type' | 'getType' | 'parseType'
-  > {}
+  extends Optional<AddressModelAttributes, '_id' | '_type'> {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Address extends Model<
@@ -108,11 +103,11 @@ export default class Address extends Model<
   @HasOne(() => BalanceChange)
   balanceChanges!: BalanceChange
 
-  getType(type: number): string | null {
+  static getType(type: number): string | null {
     return addressTypeMap[type] || null
   }
 
-  parseType(type: string): number {
+  static parseType(type: string): number {
     return addressTypes[type] || 0
   }
 }
