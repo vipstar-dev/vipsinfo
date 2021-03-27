@@ -35,7 +35,7 @@ export interface ITip extends Omit<TipModelAttributes, 'service'> {}
 
 export interface DBAPIMethods {
   getRpcClient: () => Rpc
-  getDatabase: () => Sequelize | null
+  getDatabase: () => Sequelize | undefined
   getModel: (name: StringModelTypes) => ModelCtor<ModelTypes>
   getServiceTip: (serviceName: string) => Promise<ITip | undefined>
   updateServiceTip: (serviceName: string, tip: ITip) => Promise<void>
@@ -110,8 +110,8 @@ class DBService extends Service implements IDBService {
     user: 'user',
     password: 'password',
   }
-  private sequelize: Sequelize | null = null
-  private Tip: ModelCtor<Tip> | null = null
+  private sequelize: Sequelize | undefined
+  private Tip: ModelCtor<Tip> | undefined
 
   constructor(options: DbConfig) {
     super(options)
@@ -151,7 +151,7 @@ class DBService extends Service implements IDBService {
     return new Rpc(this.rpcOptions)
   }
 
-  getDatabase(): Sequelize | null {
+  getDatabase(): Sequelize | undefined {
     return this.sequelize
   }
 
@@ -259,7 +259,7 @@ class DBService extends Service implements IDBService {
   async stop() {
     if (this.sequelize) {
       await this.sequelize.close()
-      this.sequelize = null
+      this.sequelize = undefined
     }
   }
 }
