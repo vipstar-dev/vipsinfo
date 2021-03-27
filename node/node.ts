@@ -1,5 +1,6 @@
 import assert from 'assert'
 import EventEmitter from 'events'
+import { Optional } from 'sequelize'
 
 import Chain, { chainType, IChain } from '@/lib/chain'
 import Bus, { IBus } from '@/node/bus'
@@ -21,11 +22,14 @@ export type Services =
   | 'mempool'
   | 'server'
 
-type ServiceConfigType = BaseConfig | DbConfig | P2pConfig | ServerConfig
+type ServiceConfigType = Optional<
+  BaseConfig | DbConfig | P2pConfig | ServerConfig,
+  'name' | 'node'
+>
 
 export interface ServiceObject {
   name: Services
-  config: ServiceConfigType
+  config?: ServiceConfigType
   module?: typeof Base
 }
 
@@ -156,9 +160,13 @@ class Node extends EventEmitter {
   async startService(serviceInfo: ServiceObject) {
     if (serviceInfo.module) {
       this.logger.info('Starting', serviceInfo.name)
-      let config: ServiceConfigType = serviceInfo.config || {}
-      config.node = this
-      config.name = serviceInfo.name
+      let config: Required<ServiceConfigType> = Object.assign(
+        serviceInfo.config || {},
+        {
+          node: this,
+          name: serviceInfo.name,
+        } as BaseConfig
+      )
       let service: IService = new serviceInfo.module(config)
       this.services.set(serviceInfo.name, service)
       await service.start()
