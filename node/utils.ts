@@ -41,18 +41,18 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
       }, callback)
     }
   }
-
-  static sql(strings: string[], ...args: sqlArgs[]): string {
-    let buffer: string[] = []
-    for (let i = 0; i < args.length; ++i) {
-      buffer.push(strings[i].replace(/\s+/g, ' '), transformSQLArg(args[i]))
-    }
-    buffer.push(strings[args.length].replace(/\s+/g, ' '))
-    return buffer.join('')
-  }
 }
 
 type sqlArgs = string | number | bigint | Buffer | any[] | Object
+
+export function sql(strings: string[], ...args: sqlArgs[]): string {
+  let buffer: string[] = []
+  for (let i = 0; i < args.length; ++i) {
+    buffer.push(strings[i].replace(/\s+/g, ' '), transformSQLArg(args[i]))
+  }
+  buffer.push(strings[args.length].replace(/\s+/g, ' '))
+  return buffer.join('')
+}
 
 function transformSQLArg(arg: sqlArgs): string {
   if (typeof arg === 'string') {
