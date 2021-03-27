@@ -51,7 +51,10 @@ export interface AddressModelAttributes {
 }
 
 export interface AddressCreationAttributes
-  extends Optional<AddressModelAttributes, '_type' | 'getType' | 'parseType'> {}
+  extends Optional<
+    AddressModelAttributes,
+    '_id' | '_type' | 'getType' | 'parseType'
+  > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Address extends Model<

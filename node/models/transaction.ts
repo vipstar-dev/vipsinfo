@@ -44,6 +44,7 @@ export interface TransactionModelAttributes {
 export interface TransactionCreationAttributes
   extends Optional<
     TransactionModelAttributes,
+    | '_id'
     | 'block'
     | 'witnesses'
     | 'balanceChanges'

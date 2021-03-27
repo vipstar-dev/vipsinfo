@@ -36,7 +36,7 @@ export interface EvmReceiptModelAttributes {
 export interface EvmReceiptCreationAttributes
   extends Optional<
     EvmReceiptModelAttributes,
-    '_senderType' | 'transaction' | 'logs'
+    '_id' | '_senderType' | 'transaction' | 'logs'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
