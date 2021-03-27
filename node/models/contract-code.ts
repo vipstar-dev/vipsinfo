@@ -15,7 +15,7 @@ import Contract from '@/node/models/contract'
 export interface ContractCodeModelAttributes {
   sha256sum: Buffer
   code: Buffer
-  source: string
+  source: string | null
   contractAddress: Buffer
   contract: Contract
 }
@@ -37,7 +37,7 @@ export default class ContractCode extends Model<
 
   @AllowNull
   @Column(DataType.TEXT)
-  source!: string
+  source!: string | null
 
   @ForeignKey(() => Contract)
   contractAddress!: Buffer

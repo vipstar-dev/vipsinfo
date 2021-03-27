@@ -24,7 +24,7 @@ export interface TransactionOutputModelAttributes {
   isStake: boolean
   inputId: bigint
   inputIndex: number
-  inputHeight: number
+  inputHeight: number | null
   transaction: Transaction
   refund: GasRefund
 }
@@ -72,7 +72,7 @@ export default class TransactionOutput extends Model<
 
   @AllowNull
   @Column(DataType.INTEGER.UNSIGNED)
-  inputHeight!: number
+  inputHeight!: number | null
 
   @BelongsTo(() => Transaction)
   transaction!: Transaction

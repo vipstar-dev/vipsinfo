@@ -19,7 +19,7 @@ export interface Qrc20ModelAttributes {
   decimals: number
   _totalSupply: Buffer
   totalSupply: bigint | null
-  version: Buffer
+  version: Buffer | null
   contract: Contract
 }
 
@@ -66,7 +66,7 @@ export default class Qrc20 extends Model<
 
   @AllowNull
   @Column(DataType.BLOB)
-  version!: Buffer
+  version!: Buffer | null
 
   @BelongsTo(() => Contract)
   contract!: Contract
