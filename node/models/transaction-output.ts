@@ -17,7 +17,7 @@ import Transaction from '@/node/models/transaction'
 export interface TransactionOutputModelAttributes {
   transactionId: bigint
   outputIndex: number
-  scriptPubkey: Buffer
+  scriptPubKey: Buffer
   blockHeight: number
   value: bigint
   addressId: bigint
@@ -50,7 +50,7 @@ export default class TransactionOutput extends Model<
   outputIndex!: number
 
   @Column({ type: DataType.BLOB('medium'), field: 'scriptpubkey' })
-  scriptPubkey!: Buffer
+  scriptPubKey!: Buffer
 
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
