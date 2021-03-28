@@ -17,11 +17,11 @@ export interface EvmReceiptLogModelAttributes {
   receiptId: bigint
   logIndex: number
   blockHeight: number
-  address: string
-  topic1: string
-  topic2: string
-  topic3: string
-  topic4: string
+  address: Buffer
+  topic1: Buffer
+  topic2: Buffer
+  topic3: Buffer
+  topic4: Buffer
   data: Buffer
   receipt: EvmReceipt
 }
@@ -50,19 +50,19 @@ export default class EvmReceiptLog extends Model<
   blockHeight!: number
 
   @Column(DataType.STRING(32).BINARY)
-  address!: string
+  address!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  topic1!: string
+  topic1!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  topic2!: string
+  topic2!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  topic3!: string
+  topic3!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  topic4!: string
+  topic4!: Buffer
 
   @Column(DataType.BLOB)
   data!: Buffer
