@@ -21,7 +21,10 @@ export interface ContractCodeModelAttributes {
 }
 
 export interface ContractCodeCreationAttributes
-  extends Optional<ContractCodeModelAttributes, 'contract'> {}
+  extends Optional<
+    ContractCodeModelAttributes,
+    'source' | 'contractAddress' | 'contract'
+  > {}
 
 Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class ContractCode extends Model<
