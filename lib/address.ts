@@ -42,7 +42,7 @@ const TYPES: { [key in AddressTypes]: string } = {
 }
 
 export interface AddressConstructor {
-  type: string
+  type: string | null
   data: Buffer | undefined
   chain: IChain
 }
@@ -53,7 +53,7 @@ export interface IAddress extends AddressConstructor {
 }
 
 class Address implements IAddress {
-  public type: string
+  public type: string | null
   public data: Buffer | undefined
   public chain: IChain
 
