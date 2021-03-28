@@ -39,9 +39,79 @@ export interface QtumPpcRequest {
   id: number
 }
 
+export interface Log {
+  address: string
+  topics: string[]
+  data: string
+}
+
+export interface CallContractResult {
+  address: string
+  executionResult: {
+    gasUsed: number
+    excepted: string
+    newAddress: string
+    output: string
+    codeDeposit: number
+    gasRefunded: number
+    depositSize: number
+    gasForDeposit: number
+  }
+  transactionReceipt: {
+    stateRoot: string
+    gasUsed: number
+    bloom: string
+    log: Log[]
+  }
+}
+
+export interface EstimateSmartFeeResult {
+  blocks: number
+  errors?: string[]
+  feerate?: number
+}
+
+export interface GetDgpInfoResult {
+  maxblocksize: number
+  mingasprice: number
+  blockgaslimit: number
+}
+
+export interface GetTransactionReceiptResult {
+  blockHash: string
+  blockNumber: number
+  transactionHash: string
+  transactionIndex: number
+  from: string
+  to: string
+  cumulativeGasUsed: number
+  gasUsed: number
+  contractAddress: string
+  excepted: string
+  exceptedMessage: string
+  bloom: string
+  log: Log[]
+}
+
+export interface ListContractsResult {
+  account: number
+}
+
+export type QtumRpcResult =
+  | CallContractResult
+  | EstimateSmartFeeResult
+  | GetDgpInfoResult
+  | GetTransactionReceiptResult[]
+  | ListContractsResult
+  | string[]
+  | string
+
 export interface QtumPpcResponse {
-  result?: object
-  error?: string
+  result: QtumRpcResult
+  error: {
+    code: number
+    message: string
+  } | null
 }
 
 interface rpcMethods {
@@ -49,36 +119,34 @@ interface rpcMethods {
     ...args: {
       toString: () => string
     }[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<CallContractResult> | void
   estimatesmartfee: (
     ...args: string[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<EstimateSmartFeeResult> | void
   getcontractcode: (
     ...args: {
       toString: () => string
     }[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<string> | void
   getdgpinfo: (
     ...args: {
       toString: () => string
     }[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<GetDgpInfoResult> | void
   getstorage: (
     ...args: {
       toString: () => string
     }[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<string> | void
   gettransactionreceipt: (args: {
     toString: () => string
-  }) => Promise<object | string | number | undefined> | void
-  listcontracts: (
-    ...args: string[]
-  ) => Promise<object | string | number | undefined> | void
+  }) => Promise<GetTransactionReceiptResult[]> | void
+  listcontracts: (...args: string[]) => Promise<ListContractsResult> | void
   sendrawtransaction: (
     ...args: {
       toString: () => string
     }[]
-  ) => Promise<object | string | number | undefined> | void
+  ) => Promise<string> | void
 }
 
 export type callTypes = 'str' | 'int' | 'float' | 'bool' | 'obj'
@@ -145,11 +213,7 @@ class RpcClient {
     this.generateRPCMethods()
   }
 
-  rpc(
-    _request: QtumPpcRequest | QtumPpcRequest[]
-  ):
-    | Promise<object | string | number | undefined>
-    | Promise<object | string | number | undefined>[] {
+  rpc<R extends QtumRpcResult>(_request: QtumPpcRequest): Promise<R> {
     let request: string = JSON.stringify(_request)
     let auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
       'base64'
@@ -183,28 +247,21 @@ class RpcClient {
             res.statusCode === 500 &&
             buffer.toString() === 'Work queue depth exceeded'
           ) {
-            let exceededError = new Error(`Qtum JSON-RPC: ${buffer}`)
-            // exceededError.code = 429
+            let exceededError: Error &
+              Partial<QtumPpcResponse['error']> = new Error(
+              `Qtum JSON-RPC: ${buffer}`
+            )
+            exceededError.code = 429
             reject(exceededError)
           } else {
             try {
-              let parsedBuffer:
-                | QtumPpcResponse
-                | QtumPpcResponse[] = JSON.parse(
+              let parsedBuffer: QtumPpcResponse = JSON.parse(
                 Buffer.concat(buffer).toString()
               )
-              if (Array.isArray(parsedBuffer)) {
-                parsedBuffer.map((result: QtumPpcResponse) => {
-                  if (result.error) {
-                    return Promise.reject(result.error)
-                  } else {
-                    return Promise.resolve(result.result)
-                  }
-                })
-              } else if (parsedBuffer.error) {
+              if (parsedBuffer.error) {
                 reject(parsedBuffer.error)
               } else {
-                resolve(parsedBuffer.result)
+                resolve(parsedBuffer.result as R)
               }
             } catch (err) {
               if (this.log) {
@@ -232,11 +289,15 @@ class RpcClient {
     })
   }
 
-  async batch(batchCallback: Function) {
+  async batch<R extends QtumRpcResult>(
+    batchCallback: () => void
+  ): Promise<Promise<R>[]> {
     this.batchedCalls = []
     batchCallback()
     try {
-      return await this.rpc(this.batchedCalls)
+      return this.batchedCalls.map(async (batchRequest: QtumPpcRequest) => {
+        return await this.rpc<R>(batchRequest)
+      })
     } finally {
       this.batchedCalls = null
     }
@@ -249,7 +310,7 @@ class RpcClient {
       baseArgs: callTypes[]
     ): (
       ...args: (string | { toString: () => string })[]
-    ) => Promise<object | string | number | undefined> | void {
+    ) => Promise<QtumRpcResult> | void {
       let fixedArgs: (string | number | boolean | object)[] = []
       return function (...args: { toString: () => string }[] | string[]) {
         if (baseArgs === ['int', 'int'] || baseArgs === ['int']) {
@@ -273,7 +334,7 @@ class RpcClient {
             method: methodName,
             params: fixedArgs,
             id: getRandomId(),
-          }) as Promise<object | string | number | undefined>
+          }) as Promise<QtumRpcResult>
         }
       }
     }
@@ -289,6 +350,7 @@ class RpcClient {
 
     for (let [key, value] of Object.entries(callspec)) {
       let spec: callTypes[] = value.split(' ') as callTypes[]
+      // @ts-ignore
       self.rpcMethods[key as callspecTypes] = createRPCMethod(key, spec)
     }
   }
