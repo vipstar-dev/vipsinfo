@@ -36,7 +36,13 @@ export interface ContractModelAttributes {
 export interface ContractCreationAttributes
   extends Optional<
     ContractModelAttributes,
-    'code' | 'tag' | 'qrc20' | 'qrc20Balances' | 'qrc721' | 'qrc721Tokens'
+    | 'description'
+    | 'code'
+    | 'tag'
+    | 'qrc20'
+    | 'qrc20Balances'
+    | 'qrc721'
+    | 'qrc721Tokens'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
