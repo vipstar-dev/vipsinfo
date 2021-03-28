@@ -5,7 +5,7 @@ CREATE TABLE `address` (
   `string` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `create_height` int(10) unsigned NOT NULL,
   PRIMARY KEY (`_id`),
-  UNIQUE KEY `address` (`data`,`type`),
+  UNIQUE KEY `address` (`data`,`_type`),
   UNIQUE KEY `string` (`string`) USING BTREE,
   KEY `create_height` (`create_height`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -84,7 +84,7 @@ CREATE TABLE `evm_receipt` (
   UNIQUE KEY `output` (`transaction_id`,`output_index`) USING BTREE,
   UNIQUE KEY `block` (`block_height`,`index_in_block`,`transaction_id`,`output_index`) USING BTREE,
   KEY `contract` (`contract_address`),
-  KEY `sender` (`sender_data`,`sender_type`) USING BTREE
+  KEY `sender` (`sender_data`,`_sender_type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
 CREATE TABLE `evm_receipt_log` (
@@ -163,7 +163,7 @@ CREATE TABLE `qrc20_balance` (
   `address` binary(20) NOT NULL,
   `_balance` binary(32) NOT NULL,
   PRIMARY KEY (`contract_address`,`address`),
-  KEY `rich_list` (`contract_address`,`balance` DESC) USING BTREE,
+  KEY `rich_list` (`contract_address`,`_balance` DESC) USING BTREE,
   KEY `address` (`address`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
