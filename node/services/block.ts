@@ -18,6 +18,7 @@ import { IHeaderService } from '@/node/services/header'
 import AsyncQueue from '@/node/utils'
 import Timeout = NodeJS.Timeout
 import { Services } from '@/node/node'
+import { GetTransactionReceiptResult, Log } from '@/rpc'
 
 const { gt: $gt, between: $between } = Sequelize.Op
 
@@ -57,12 +58,10 @@ interface IBlockService extends IService, BlockAPIMethods {
   _processReorg(blocksToRemove: ITip[]): Promise<void>
   _onBlock(rawBlock: BlockObjectFromIBlock): Promise<void>
   _processBlock(block: BlockObjectFromIBlock): Promise<void>
-  _saveBlock(rawBlock: BlockObjectFromModel): Promise<void>
+  _saveBlock(rawBlock: BlockObject): Promise<void>
   _handleError(...err: (string | number)[]): void
-  _syncBlock(block: BlockObjectFromModel | BlockObjectFromIBlock): Promise<void>
-  __onBlock(
-    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
-  ): Promise<BlockModel | undefined>
+  _syncBlock(block: BlockObject): Promise<void>
+  __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined>
   _setTip(tip: ITip): Promise<void>
   _logSynced(): Promise<void>
   _onSynced(): Promise<void>
@@ -76,6 +75,17 @@ export interface BlockObjectFromModel
 
 export interface BlockObjectFromIBlock extends IBlock {
   height?: number
+  transactionsCount?: number
+  contractTransactionsCount?: number
+}
+
+export interface TransactionReceipt
+  extends Pick<GetTransactionReceiptResult, 'contractAddress'> {
+  logs: Log
+}
+
+export type BlockObject = (BlockObjectFromModel | BlockObjectFromIBlock) & {
+  receipts?: TransactionReceipt[]
 }
 
 class BlockService extends Service implements IBlockService {
@@ -231,7 +241,7 @@ class BlockService extends Service implements IBlockService {
       tip = undefined
     }
     this.blockProcessor = new AsyncQueue((block: IBlock) =>
-      this._onBlock(block)
+      this._onBlock(block as BlockObjectFromIBlock)
     )
     // this.bus = this.node.openBus({ remoteAddress: 'localhost-block' })
     this.bus = this.node.openBus()
@@ -570,9 +580,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _saveBlock(
-    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
-  ): Promise<void> {
+  async _saveBlock(rawBlock: BlockObject): Promise<void> {
     if (!('height' in rawBlock) && this.tip) {
       rawBlock.height = this.tip.height + 1
     }
@@ -606,9 +614,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _syncBlock(
-    block: BlockObjectFromModel | BlockObjectFromIBlock
-  ): Promise<void> {
+  async _syncBlock(block: BlockObject): Promise<void> {
     if (this.getBlocksTimer) {
       clearTimeout(this.getBlocksTimer)
     }
@@ -630,9 +636,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async __onBlock(
-    rawBlock: BlockObjectFromModel | BlockObjectFromIBlock
-  ): Promise<BlockModel | undefined> {
+  async __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined> {
     let header: Pick<
       HeaderModel,
       'height' | 'stakePrevTxId' | 'stakeOutputIndex' | 'isProofOfStake'
