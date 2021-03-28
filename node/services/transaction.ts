@@ -79,7 +79,7 @@ export interface ITransactionService extends IService {
     block,
     transactions,
   }: {
-    block: BlockObject
+    block?: BlockObject
     transactions?: (TransactionModel | ITransactionAndModelSetting)[]
   }): Promise<void>
   processReceipts(
@@ -651,10 +651,10 @@ class TransactionService extends Service implements ITransactionService {
     block,
     transactions,
   }: {
-    block: BlockObject
+    block?: BlockObject
     transactions?: (TransactionModel | ITransactionAndModelSetting)[]
   }): Promise<void> {
-    let filter: string
+    let filter: string = ''
     if (transactions) {
       if (transactions.length === 0) {
         return
@@ -673,7 +673,7 @@ class TransactionService extends Service implements ITransactionService {
           transactions[transactions.length - 1]._id
         }`,
       ])
-    } else {
+    } else if (block) {
       filter = sql([`block_height = ${block.height}`])
     }
 
