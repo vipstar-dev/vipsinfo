@@ -1,5 +1,6 @@
 import { Optional } from 'sequelize'
 import {
+  AutoIncrement,
   BelongsTo,
   Column,
   DataType,
@@ -19,13 +20,14 @@ export interface ContractTagModelAttributes {
 }
 
 export interface ContractTagCreationAttributes
-  extends Optional<ContractTagModelAttributes, 'contract'> {}
+  extends Optional<ContractTagModelAttributes, '_id' | 'contract'> {}
 
 Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class ContractTag extends Model<
   ContractTagModelAttributes,
   ContractTagCreationAttributes
 > {
+  @AutoIncrement
   @PrimaryKey
   @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })
   _id!: bigint
