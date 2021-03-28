@@ -37,7 +37,7 @@ export interface HeaderModelAttributes {
 export interface HeaderCreationAttributes
   extends Optional<
     HeaderModelAttributes,
-    '_chainwork' | 'block' | 'isProofOfStake' | 'difficulty'
+    'prevHash' | '_chainwork' | 'block' | 'isProofOfStake' | 'difficulty'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -57,8 +57,8 @@ export default class Header extends Model<
   @Column(DataType.INTEGER)
   version!: number
 
-  @Column(DataType.STRING(32).BINARY)
   @Default(Buffer.alloc(32))
+  @Column(DataType.STRING(32).BINARY)
   prevHash!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
