@@ -483,7 +483,7 @@ class TransactionService extends Service implements ITransactionService {
             addressItem.indices.push([index, outputIndex])
           } else {
             addressMap.set(key, {
-              type: address.type,
+              type: address.type as string,
               data: address.data,
               string: address.toString() as string,
               createHeight: tx.blockHeight as number,
