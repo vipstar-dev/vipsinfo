@@ -19,7 +19,66 @@ vipsinfo is splitted into 3 repos:
 ## Deploy vipsinfo
 1. `git clone https://github.com/vipstar-dev/vipsinfo.git`
 2. `cd vipsinfo && yarn install`
-3. Create a mysql database and import [docs/structure.sql](structure.sql)
+3. Create a mysql database and import [docs/structure.sql](structure.sql)  
+   ex.) 
+   ```
+   mysql> create database vips_mainnet;
+   Query OK, 1 row affected (0.00 sec)
+   mysql> connect vips_mainnet;
+   Connection id:    26
+   Current database: vips_mainnet
+   
+   mysql> source doc/structure.sql;
+   Query OK, 0 rows affected, 5 warnings (0.03 sec)
+
+   Query OK, 0 rows affected, 5 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 6 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 6 warnings (0.03 sec)
+   
+   Query OK, 0 rows affected (0.02 sec)
+   
+   Query OK, 0 rows affected, 2 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 1 warning (0.02 sec)
+   
+   Query OK, 0 rows affected, 10 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 4 warnings (0.03 sec)
+   
+   Query OK, 0 rows affected, 7 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 4 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 6 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 1 warning (0.02 sec)
+   
+   Query OK, 0 rows affected (0.02 sec)
+   
+   Query OK, 0 rows affected, 2 warnings (0.03 sec)
+   
+   Query OK, 0 rows affected (0.02 sec)
+   
+   Query OK, 0 rows affected (0.01 sec)
+   
+   Query OK, 0 rows affected, 2 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 3 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 8 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 8 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 9 warnings (0.02 sec)
+   
+   Query OK, 0 rows affected, 5 warnings (0.01 sec)
+   
+   Query OK, 0 rows affected, 2 warnings (0.02 sec)
+   
+   mysql>
+   ```
 4. Edit file `vipsinfo-node.json` and change the configurations if needed.
 5. `yarn dev`
 
