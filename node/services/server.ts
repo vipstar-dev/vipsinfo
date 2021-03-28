@@ -2,20 +2,24 @@ import socketio from 'socket.io'
 
 import { IBus } from '@/node/bus'
 import { Services } from '@/node/node'
-import Service, { BaseConfig } from '@/node/services/base'
+import Service, { BaseConfig, IService } from '@/node/services/base'
 import { ITip } from '@/node/services/db'
 
 export interface ServerConfig extends BaseConfig {
   port: number
 }
 
-class ServerService extends Service {
+export interface IServerService extends IService {
+  _onConnection(socket: socketio.Server): void
+  _onBlock(block: ITip): void
+  _onReorg(block: ITip): void
+  _onMempoolTransaction(transaction: { id: Buffer }): void
+}
+
+class ServerService extends Service implements IServerService {
   public options: ServerConfig
-  public bus: IBus | undefined
-  public io: socketio.Server | undefined
-  public height: number | undefined
-  public hash: Buffer | undefined
-  public id: Buffer | undefined
+  private bus: IBus | undefined
+  private io: socketio.Server | undefined
 
   constructor(options: ServerConfig) {
     super(options)
@@ -46,7 +50,7 @@ class ServerService extends Service {
     this.io.on('connection', this._onConnection.bind(this))
   }
 
-  async stop() {
+  async stop(): Promise<void> {
     this.io?.close()
   }
 
