@@ -40,7 +40,7 @@ export interface BlockAPIMethods {
   isSynced: () => boolean
 }
 
-interface IBlockService extends IService, BlockAPIMethods {
+export interface IBlockService extends IService, BlockAPIMethods {
   subscriptions: BlockSubscriptions
   APIMethods: BlockAPIMethods
   _checkTip(): Promise<void>

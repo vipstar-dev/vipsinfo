@@ -53,7 +53,7 @@ const TransferABI = qrc20ABIs.find(
   (abi: IMethodABI | IEventABI) => abi.name === 'Transfer'
 ) as IEventABI
 
-interface IContractService extends IService {
+export interface IContractService extends IService {
   _syncContracts(): Promise<void>
   _createContract(
     address: Buffer,
