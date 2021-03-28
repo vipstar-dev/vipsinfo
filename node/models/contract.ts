@@ -36,6 +36,7 @@ export interface ContractModelAttributes {
 export interface ContractCreationAttributes
   extends Optional<
     ContractModelAttributes,
+    | 'type'
     | 'description'
     | 'code'
     | 'tag'
