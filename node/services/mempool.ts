@@ -19,7 +19,18 @@ import AsyncQueue, { sql } from '@/node/utils'
 
 const { in: $in } = Op
 
-export interface IMempoolService extends IService {}
+export interface IMempoolService extends IService {
+  _startSubscriptions(): void
+  enable(): void
+  _queueTransaction(tx: TransactionModel | ITransactionAndModelSetting): void
+  _handleError(err: string | number): void
+  _onTransaction(
+    tx: TransactionModel | ITransactionAndModelSetting
+  ): Promise<void>
+  _validate(
+    tx: TransactionModel | ITransactionAndModelSetting
+  ): Promise<boolean | void>
+}
 
 class MempoolService extends Service implements IMempoolService {
   public subscriptions: Subscriptions = { transaction: [] }
@@ -101,7 +112,9 @@ class MempoolService extends Service implements IMempoolService {
     }
   }
 
-  async _onTransaction(tx: TransactionModel | ITransactionAndModelSetting) {
+  async _onTransaction(
+    tx: TransactionModel | ITransactionAndModelSetting
+  ): Promise<void> {
     tx.blockHeight = 0xffffffff
     tx.indexInBlock = 0xffffffff
     try {
@@ -140,7 +153,9 @@ class MempoolService extends Service implements IMempoolService {
     }
   }
 
-  async _validate(tx: TransactionModel | ITransactionAndModelSetting) {
+  async _validate(
+    tx: TransactionModel | ITransactionAndModelSetting
+  ): Promise<boolean | void> {
     if (this.Transaction && this.db) {
       let prevTxs: Pick<
         TransactionModel,
