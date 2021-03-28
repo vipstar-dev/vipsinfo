@@ -642,7 +642,7 @@ class BlockService extends Service implements IBlockService {
         attributes: ['height', 'stakePrevTxId', 'stakeOutputIndex'],
       })
     } while (!header)
-    let isProofOfStake = header.isProofOfStake()
+    let isProofOfStake = header.isProofOfStake
     let minerId = (
       await this.TransactionOutput?.findOne({
         where: { outputIndex: isProofOfStake ? 1 : 0 },

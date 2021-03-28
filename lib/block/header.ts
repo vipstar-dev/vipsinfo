@@ -26,7 +26,7 @@ export interface IHeader extends HeaderConstructor {
   difficulty: number
   toBuffer(): Buffer
   toBufferWriter(writer: BufferWriter): void
-  isProofOfStake(): boolean
+  isProofOfStake: boolean
 }
 
 class Header implements IHeader {
@@ -153,7 +153,7 @@ class Header implements IHeader {
     }
   }
 
-  isProofOfStake(): boolean {
+  get isProofOfStake(): boolean {
     return (
       Buffer.compare(
         this.stakePrevTxId || Buffer.alloc(0),

@@ -30,7 +30,7 @@ export interface HeaderModelAttributes {
   _chainwork: Buffer
   block: Block
   chainwork: bigint
-  isProofOfStake(): boolean
+  isProofOfStake: boolean
   difficulty: number
 }
 
@@ -122,7 +122,7 @@ export default class Header extends Model<
     return Header.findOne({ where: { hash }, ...options })
   }
 
-  isProofOfStake(): boolean {
+  get isProofOfStake(): boolean {
     return (
       Buffer.compare(this.stakePrevTxId, Buffer.alloc(32)) !== 0 &&
       this.stakeOutputIndex !== 0xffffffff
