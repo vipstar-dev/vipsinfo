@@ -5,7 +5,7 @@ import {
   DataType,
   ForeignKey,
   HasMany,
-  HasOne,
+  // HasOne,
   Model,
   PrimaryKey,
   Table,
@@ -65,7 +65,14 @@ export default class Block extends Model<
   @BelongsTo(() => Header)
   header!: Header
 
+  /*
+  This is code whose original I(y-chan) reproduced which was written by JavaScript.
+  But I thought this code was wrong...
   @HasOne(() => Address)
+  miner!: Address
+  */
+
+  @BelongsTo(() => Address)
   miner!: Address
 
   @HasMany(() => Transaction)

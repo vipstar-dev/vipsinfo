@@ -1,10 +1,10 @@
 import { Optional } from 'sequelize'
 import {
   AutoIncrement,
-  // ForeignKey,
-  BelongsTo,
+  // BelongsTo,
   Column,
   DataType,
+  HasMany,
   HasOne,
   Model,
   PrimaryKey,
@@ -92,15 +92,12 @@ export default class Address extends Model<
   /*
   This is code whose original I(y-chan) reproduced which was written by JavaScript.
   But I thought this code was wrong...
-  @ForeignKey(() => Block)
-  minerId!: bigint
-
   @HasOne(() => Block)
   minedBlocks!: Block
    */
 
   // I think that true code which this code author wanted to write.
-  @BelongsTo(() => Block)
+  @HasMany(() => Block)
   minedBlocks!: Block
 
   @HasOne(() => BalanceChange)
