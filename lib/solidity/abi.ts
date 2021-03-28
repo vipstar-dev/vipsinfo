@@ -173,11 +173,11 @@ export class EventABI implements IEventABI {
 
 function transformABIList(
   abiList: (MethodABIConstructor | EventABIConstructor)[]
-): (IMethodABI | IEventABI | undefined)[] {
+): (IMethodABI | IEventABI)[] {
   return abiList.map((abi: MethodABIConstructor | EventABIConstructor) => {
     if (abi.type === 'function') {
       return new MethodABI(abi as MethodABIConstructor)
-    } else if (abi.type === 'event') {
+    } else {
       return new EventABI(abi as EventABIConstructor)
     }
   })
