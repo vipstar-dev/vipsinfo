@@ -26,7 +26,7 @@ export interface ContractCodeCreationAttributes
     'source' | 'contractAddress' | 'contract'
   > {}
 
-Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class ContractCode extends Model<
   ContractCodeModelAttributes,
   ContractCodeCreationAttributes
