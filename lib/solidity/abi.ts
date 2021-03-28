@@ -124,40 +124,51 @@ export class EventABI implements IEventABI {
 
   encode(params: any[]): { data: Buffer; topics: Buffer[] } {
     let topics: Buffer[] = []
-    let unindexedInputs: EventABIsIO[] = this.inputs.filter(input => !input.indexed)
+    let unindexedInputs: EventABIsIO[] = this.inputs.filter(
+      (input) => !input.indexed
+    )
     let unindexedParams: any[] = []
     for (let index = 0; index < this.inputs.length; ++index) {
       let input = this.inputs[index]
       if (input.indexed) {
-        topics.push(rawEncode(
-          getTypes({inputs: [input]}, 'inputs'),
-          [params[index]]
-        ))
+        topics.push(
+          rawEncode(getTypes({ inputs: [input] }, 'inputs'), [params[index]])
+        )
       } else {
         unindexedInputs.push(input)
         unindexedParams.push(params[index])
       }
     }
     let data = rawEncode(
-      getTypes({inputs: unindexedInputs}, 'inputs'),
+      getTypes({ inputs: unindexedInputs }, 'inputs'),
       unindexedParams
     )
     return {
       data,
-      topics
+      topics,
     }
   }
 
   decode({ data, topics }: { data: Buffer; topics: Buffer[] }): any[] {
-    let indexedInputs: EventABIsIO[] = this.inputs.filter(input => input.indexed)
-    let unindexedInputs: EventABIsIO[] = this.inputs.filter(input => !input.indexed)
+    let indexedInputs: EventABIsIO[] = this.inputs.filter(
+      (input) => input.indexed
+    )
+    let unindexedInputs: EventABIsIO[] = this.inputs.filter(
+      (input) => !input.indexed
+    )
     let indexedParams: any[] = []
     for (let index = 0; index < topics.length; ++index) {
       let input: EventABIsIO = indexedInputs[index]
-      let [param]: any[] = rawDecode(getTypes({inputs: [input]}, 'inputs'), topics[index])
+      let [param]: any[] = rawDecode(
+        getTypes({ inputs: [input] }, 'inputs'),
+        topics[index]
+      )
       indexedParams.push(param)
     }
-    let unindexedParams: any[] = rawDecode(getTypes({inputs: unindexedInputs}, 'inputs'), data)
+    let unindexedParams: any[] = rawDecode(
+      getTypes({ inputs: unindexedInputs }, 'inputs'),
+      data
+    )
     let params: any[] = []
     for (let index = 0, i = 0, j = 0; index < this.inputs.length; ++index) {
       let input: EventABIsIO = this.inputs[index]
@@ -186,4 +197,4 @@ function transformABIList(
 export const qrc20ABIs = transformABIList(qrc20List)
 export const qrc721ABIs = transformABIList(qrc721List)
 
-Object.assign(exports, {MethodABI, EventABI, qrc20ABIs, qrc721ABIs})
+Object.assign(exports, { MethodABI, EventABI, qrc20ABIs, qrc721ABIs })
