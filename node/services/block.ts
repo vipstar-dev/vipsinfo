@@ -18,7 +18,7 @@ import { IHeaderService } from '@/node/services/header'
 import AsyncQueue from '@/node/utils'
 import Timeout = NodeJS.Timeout
 import { Services } from '@/node/node'
-import { GetTransactionReceiptResult, Log } from '@/rpc'
+import { Log } from '@/rpc'
 
 const { gt: $gt, between: $between } = Sequelize.Op
 
