@@ -21,8 +21,8 @@ import Qrc721Token from '@/node/models/qrc721-token'
 export interface ContractModelAttributes {
   address: Buffer
   addressString: string
-  vm: string[]
-  type: string[]
+  vm: 'evm' | 'x86'
+  type: 'dgp' | 'qrc20' | 'qrc721'
   bytecodeSha256sum: Buffer
   description: string
   code: ContractCode
@@ -51,12 +51,12 @@ export default class Contract extends Model<
   @Column(DataType.STRING(34))
   addressString!: string
 
-  @Column(DataType.ENUM)
-  vm: string[] = ['evm', 'x86']
+  @Column(DataType.ENUM('evm', 'x86'))
+  vm!: 'evm' | 'x86'
 
   @AllowNull
-  @Column(DataType.ENUM)
-  type: string[] = ['dgp', 'qrc20', 'qrc721']
+  @Column(DataType.ENUM('dgp', 'qrc20', 'qrc721'))
+  type!: 'dgp' | 'qrc20' | 'qrc721'
 
   @Column(DataType.STRING(32).BINARY)
   bytecodeSha256sum!: Buffer
