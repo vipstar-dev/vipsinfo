@@ -79,9 +79,9 @@ export interface BlockObjectFromIBlock extends IBlock {
   contractTransactionsCount?: number
 }
 
-export interface TransactionReceipt
-  extends Pick<GetTransactionReceiptResult, 'contractAddress'> {
-  logs: Log
+export interface TransactionReceipt {
+  contractAddress: Buffer
+  logs: Log<Buffer>[]
 }
 
 export type BlockObject = (BlockObjectFromModel | BlockObjectFromIBlock) & {

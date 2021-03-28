@@ -39,10 +39,10 @@ export interface QtumPpcRequest {
   id: number
 }
 
-export interface Log {
-  address: string
-  topics: string[]
-  data: string
+export interface Log<T extends Buffer | string> {
+  address: T
+  topics: T[]
+  data: T
 }
 
 export interface CallContractResult {
@@ -61,7 +61,7 @@ export interface CallContractResult {
     stateRoot: string
     gasUsed: number
     bloom: string
-    log: Log[]
+    log: Log<string>[]
   }
 }
 
@@ -90,7 +90,7 @@ export interface GetTransactionReceiptResult {
   excepted: string
   exceptedMessage: string
   bloom: string
-  log: Log[]
+  log: Log<string>[]
 }
 
 export interface ListContractsResult {
