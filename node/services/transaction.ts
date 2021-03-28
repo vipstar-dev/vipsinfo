@@ -897,16 +897,16 @@ class TransactionService extends Service implements ITransactionService {
           blockReceipts.map((receipts: GetTransactionReceiptResult[]) => {
             receipts.map(
               ({ contractAddress, log: logs }: GetTransactionReceiptResult) => {
-                return {
+                block.receipts?.push({
                   contractAddress: Buffer.from(contractAddress, 'hex'),
-                  logs: logs.map(({ address, topics, data }: Log) => ({
+                  logs: logs.map(({ address, topics, data }: Log<string>) => ({
                     address: Buffer.from(address, 'hex'),
                     topics: topics.map((topic: string) =>
                       Buffer.from(topic, 'hex')
                     ),
                     data: Buffer.from(data, 'hex'),
                   })),
-                }
+                })
               }
             )
           })
