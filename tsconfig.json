@@ -25,13 +25,15 @@
     },
     "types": [
       "@types/bluebird",
-      "@types/ethereumjs-abi",
       "@types/node",
       "@types/liftoff",
       "@types/lru-cache",
       "@types/socket.io",
       "@types/uuid",
       "@types/validator"
+    ],
+    "typeRoots": [
+      "types"
     ],
     /* Advanced Options */
     "resolveJsonModule": true,

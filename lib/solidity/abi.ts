@@ -1,4 +1,11 @@
-import { eventID, methodID, rawDecode, rawEncode } from 'ethereumjs-abi'
+import {
+  eventID,
+  methodID,
+  rawDecode,
+  rawDecodeResults,
+  rawEncode,
+  rawEncodeArgument,
+} from 'ethereumjs-abi'
 
 import qrc20List from '@/lib/solidity/qrc20-abi.json'
 import qrc721List from '@/lib/solidity/qrc721-abi.json'
@@ -42,7 +49,7 @@ export interface IEventABI extends EventABIConstructor {
 }
 
 function getTypes(
-  abi: IMethodABI | IEventABI | { inputs: EventABIsIO[] },
+  abi: IMethodABI | IEventABI | Pick<EventABIConstructor, 'inputs'>,
   category: 'inputs' | 'outputs'
 ): string[] {
   const result: string[] = []
@@ -54,7 +61,7 @@ function getTypes(
     } else {
       result.push(item.type)
     } */
-    result.push(item.type)
+    result.push((item as MethodABIsIO).type)
   }
   return result
 }
@@ -86,19 +93,19 @@ export class MethodABI implements IMethodABI {
     return this._id
   }
 
-  encodeInputs(params: any[]): Buffer {
+  encodeInputs(params: rawEncodeArgument[]): Buffer {
     return rawEncode(getTypes(this, 'inputs'), params)
   }
 
-  decodeInputs(data: Buffer): any[] {
+  decodeInputs(data: Buffer): (rawDecodeResults | rawDecodeResults[])[] {
     return rawDecode(getTypes(this, 'inputs'), data)
   }
 
-  encodeOutputs(params: any[]): Buffer {
+  encodeOutputs(params: rawEncodeArgument[]): Buffer {
     return rawEncode(getTypes(this, 'outputs'), params)
   }
 
-  decodeOutputs(data: Buffer): any[] {
+  decodeOutputs(data: Buffer): (rawDecodeResults | rawDecodeResults[])[] {
     return rawDecode(getTypes(this, 'outputs'), data)
   }
 }
@@ -149,27 +156,33 @@ export class EventABI implements IEventABI {
     }
   }
 
-  decode({ data, topics }: { data: Buffer; topics: Buffer[] }): any[] {
+  decode({
+    data,
+    topics,
+  }: {
+    data: Buffer
+    topics: Buffer[]
+  }): (rawDecodeResults | rawDecodeResults[])[] {
     const indexedInputs: EventABIsIO[] = this.inputs.filter(
       (input) => input.indexed
     )
     const unindexedInputs: EventABIsIO[] = this.inputs.filter(
       (input) => !input.indexed
     )
-    const indexedParams: any[] = []
+    const indexedParams: (rawDecodeResults | rawDecodeResults[])[] = []
     for (let index = 0; index < topics.length; ++index) {
       const input: EventABIsIO = indexedInputs[index]
-      const [param]: any[] = rawDecode(
+      const [param]: (rawDecodeResults | rawDecodeResults[])[] = rawDecode(
         getTypes({ inputs: [input] }, 'inputs'),
         topics[index]
       )
       indexedParams.push(param)
     }
-    const unindexedParams: any[] = rawDecode(
-      getTypes({ inputs: unindexedInputs }, 'inputs'),
-      data
-    )
-    const params: any[] = []
+    const unindexedParams: (
+      | rawDecodeResults
+      | rawDecodeResults[]
+    )[] = rawDecode(getTypes({ inputs: unindexedInputs }, 'inputs'), data)
+    const params: (rawDecodeResults | rawDecodeResults[])[] = []
     for (let index = 0, i = 0, j = 0; index < this.inputs.length; ++index) {
       const input: EventABIsIO = this.inputs[index]
       if (input.indexed) {
