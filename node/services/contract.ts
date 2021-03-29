@@ -1,3 +1,4 @@
+import { rawDecodeResults, rawEncodeArgument } from 'ethereumjs-abi'
 import { ModelCtor, Op, Sequelize } from 'sequelize'
 
 import {
@@ -126,7 +127,7 @@ class ContractService extends Service implements IContractService {
       this.QRC721Token = getModel('qrc721_token') as ModelCtor<Qrc721TokenModel>
     }
     this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
-    const blockTip = await this.node.addedMethods.getBlockTip?.()
+    const blockTip = this.node.addedMethods.getBlockTip?.()
     if (this.tip) {
       if (blockTip && this.tip.height > blockTip.height) {
         this.tip = { height: blockTip.height, hash: blockTip.hash }
@@ -447,8 +448,8 @@ class ContractService extends Service implements IContractService {
           })
           await this.QRC721?.create({
             contractAddress: address,
-            name,
-            symbol,
+            name: name as Buffer,
+            symbol: symbol as Buffer,
             totalSupply,
           })
         } catch (err) {
@@ -518,11 +519,11 @@ class ContractService extends Service implements IContractService {
           })
           await this.QRC20?.create({
             contractAddress: address,
-            name,
-            symbol,
-            decimals,
+            name: name as Buffer,
+            symbol: symbol as Buffer,
+            decimals: Number(decimals),
             totalSupply,
-            version,
+            version: version as Buffer,
           })
         } catch (err) {
           await contract.save()
@@ -562,9 +563,9 @@ class ContractService extends Service implements IContractService {
     callList: {
       address: Buffer
       abi: IMethodABI
-      args?: string[]
+      args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<Promise<any[]>[] | undefined> {
+  ): Promise<Promise<(rawDecodeResults | rawDecodeResults[])[]>[] | undefined> {
     const client = this.node.addedMethods.getRpcClient?.()
     const results = await client?.batch<CallContractResult>(() => {
       for (const { address, abi, args = [] } of callList) {
@@ -589,7 +590,7 @@ class ContractService extends Service implements IContractService {
 
   async _processReceipts(block: BlockObject): Promise<void> {
     const balanceChanges: Set<string> = new Set()
-    const tokenHolders: Map<string, Buffer> = new Map()
+    const tokenHolders: Map<string, Buffer> = new Map<string, Buffer>()
     const totalSupplyChanges: Set<string> = new Set()
     // This is not used in here...
     // let contractsToCreate: Set<string> = new Set()
