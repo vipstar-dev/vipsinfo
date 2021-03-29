@@ -21,13 +21,13 @@ export class InvalidBase58Error extends Error {
 
 export class Base58 {
   static encode(buf: Buffer): string {
-    let result: number[] = []
+    const result: number[] = []
     let n: bigint = BigInt(0)
-    for (let x of buf) {
+    for (const x of buf) {
       n = (n << BigInt(8)) | BigInt(x)
     }
     while (n > 0) {
-      let r: bigint = n % BigInt(58)
+      const r: bigint = n % BigInt(58)
       n /= BigInt(58)
       result.push(Number(r))
     }
@@ -45,13 +45,13 @@ export class Base58 {
       return Buffer.alloc(0)
     }
     let n: bigint = BigInt(0)
-    for (let s of str) {
+    for (const s of str) {
       if (!(s in ALPHABET_MAP)) {
         throw new InvalidBase58Error(str)
       }
       n = n * BigInt(58) + BigInt(ALPHABET_MAP[s])
     }
-    let list: number[] = []
+    const list: number[] = []
     while (n > 0) {
       list.push(Number(n & BigInt(0xff)))
       n >>= BigInt(8)
@@ -76,18 +76,18 @@ export class InvalidBase58ChecksumError extends Error {
 
 export class Base58Check {
   static encode(buf: Buffer): string {
-    let checkedBuffer: Buffer = Buffer.alloc(buf.length + 4)
-    let hashBuffer: Buffer = sha256d(buf)
+    const checkedBuffer: Buffer = Buffer.alloc(buf.length + 4)
+    const hashBuffer: Buffer = sha256d(buf)
     buf.copy(checkedBuffer)
     hashBuffer.copy(checkedBuffer, buf.length)
     return Base58.encode(checkedBuffer)
   }
 
   static decode(str: string): Buffer {
-    let buf: Buffer = Base58.decode(str)
-    let data: Buffer = buf.slice(0, -4)
-    let checksum: Buffer = buf.slice(-4)
-    let hashBuffer: Buffer = sha256d(data)
+    const buf: Buffer = Base58.decode(str)
+    const data: Buffer = buf.slice(0, -4)
+    const checksum: Buffer = buf.slice(-4)
+    const hashBuffer: Buffer = sha256d(data)
     if (Buffer.compare(hashBuffer.slice(0, 4), checksum) !== 0) {
       throw new InvalidBase58ChecksumError(str)
     }

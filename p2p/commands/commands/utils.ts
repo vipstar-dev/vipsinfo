@@ -23,9 +23,9 @@ export function getNonce(): Buffer {
 }
 
 export function parseIP(reader: BufferReader): IpAddress {
-  let ipv6: (string | undefined)[] = []
+  const ipv6: (string | undefined)[] = []
   for (let i = 0; i < 8; ++i) {
-    let word = reader.read(2)
+    const word = reader.read(2)
     ipv6.push(word?.toString('hex'))
   }
   return { v6: ipv6.join(':') }
@@ -33,16 +33,16 @@ export function parseIP(reader: BufferReader): IpAddress {
 
 export function writeIP(writer: BufferWriter, ip: IpAddress) {
   if (ip.v6) {
-    for (let word of ip.v6.split(':')) {
+    for (const word of ip.v6.split(':')) {
       writer.write(Buffer.from(word, 'hex'))
     }
   }
 }
 
 export function parseAddress(reader: BufferReader): AddressData {
-  let services = reader.readUInt64LE()
-  let ip = parseIP(reader)
-  let port = reader.readUInt16BE()
+  const services = reader.readUInt64LE()
+  const ip = parseIP(reader)
+  const port = reader.readUInt16BE()
   return { services, ip, port }
 }
 
@@ -60,12 +60,12 @@ export function writeAddress(
 }
 
 export function parseInventories(reader: BufferReader): InventoryConstructor[] {
-  let inventories: InventoryConstructor[] = []
-  let count = reader.readVarintNumber()
+  const inventories: InventoryConstructor[] = []
+  const count = reader.readVarintNumber()
   if (count) {
     for (let i = 0; i < count; ++i) {
-      let type = reader.readUInt32LE()
-      let data = reader.read(32)
+      const type = reader.readUInt32LE()
+      const data = reader.read(32)
       inventories.push({ type, data })
     }
   }
@@ -77,7 +77,7 @@ export function writeInventories(
   inventories: InventoryConstructor[]
 ): void {
   writer.writeVarintNumber(inventories.length)
-  for (let inventory of inventories) {
+  for (const inventory of inventories) {
     if (inventory.type && inventory.data) {
       writer.writeUInt32LE(inventory.type)
       writer.write(inventory.data)

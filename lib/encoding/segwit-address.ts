@@ -19,10 +19,10 @@ function convertBits(
 ): Buffer | null {
   let acc: number = 0
   let bits: number = 0
-  let result: number[] = []
-  let maxV: number = (1 << toBits) - 1
+  const result: number[] = []
+  const maxV: number = (1 << toBits) - 1
   for (let p = 0; p < data.length; ++p) {
-    let value: number = data[p]
+    const value: number = data[p]
     if (value < 0 || value >>> fromBits !== 0) {
       return null
     }
@@ -45,8 +45,8 @@ function convertBits(
 
 export class SegwitAddress {
   static encode(hrp: string, version: number, program: Buffer): string {
-    let dataBuffer: Buffer | null = convertBits(program, 8, 5, true)
-    let dataArray: number[] = []
+    const dataBuffer: Buffer | null = convertBits(program, 8, 5, true)
+    const dataArray: number[] = []
     if (dataBuffer !== null) {
       dataBuffer.map((n: number) => dataArray.push(n))
     }
@@ -57,14 +57,14 @@ export class SegwitAddress {
     address: string
   ): { hrp: string; version: number; program: Buffer } | null | undefined {
     try {
-      let { hrp, data }: { hrp: string; data: number[] } = Bech32.decode(
+      const { hrp, data }: { hrp: string; data: number[] } = Bech32.decode(
         address
       )
-      let [version, ...programBits]: number[] = data
+      const [version, ...programBits]: number[] = data
       if (data.length < 1 || data[0] > 16) {
         throw new InvalidSegwitAddressError(address)
       }
-      let program: Buffer | null = convertBits(programBits, 5, 8, false)
+      const program: Buffer | null = convertBits(programBits, 5, 8, false)
       if (program === null || program.length < 2 || program.length > 40) {
         return null
       }

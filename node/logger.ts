@@ -43,8 +43,8 @@ class Logger implements ILogger {
 
   _log(color: colorTypes, level: levelTypes, ...args: any[]): void {
     if (this.formatting) {
-      let date = new Date()
-      let typeString = colors[color](`${level}:`)
+      const date = new Date()
+      const typeString = colors[color](`${level}:`)
       args.unshift(`[${date.toISOString()}]`, typeString)
     }
     console[level === 'error' ? 'error' : 'log'](...args)

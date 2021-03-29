@@ -20,7 +20,7 @@ class PongMessage extends Message implements IPongMessage {
   }
 
   static fromBuffer(payload: Buffer, options: PongMessageOptions): PongMessage {
-    let message = new PongMessage(options)
+    const message = new PongMessage(options)
     message.payload = payload
     return message
   }
@@ -30,8 +30,8 @@ class PongMessage extends Message implements IPongMessage {
   }
 
   set payload(payload) {
-    let reader = new BufferReader(payload)
-    let nonce = reader.read(8)
+    const reader = new BufferReader(payload)
+    const nonce = reader.read(8)
     if (nonce) {
       this.nonce = nonce
     }

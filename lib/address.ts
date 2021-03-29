@@ -152,7 +152,7 @@ class Address implements IAddress {
       })
     }
     try {
-      let result: Buffer = Base58Check.decode(str)
+      const result: Buffer = Base58Check.decode(str)
       if (result.length === 21) {
         if (result[0] === chain.pubkeyhash) {
           return new Address({
@@ -185,7 +185,7 @@ class Address implements IAddress {
       }
     }
     try {
-      let {
+      const {
         hrp,
         version,
         program,
@@ -248,7 +248,7 @@ class Address implements IAddress {
 }
 
 function getUInt32LEBuffer(n: number): Buffer {
-  let buffer: Buffer = Buffer.alloc(4)
+  const buffer: Buffer = Buffer.alloc(4)
   buffer.writeUInt32LE(n)
   return buffer
 }

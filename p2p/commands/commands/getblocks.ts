@@ -33,18 +33,18 @@ class GetBlocksMessage extends Message implements IGetBlocksMessage {
     payload: Buffer,
     options: GetBlocksMessageOptions
   ): GetBlocksMessage {
-    let message = new GetBlocksMessage(options)
+    const message = new GetBlocksMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     if (this.version) {
       writer.writeUInt32LE(this.version)
     }
     writer.writeVarintNumber(this.starts.length)
-    for (let start of this.starts) {
+    for (const start of this.starts) {
       if (start) {
         writer.write(start?.reverse())
       }
@@ -56,21 +56,21 @@ class GetBlocksMessage extends Message implements IGetBlocksMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
-    let version: number | undefined = reader.readUInt32LE()
+    const reader = new BufferReader(payload)
+    const version: number | undefined = reader.readUInt32LE()
     if (version) {
       this.version = version
     }
-    let startCount = reader.readVarintNumber()
+    const startCount = reader.readVarintNumber()
     this.starts = []
     if (startCount) {
       for (let i = 0; i < startCount; ++i) {
-        let start: Buffer | undefined = reader.read(32)
+        const start: Buffer | undefined = reader.read(32)
         if (start) {
           this.starts.push(start.reverse())
         }
       }
-      let stop: Buffer | undefined = reader.read(32)
+      const stop: Buffer | undefined = reader.read(32)
       if (stop) {
         this.stop = stop.reverse()
       }

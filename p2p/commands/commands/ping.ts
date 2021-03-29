@@ -20,7 +20,7 @@ class PingMessage extends Message implements IPingMessage {
   }
 
   static fromBuffer(payload: Buffer, options: PingMessageOptions): PingMessage {
-    let message = new PingMessage(options)
+    const message = new PingMessage(options)
     message.payload = payload
     return message
   }
@@ -30,8 +30,8 @@ class PingMessage extends Message implements IPingMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
-    let nonce = reader.read(8)
+    const reader = new BufferReader(payload)
+    const nonce = reader.read(8)
     if (nonce) {
       this.nonce = nonce
     }

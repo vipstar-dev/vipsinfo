@@ -74,7 +74,7 @@ class HeaderService extends Service implements IHeaderService {
 
   constructor(options: BaseConfig) {
     super(options)
-    let p2p = this.node.services.get('p2p')
+    const p2p = this.node.services.get('p2p')
     if (p2p) {
       this.p2p = p2p as IP2PService
     }
@@ -189,7 +189,9 @@ class HeaderService extends Service implements IHeaderService {
       return
     }
     try {
-      let header: HeaderModel | null = await HeaderModel.findByHash(block.hash)
+      const header: HeaderModel | null = await HeaderModel.findByHash(
+        block.hash
+      )
       if (header) {
         this.logger.debug('Header Service: block already exists in data set')
       } else {
@@ -214,7 +216,7 @@ class HeaderService extends Service implements IHeaderService {
   async _syncBlock(block: BlockModel): Promise<void> {
     this.logger.debug('Header Service: new block:', block.hash.toString('hex'))
     if (this.Header) {
-      let header = new HeaderModel({
+      const header = new HeaderModel({
         hash: block.header.hash,
         height: block.header.height,
         version: block.header.version,
@@ -259,7 +261,7 @@ class HeaderService extends Service implements IHeaderService {
           headers.length,
           'header(s)'
         )
-        let transformedHeaders: HeaderCreationAttributes[] = headers.map(
+        const transformedHeaders: HeaderCreationAttributes[] = headers.map(
           (header: HeaderModel) => ({
             hash: header.hash,
             height: 0,
@@ -277,7 +279,7 @@ class HeaderService extends Service implements IHeaderService {
             chainwork: BigInt(0),
           })
         )
-        for (let header of transformedHeaders) {
+        for (const header of transformedHeaders) {
           if (this.lastHeader && header.prevHash) {
             assert(
               Buffer.compare(this.lastHeader.hash, header.prevHash) === 0,
@@ -324,7 +326,7 @@ class HeaderService extends Service implements IHeaderService {
     }
     this.logger.info('Header Service: sync complete')
     this.initialSync = false
-    for (let service of this.node.getServicesByOrder()) {
+    for (const service of this.node.getServicesByOrder()) {
       await service.onHeaders()
     }
     this.emit('reorg complete')
@@ -387,10 +389,10 @@ class HeaderService extends Service implements IHeaderService {
       'Header Service: starting sync routines, ensuring no pre-exiting subscriptions to p2p blocks'
     )
     this._removeAllSubscriptions()
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (this.blockProcessor && this.blockProcessor.length === 0 && this.tip) {
         clearInterval(interval)
-        let numNeeded =
+        const numNeeded =
           Math.max(Number(this._bestHeight), this.originalHeight) -
           this.tip.height
         assert(numNeeded >= 0)
@@ -425,11 +427,11 @@ class HeaderService extends Service implements IHeaderService {
       if (!this.initialSync || this.lastTipHeightReported === this.tip.height) {
         return
       }
-      let bestHeight = Math.max(
+      const bestHeight = Math.max(
         Number(this._bestHeight),
         Number(this.lastHeader?.height)
       )
-      let progress =
+      const progress =
         bestHeight === 0 ? 0 : ((this.tip.height / bestHeight) * 100).toFixed(2)
       this.logger.info(
         'Header Service: download progress:',
@@ -458,7 +460,7 @@ class HeaderService extends Service implements IHeaderService {
       'Header Service: block count to getEndHash must be at least 1'
     )
     if (this.tip && this.Header) {
-      let numResultsNeeded = Math.min(
+      const numResultsNeeded = Math.min(
         this.tip.height - tip.height,
         blockCount + 1
       )
@@ -470,8 +472,8 @@ class HeaderService extends Service implements IHeaderService {
       } else if (numResultsNeeded <= 0) {
         throw new Error('Header Service: block service is mis-aligned')
       }
-      let startingHeight = tip.height + 1
-      let results = (
+      const startingHeight = tip.height + 1
+      const results = (
         await this.Header.findAll({
           where: {
             height: {
@@ -481,8 +483,8 @@ class HeaderService extends Service implements IHeaderService {
           attributes: ['hash'],
         })
       ).map((header: Pick<HeaderModel, 'hash'>) => header.hash)
-      let index = numResultsNeeded - 1
-      let endHash = index <= 0 || !results[index] ? undefined : results[index]
+      const index = numResultsNeeded - 1
+      const endHash = index <= 0 || !results[index] ? undefined : results[index]
       return { targetHash: results[0], endHash }
     }
   }
@@ -500,7 +502,7 @@ class HeaderService extends Service implements IHeaderService {
       await this.Header.destroy({
         where: { height: { [$gt]: this.tip.height } },
       })
-      let lastHeader = await HeaderModel.findByHeight(this.tip.height)
+      const lastHeader = await HeaderModel.findByHeight(this.tip.height)
       if (lastHeader) {
         this.lastHeader = lastHeader
         this.tip.height = this.lastHeader.height
@@ -513,7 +515,7 @@ class HeaderService extends Service implements IHeaderService {
     header: HeaderCreationAttributes,
     prevHeader: HeaderModel | HeaderCreationAttributes
   ): bigint {
-    let target = fromCompact(header.bits)
+    const target = fromCompact(header.bits)
     if (target <= BigInt(0)) {
       return BigInt(0)
     }
@@ -525,7 +527,7 @@ function fromCompact(bits: number): bigint {
   if (bits === 0) {
     return BigInt(0)
   }
-  let exponent = bits >>> 24
+  const exponent = bits >>> 24
   let num = BigInt(bits & 0x7fffff) << BigInt(8 * (exponent - 3))
   if ((bits >>> 23) & 1) {
     num = -num

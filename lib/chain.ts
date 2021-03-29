@@ -14,7 +14,7 @@ export interface IChain {
   dnsSeeds?: string[]
 }
 
-const chains: Map<string, IChain> = new Map()
+const chains: Map<chainType, IChain> = new Map()
 
 class Chain implements IChain {
   name: chainType
@@ -56,7 +56,7 @@ class Chain implements IChain {
   }
 
   static add(options: IChain): void {
-    let chain = new Chain(options)
+    const chain = new Chain(options)
     chains.set(chain.name, chain)
   }
 

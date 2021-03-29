@@ -208,7 +208,7 @@ class DBService extends Service implements IDBService {
   }
 
   async getServiceTip(serviceName: string): Promise<ITip | undefined> {
-    let tip = await this.Tip?.findByPk(serviceName)
+    const tip = await this.Tip?.findByPk(serviceName)
     if (tip) {
       return { height: tip.height, hash: tip.hash }
     } else if (this.genesisHash) {
@@ -220,8 +220,8 @@ class DBService extends Service implements IDBService {
     await this.Tip?.upsert(
       new Tip({
         service: serviceName,
-        height: tip.height as number,
-        hash: tip.hash as Buffer,
+        height: tip.height,
+        hash: tip.hash,
       })
     )
   }

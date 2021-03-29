@@ -29,7 +29,7 @@ class InvMessage extends Message implements IInvMessage {
   }
 
   static fromBuffer(payload: Buffer, options: InvMessageOptions): InvMessage {
-    let message = new InvMessage(options)
+    const message = new InvMessage(options)
     message.payload = payload
     return message
   }
@@ -56,13 +56,13 @@ class InvMessage extends Message implements IInvMessage {
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writeInventories(writer, this.inventories)
     return writer.toBuffer()
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
+    const reader = new BufferReader(payload)
     this.inventories = parseInventories(reader)
     Message.checkFinished(reader)
   }

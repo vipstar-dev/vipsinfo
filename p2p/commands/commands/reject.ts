@@ -49,13 +49,13 @@ class RejectMessage extends Message implements IRejectMessage {
     payload: Buffer,
     options: RejectMessageOptions
   ): RejectMessage {
-    let message = new RejectMessage(options)
+    const message = new RejectMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     if (this.message && this.code && this.reason && this.data) {
       writer.writeVarLengthBuffer(Buffer.from(this.message, 'ascii'))
       writer.writeUInt8(this.code)
@@ -66,11 +66,11 @@ class RejectMessage extends Message implements IRejectMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
-    let message = reader.readVarLengthBuffer()?.toString('ascii')
-    let code = reader.readUInt8()
-    let reason = reader.readVarLengthBuffer()?.toString('ascii')
-    let data = reader.readAll()
+    const reader = new BufferReader(payload)
+    const message = reader.readVarLengthBuffer()?.toString('ascii')
+    const code = reader.readUInt8()
+    const reason = reader.readVarLengthBuffer()?.toString('ascii')
+    const data = reader.readAll()
     if (message && code && reason && data) {
       this.message = message
       this.code = code

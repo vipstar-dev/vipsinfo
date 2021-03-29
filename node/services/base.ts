@@ -105,7 +105,7 @@ class Service extends EventEmitter implements IService {
   async onReorg(height: number) {}
 
   subscribe(name: string, emitter: IBus): void {
-    let subscription = this.subscriptions[name]
+    const subscription = this.subscriptions[name]
     subscription.push(emitter)
     this.logger?.info(
       'Subscribe:',
@@ -116,8 +116,8 @@ class Service extends EventEmitter implements IService {
   }
 
   unsubscribe(name: string, emitter: IBus): void {
-    let subscription = this.subscriptions[name]
-    let index = subscription.indexOf(emitter)
+    const subscription = this.subscriptions[name]
+    const index = subscription.indexOf(emitter)
     if (index >= 0) {
       subscription.splice(index, 1)
       this.logger?.info(

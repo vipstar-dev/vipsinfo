@@ -159,7 +159,7 @@ class BlockService extends Service implements IBlockService {
   async _checkTip(): Promise<void> {
     this.logger.info('Block Service: checking the saved tip...')
     if (this.Header && this.tip) {
-      let header =
+      const header =
         (await HeaderModel.findByHeight(this.tip.height)) ||
         this.header?.getLastHeader()
       if (
@@ -181,7 +181,7 @@ class BlockService extends Service implements IBlockService {
     this.logger.warn(
       'Block Service: resetting tip due to a non-exist tip block...'
     )
-    let headerModel = this.header?.getLastHeader()
+    const headerModel = this.header?.getLastHeader()
     if (headerModel) {
       let { hash, height } = headerModel
       this.logger.info('Block Service: retrieved all the headers of lookups')
@@ -198,10 +198,12 @@ class BlockService extends Service implements IBlockService {
             'was not found, proceeding to older blocks'
           )
         }
-        let header: BlockModel | null | undefined = await this.Block?.findOne({
-          where: { height: --height },
-          attributes: ['hash'],
-        })
+        const header: BlockModel | null | undefined = await this.Block?.findOne(
+          {
+            where: { height: --height },
+            attributes: ['hash'],
+          }
+        )
         assert(header, 'Header not found for reset')
         if (!block) {
           this.logger.debug(
@@ -292,14 +294,14 @@ class BlockService extends Service implements IBlockService {
 
   async _getTimeSinceLastBlock(): Promise<string | void> {
     if (this.Header && this.tip) {
-      let header: Pick<
+      const header: Pick<
         HeaderModel,
         'timestamp'
       > | null = await this.Header.findOne({
         where: { height: Math.max(this.tip.height - 1, 0) },
         attributes: ['timestamp'],
       })
-      let tip: Pick<
+      const tip: Pick<
         HeaderModel,
         'timestamp'
       > | null = await this.Header.findOne({
@@ -330,12 +332,12 @@ class BlockService extends Service implements IBlockService {
   }
 
   async _onReorg(blocks: ITip[]): Promise<void> {
-    let targetHeight = blocks[blocks.length - 1].height - 1
+    const targetHeight = blocks[blocks.length - 1].height - 1
     /* let { hash: targetHash } = await HeaderModel.findByHeight(targetHeight, {
       attributes: ['hash'],
     }) */
     try {
-      for (let service of this.node.getServicesByOrder().reverse()) {
+      for (const service of this.node.getServicesByOrder().reverse()) {
         this.logger.info('Block Service: reorging', service.name, 'service')
         // await service.onReorg(targetHeight, targetHash)
         await service.onReorg(targetHeight)
@@ -366,7 +368,7 @@ class BlockService extends Service implements IBlockService {
     } else {
       this.initialSync = true
       return new Promise((resolve) => {
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
           if (!this.processingBlock) {
             clearInterval(interval)
             resolve(this._onHeaders())
@@ -379,7 +381,7 @@ class BlockService extends Service implements IBlockService {
   async _onHeaders(): Promise<void> {
     await this._resetTip()
     return new Promise((resolve, reject) => {
-      let interval = setInterval(async () => {
+      const interval = setInterval(async () => {
         if (this.blocksInQueue === 0) {
           clearInterval(interval)
           this._removeAllSubscriptions()
@@ -407,7 +409,7 @@ class BlockService extends Service implements IBlockService {
 
   async _findLatestValidBlockHeader(): Promise<ITip | undefined> {
     if (this.reorgToBlock) {
-      let header: ITip | null = await HeaderModel.findByHeight(
+      const header: ITip | null = await HeaderModel.findByHeight(
         this.reorgToBlock,
         {
           attributes: ['hash', 'height'],
@@ -421,14 +423,14 @@ class BlockService extends Service implements IBlockService {
       let blockServiceHeight: number = this.tip.height
       let header: ITip | undefined
       for (let i = 0; i <= this.recentBlockHashes.length; ++i) {
-        let currentHeader: ITip | null = await HeaderModel.findByHash(
+        const currentHeader: ITip | null = await HeaderModel.findByHash(
           blockServiceHash as Buffer,
           {
             attributes: ['hash', 'height'],
           }
         )
-        let hash: Buffer = blockServiceHash as Buffer
-        let height: number = blockServiceHeight--
+        const hash: Buffer = blockServiceHash as Buffer
+        const height: number = blockServiceHeight--
         blockServiceHash = this.recentBlockHashes.get(hash.toString('hex'))
         if (
           currentHeader &&
@@ -459,12 +461,14 @@ class BlockService extends Service implements IBlockService {
 
   async _findBlocksToRemove(commonHeader: ITip): Promise<ITip[]> {
     let hash: Buffer | undefined = this.tip?.hash
-    let blocks: ITip[] = []
+    const blocks: ITip[] = []
     if (hash && this.Block) {
-      let block: Pick<BlockModel, 'height'> | null = await this.Block.findOne({
-        where: { hash },
-        attributes: ['height'],
-      })
+      const block: Pick<BlockModel, 'height'> | null = await this.Block.findOne(
+        {
+          where: { hash },
+          attributes: ['height'],
+        }
+      )
       if (block) {
         let { height } = block
         for (
@@ -474,7 +478,7 @@ class BlockService extends Service implements IBlockService {
           ++i
         ) {
           blocks.push({ height, hash })
-          let prevBlock: Pick<
+          const prevBlock: Pick<
             BlockModel,
             'hash'
           > | null = await this.Block.findOne({
@@ -490,12 +494,14 @@ class BlockService extends Service implements IBlockService {
 
   async _handleReorg(): Promise<void> {
     this.node.addedMethods.clearInventoryCache?.()
-    let commonAncestorHeader = await this._findLatestValidBlockHeader()
+    const commonAncestorHeader = await this._findLatestValidBlockHeader()
     if (commonAncestorHeader && this.tip) {
       if (Buffer.compare(commonAncestorHeader.hash, this.tip.hash) === 0) {
         return
       }
-      let blocksToRemove = await this._findBlocksToRemove(commonAncestorHeader)
+      const blocksToRemove = await this._findBlocksToRemove(
+        commonAncestorHeader
+      )
       assert(
         blocksToRemove.length > 0 &&
           blocksToRemove.length <= this.recentBlockHashes.length,
@@ -516,7 +522,7 @@ class BlockService extends Service implements IBlockService {
         height: commonAncestorHeader.height,
       })
       await this._processReorg(blocksToRemove)
-      for (let subscription of this.subscriptions.block) {
+      for (const subscription of this.subscriptions.block) {
         subscription.emit('block/reorg', {
           hash: commonAncestorHeader.hash,
           height: commonAncestorHeader.height,
@@ -526,7 +532,7 @@ class BlockService extends Service implements IBlockService {
   }
 
   async _processReorg(blocksToRemove: ITip[]): Promise<void> {
-    for (let block of blocksToRemove) {
+    for (const block of blocksToRemove) {
       this.recentBlockHashes.del(block.hash.toString('hex'))
     }
     await this._onReorg(blocksToRemove)
@@ -585,7 +591,7 @@ class BlockService extends Service implements IBlockService {
       rawBlock.height = this.tip.height + 1
     }
     try {
-      for (let service of this.node.getServicesByOrder()) {
+      for (const service of this.node.getServicesByOrder()) {
         await service.onBlock(rawBlock)
       }
       await this.__onBlock(rawBlock)
@@ -598,7 +604,7 @@ class BlockService extends Service implements IBlockService {
         height: rawBlock.height as number,
       })
       this.processingBlock = false
-      for (let subscription of this.subscriptions.block) {
+      for (const subscription of this.subscriptions.block) {
         subscription.emit('block/block', rawBlock)
       }
     } catch (err) {
@@ -625,7 +631,7 @@ class BlockService extends Service implements IBlockService {
     try {
       await this._saveBlock(block)
       this.lastBlockSaved = block.hash
-      let lastHeaderHeight = this.header?.getLastHeader()?.height
+      const lastHeaderHeight = this.header?.getLastHeader()?.height
       if (this.tip && lastHeaderHeight && this.tip.height < lastHeaderHeight) {
         this.emit('next block')
       } else {
@@ -646,8 +652,8 @@ class BlockService extends Service implements IBlockService {
         attributes: ['height', 'stakePrevTxId', 'stakeOutputIndex'],
       })
     } while (!header)
-    let isProofOfStake = header.isProofOfStake
-    let minerId = (
+    const isProofOfStake = header.isProofOfStake
+    const minerId = (
       await this.TransactionOutput?.findOne({
         where: { outputIndex: isProofOfStake ? 1 : 0 },
         attributes: ['addressId'],
@@ -694,7 +700,7 @@ class BlockService extends Service implements IBlockService {
       return
     }
     try {
-      let diff: string | void = await this._getTimeSinceLastBlock()
+      const diff: string | void = await this._getTimeSinceLastBlock()
       this.logger.info(
         'Block Service: the best block hash is:',
         this.tip?.hash.toString('hex'),
@@ -717,15 +723,15 @@ class BlockService extends Service implements IBlockService {
     this._startBlockSubscription()
     // this._logSynced(this.tip.hash)
     await this._logSynced()
-    for (let service of this.node.getServicesByOrder()) {
+    for (const service of this.node.getServicesByOrder()) {
       await service.onSynced()
     }
   }
 
   async _startSync(): Promise<void> {
-    let lastHeaderHeight = this.header?.getLastHeader()?.height
+    const lastHeaderHeight = this.header?.getLastHeader()?.height
     if (lastHeaderHeight && this.tip) {
-      let numNeeded = Math.max(lastHeaderHeight - this.tip.height, 0)
+      const numNeeded = Math.max(lastHeaderHeight - this.tip.height, 0)
       this.logger.info(
         'Block Service: gathering:',
         numNeeded,
@@ -738,7 +744,7 @@ class BlockService extends Service implements IBlockService {
           clearInterval(this.reportInterval)
         }
         if (this.tip.height === 0) {
-          let genesisBlock = Block.fromBuffer(
+          const genesisBlock = Block.fromBuffer(
             this.chain.genesis
           ) as BlockObjectFromIBlock
           genesisBlock.height = 0
@@ -766,12 +772,12 @@ class BlockService extends Service implements IBlockService {
     )
     try {
       if (this.tip) {
-        let hashes = await this.header?.getEndHash(
+        const hashes = await this.header?.getEndHash(
           this.tip,
           this.readAheadBlockCount
         )
         if (hashes) {
-          let { targetHash, endHash } = hashes
+          const { targetHash, endHash } = hashes
           if (!targetHash && !endHash) {
             this.processingBlock = false
             this.emit('synced')
@@ -786,7 +792,7 @@ class BlockService extends Service implements IBlockService {
                 this.emit('next block')
               }
             }, 5000).unref()
-            let block = await this.node.addedMethods.getP2PBlock?.({
+            const block = await this.node.addedMethods.getP2PBlock?.({
               filter: { startHash: this.tip.hash, endHash },
               blockHash: targetHash,
             })
@@ -804,10 +810,10 @@ class BlockService extends Service implements IBlockService {
     if (!this.initialSync) {
       return
     }
-    let headerBestHeight = this.node.addedMethods.getBestHeight?.()
+    const headerBestHeight = this.node.addedMethods.getBestHeight?.()
     if (headerBestHeight && this.tip) {
-      let bestHeight = Math.max(headerBestHeight, this.tip.height)
-      let progress =
+      const bestHeight = Math.max(headerBestHeight, this.tip.height)
+      const progress =
         bestHeight && ((this.tip.height / bestHeight) * 100).toFixed(4)
       this.logger.info(
         'Block Service: download progress:',

@@ -281,8 +281,8 @@ const opcodes: IOpCodes = {
 }
 
 function mapReverse(): OpcodeTypes[] {
-  let reverseMap: OpcodeTypes[] = []
-  for (let [key, value] of Object.entries(opcodes)) {
+  const reverseMap: OpcodeTypes[] = []
+  for (const [key, value] of Object.entries(opcodes)) {
     reverseMap[value] = key as OpcodeTypes
   }
   return reverseMap

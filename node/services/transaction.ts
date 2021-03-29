@@ -124,7 +124,7 @@ class TransactionService extends Service implements ITransactionService {
 
   async start(): Promise<void> {
     this.db = this.node.addedMethods.getDatabase?.()
-    let getModelFn = this.node.addedMethods.getModel
+    const getModelFn = this.node.addedMethods.getModel
     if (getModelFn) {
       this.Address = getModelFn('address') as ModelCtor<AddressModel>
       this.Transaction = getModelFn(
@@ -155,7 +155,7 @@ class TransactionService extends Service implements ITransactionService {
         'evm_receipt_mapping'
       ) as ModelCtor<EvmReceiptMappingModel>
       this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
-      let blockTip = this.node.addedMethods.getBlockTip?.()
+      const blockTip = this.node.addedMethods.getBlockTip?.()
       if (this.tip && blockTip && this.tip.height > blockTip.height) {
         this.tip = { height: blockTip.height, hash: blockTip.hash } as ITip
       }
@@ -266,7 +266,7 @@ class TransactionService extends Service implements ITransactionService {
       return
     }
     try {
-      let newTransactions: (
+      const newTransactions: (
         | TransactionModel
         | ITransactionAndModelSetting
       )[] = await this._processBlock(block)
@@ -301,11 +301,14 @@ class TransactionService extends Service implements ITransactionService {
   async _processBlock(
     block: BlockObject
   ): Promise<(TransactionModel | ITransactionAndModelSetting)[]> {
-    let newTransactions: (TransactionModel | ITransactionAndModelSetting)[] = []
-    let txs: TransactionCreationAttributes[] = []
-    let witnesses: WitnessCreationAttributes[] = []
+    const newTransactions: (
+      | TransactionModel
+      | ITransactionAndModelSetting
+    )[] = []
+    const txs: TransactionCreationAttributes[] = []
+    const witnesses: WitnessCreationAttributes[] = []
     if (this.synced && block.transactions && block.header && block.height) {
-      let mempoolTransactions: Pick<TransactionModel, '_id' | 'id'>[] =
+      const mempoolTransactions: Pick<TransactionModel, '_id' | 'id'>[] =
         (await this.Transaction?.findAll({
           where: {
             id: {
@@ -323,10 +326,10 @@ class TransactionService extends Service implements ITransactionService {
         })) || []
       let mempoolTransactionsSet: Set<string> = new Set()
       if (mempoolTransactions.length) {
-        let ids: Buffer[] = mempoolTransactions.map(
+        const ids: Buffer[] = mempoolTransactions.map(
           (tx: Pick<TransactionModel, '_id' | 'id'>) => tx.id
         )
-        let _ids: bigint[] = mempoolTransactions.map(
+        const _ids: bigint[] = mempoolTransactions.map(
           (tx: Pick<TransactionModel, '_id' | 'id'>) => tx._id
         )
         mempoolTransactionsSet = new Set(
@@ -359,7 +362,7 @@ class TransactionService extends Service implements ITransactionService {
       }
 
       for (let index = 0; index < block.transactions.length; ++index) {
-        let tx: TransactionModel | ITransactionAndModelSetting =
+        const tx: TransactionModel | ITransactionAndModelSetting =
           block.transactions[index]
         tx.blockHeight = block.height
         tx.indexInBlock = index
@@ -389,7 +392,7 @@ class TransactionService extends Service implements ITransactionService {
       })
     } else if (block.transactions && block.header && block.height) {
       for (let index = 0; index < block.transactions.length; ++index) {
-        let tx: TransactionModel | ITransactionAndModelSetting =
+        const tx: TransactionModel | ITransactionAndModelSetting =
           block.transactions[index]
         tx.blockHeight = block.height
         tx.indexInBlock = index
@@ -411,7 +414,7 @@ class TransactionService extends Service implements ITransactionService {
     }
     await this.Witness?.bulkCreate(witnesses, { validate: false })
     if (this.Transaction) {
-      let ids = (
+      const ids = (
         await this.Transaction.findAll({
           where: {
             id: {
@@ -434,7 +437,7 @@ class TransactionService extends Service implements ITransactionService {
   async processTxos(
     transactions: (TransactionModel | ITransactionAndModelSetting)[]
   ): Promise<void> {
-    let addressMap: Map<
+    const addressMap: Map<
       string,
       {
         type: string
@@ -444,10 +447,10 @@ class TransactionService extends Service implements ITransactionService {
         indices: number[][]
       }
     > = new Map()
-    let addressIds: bigint[][] = []
+    const addressIds: bigint[][] = []
     for (let index = 0; index < transactions.length; ++index) {
       addressIds.push([])
-      let tx: TransactionModel | ITransactionAndModelSetting =
+      const tx: TransactionModel | ITransactionAndModelSetting =
         transactions[index]
       for (
         let outputIndex = 0;
@@ -455,7 +458,7 @@ class TransactionService extends Service implements ITransactionService {
         ++outputIndex
       ) {
         addressIds[index].push(BigInt(0))
-        let address = Address.fromScript(
+        const address = Address.fromScript(
           (OutputScript.fromBuffer(
             (tx as TransactionModel).outputs[outputIndex].scriptPubKey
           ) ||
@@ -477,8 +480,8 @@ class TransactionService extends Service implements ITransactionService {
           outputIndex
         )
         if (address && address.data) {
-          let key = `${address.data.toString('hex')}/${address.type}`
-          let addressItem = addressMap.get(key)
+          const key = `${address.data.toString('hex')}/${address.type}`
+          const addressItem = addressMap.get(key)
           if (addressItem) {
             addressItem.indices.push([index, outputIndex])
           } else {
@@ -493,12 +496,12 @@ class TransactionService extends Service implements ITransactionService {
         }
       }
     }
-    let addressItems = []
-    for (let { type, data } of addressMap.values()) {
+    const addressItems = []
+    for (const { type, data } of addressMap.values()) {
       addressItems.push([AddressModel.parseType(type), data])
     }
     if (addressItems.length && this.db) {
-      for (let { _id, _type, data } of await this.db.query<
+      for (const { _id, _type, data } of await this.db.query<
         Pick<AddressModelAttributes, '_id' | '_type' | 'data'>
       >(
         sql([
@@ -507,50 +510,50 @@ class TransactionService extends Service implements ITransactionService {
         ]),
         { type: QueryTypes.SELECT }
       )) {
-        let key = `${data.toString('hex')}/${AddressModel.getType(_type)}`
-        let item = addressMap.get(key)
+        const key = `${data.toString('hex')}/${AddressModel.getType(_type)}`
+        const item = addressMap.get(key)
         if (item) {
-          for (let [index, outputIndex] of item.indices) {
+          for (const [index, outputIndex] of item.indices) {
             addressIds[index][outputIndex] = _id
           }
         }
         addressMap.delete(key)
       }
     }
-    let newAddressItems: AddressCreationAttributes[] = []
-    for (let { type, data, string, createHeight } of addressMap.values()) {
+    const newAddressItems: AddressCreationAttributes[] = []
+    for (const { type, data, string, createHeight } of addressMap.values()) {
       newAddressItems.push({ type, data, string, createHeight })
     }
 
     if (this.Address) {
-      for (let { _id, type, data } of await this.Address.bulkCreate(
+      for (const { _id, type, data } of await this.Address.bulkCreate(
         newAddressItems,
         {
           validate: false,
         }
       )) {
-        let key = `${data.toString('hex')}/${type}`
-        let item = addressMap.get(key)
+        const key = `${data.toString('hex')}/${type}`
+        const item = addressMap.get(key)
         if (item) {
-          for (let [index, outputIndex] of item.indices) {
+          for (const [index, outputIndex] of item.indices) {
             addressIds[index][outputIndex] = _id
           }
         }
       }
     }
 
-    let outputTxos: TransactionOutputCreationAttributes[] = []
-    let inputTxos: TransactionInputCreationAttributes[] = []
-    let mappings: string[] = []
-    let mappingId: string = uuidv4().replace(/-/g, '')
+    const outputTxos: TransactionOutputCreationAttributes[] = []
+    const inputTxos: TransactionInputCreationAttributes[] = []
+    const mappings: string[] = []
+    const mappingId: string = uuidv4().replace(/-/g, '')
     for (let index = 0; index < transactions.length; ++index) {
-      let tx = transactions[index]
+      const tx = transactions[index]
       for (
         let outputIndex = 0;
         outputIndex < tx.outputs.length;
         ++outputIndex
       ) {
-        let output = tx.outputs[outputIndex]
+        const output = tx.outputs[outputIndex]
         outputTxos.push({
           transactionId: tx._id as bigint,
           outputIndex,
@@ -570,7 +573,7 @@ class TransactionService extends Service implements ITransactionService {
         })
       }
       for (let inputIndex = 0; inputIndex < tx.inputs.length; ++inputIndex) {
-        let input = tx.inputs[inputIndex]
+        const input = tx.inputs[inputIndex]
         if (
           Buffer.compare(
             (tx.inputs[0] as ITransactionInput | undefined)?.prevTxId ||
@@ -606,7 +609,7 @@ class TransactionService extends Service implements ITransactionService {
       }
     }
     if (this.TransactionInput && this.TransactionOutput && this.db) {
-      let promiseList: Promise<any>[] = [
+      const promiseList: Promise<any>[] = [
         this.TransactionOutput?.bulkCreate(outputTxos, { validate: false }),
         this.TransactionInput?.bulkCreate(inputTxos, { validate: false }),
       ]
@@ -631,7 +634,7 @@ class TransactionService extends Service implements ITransactionService {
              AND mapping._id = ${mappingId}`,
         ])
       )
-      let t = await this.db.transaction({
+      const t = await this.db.transaction({
         isolationLevel: SequelizeTransaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
       })
       try {
@@ -677,7 +680,7 @@ class TransactionService extends Service implements ITransactionService {
       filter = sql([`block_height = ${block.height}`])
     }
 
-    let t = await this.db?.transaction({
+    const t = await this.db?.transaction({
       isolationLevel: SequelizeTransaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
     })
     try {
@@ -716,15 +719,15 @@ class TransactionService extends Service implements ITransactionService {
   async processReceipts(
     transactions: (TransactionModel | ITransactionAndModelSetting)[]
   ): Promise<void> {
-    let receipts: EvmReceiptCreationAttributes[] = []
-    for (let tx of transactions) {
+    const receipts: EvmReceiptCreationAttributes[] = []
+    for (const tx of transactions) {
       for (
         let outputIndex = 0;
         outputIndex < tx.outputs.length;
         ++outputIndex
       ) {
-        let output = tx.outputs[outputIndex]
-        let outputScriptPubKey: IOutputScript | undefined =
+        const output = tx.outputs[outputIndex]
+        const outputScriptPubKey: IOutputScript | undefined =
           OutputScript.fromBuffer(output?.scriptPubKey as Buffer) ||
           output?.scriptPubKey
         if (
@@ -737,7 +740,7 @@ class TransactionService extends Service implements ITransactionService {
         ) {
           let senderType: string | null = null
           let senderData: Buffer | undefined
-          let hasOpSender = [
+          const hasOpSender = [
             OutputScript.EVM_CONTRACT_CREATE_SENDER,
             OutputScript.EVM_CONTRACT_CALL_SENDER,
           ].includes(outputScriptPubKey.type)
@@ -751,7 +754,7 @@ class TransactionService extends Service implements ITransactionService {
               | IEVMContractCallBySenderScript
               | IEVMContractCreateBySenderScript).senderData
           } else {
-            let transactionInput = await this.TransactionInput?.findOne({
+            const transactionInput = await this.TransactionInput?.findOne({
               // @ts-ignore
               where: { transactionId: tx._id, inputIndex: 0 },
               attributes: [],
@@ -765,7 +768,7 @@ class TransactionService extends Service implements ITransactionService {
               ],
             })
             if (transactionInput) {
-              let { address: refunder } = transactionInput
+              const { address: refunder } = transactionInput
               senderType = refunder.type
               senderData = refunder.data
             }
@@ -799,19 +802,19 @@ class TransactionService extends Service implements ITransactionService {
       this.TransactionOutput &&
       block.header
     ) {
-      let transactionIds: bigint[] = (
+      const transactionIds: bigint[] = (
         await this.Transaction.findAll({
           where: { blockHeight: block.height },
           attributes: ['_id'],
           order: [['indexInBlock', 'ASC']],
         })
       ).map((tx: Pick<TransactionModel, '_id'>) => tx._id)
-      let contractSpends: ContractSpendCreationAttributes[] = []
-      let receiptIndices: number[] = []
+      const contractSpends: ContractSpendCreationAttributes[] = []
+      const receiptIndices: number[] = []
       let lastTransactionIndex = 0
       if (block.transactions) {
         for (let i = 0; i < block.transactions.length; ++i) {
-          let tx = block.transactions[i]
+          const tx = block.transactions[i]
           if (
             Buffer.compare(
               (tx.inputs[0] as ITransactionInput | undefined)?.prevTxId ||
@@ -869,14 +872,14 @@ class TransactionService extends Service implements ITransactionService {
         if (receiptIndices.length === 0) {
           return
         }
-        let gasRefunds: GasRefundCreationAttributes[] = []
-        let receipts: EvmReceiptMappingModelAttributes[] = []
-        let receiptLogs: EvmReceiptLogCreationAttributes[] = []
-        let client = this.node.addedMethods.getRpcClient?.()
+        const gasRefunds: GasRefundCreationAttributes[] = []
+        const receipts: EvmReceiptMappingModelAttributes[] = []
+        const receiptLogs: EvmReceiptLogCreationAttributes[] = []
+        const client = this.node.addedMethods.getRpcClient?.()
         if (client) {
-          let blockReceipts: GetTransactionReceiptResult[][] = await Promise.all(
+          const blockReceipts: GetTransactionReceiptResult[][] = await Promise.all(
             await client.batch<GetTransactionReceiptResult[]>(() => {
-              let transactions:
+              const transactions:
                 | TransactionModel[]
                 | ITransaction[]
                 | undefined = block.transactions
@@ -885,7 +888,7 @@ class TransactionService extends Service implements ITransactionService {
                 client &&
                 client.rpcMethods.gettransactionreceipt
               ) {
-                for (let index of receiptIndices) {
+                for (const index of receiptIndices) {
                   client.rpcMethods.gettransactionreceipt(
                     transactions[index].id.toString('hex')
                   )
@@ -910,7 +913,7 @@ class TransactionService extends Service implements ITransactionService {
               }
             )
           })
-          let refundTxos = await this.TransactionOutput.findAll({
+          const refundTxos = await this.TransactionOutput.findAll({
             where: {
               outputIndex: { [$gt]: block.header.isProofOfStake ? 1 : 0 },
             },
@@ -925,7 +928,7 @@ class TransactionService extends Service implements ITransactionService {
               attributes: [],
             },
           })
-          let refunderMap: Map<
+          const refunderMap: Map<
             string,
             Pick<AddressCreationAttributes, '_id' | 'type' | 'data'>
           > = new Map(
@@ -970,9 +973,9 @@ class TransactionService extends Service implements ITransactionService {
           )
           let receiptIndex = -1
           for (let index = 0; index < receiptIndices.length; ++index) {
-            let indexInBlock = receiptIndices[index]
-            let tx = block.transactions[indexInBlock]
-            let indices = []
+            const indexInBlock = receiptIndices[index]
+            const tx = block.transactions[indexInBlock]
+            const indices = []
             for (let i = 0; i < tx.outputs.length; ++i) {
               if (
                 [
@@ -991,9 +994,9 @@ class TransactionService extends Service implements ITransactionService {
               }
             }
             for (let i = 0; i < indices.length; ++i) {
-              let output = tx.outputs[indices[i]]
-              let refunder = refunderMap.get((tx.id as Buffer).toString('hex'))
-              let {
+              const output = tx.outputs[indices[i]]
+              const refunder = refunderMap.get(tx.id.toString('hex'))
+              const {
                 gasUsed,
                 contractAddress,
                 excepted,
@@ -1001,7 +1004,7 @@ class TransactionService extends Service implements ITransactionService {
                 log: logs,
               } = blockReceipts[index][i]
               if (gasUsed) {
-                let { gasLimit, gasPrice } = ((output as ITransactionOutput)
+                const { gasLimit, gasPrice } = ((output as ITransactionOutput)
                   .scriptPubKey ||
                   OutputScript.fromBuffer(
                     (output as TransactionOutputModel).scriptPubKey
@@ -1010,18 +1013,18 @@ class TransactionService extends Service implements ITransactionService {
                   | IEVMContractCreateBySenderScript
                   | IEVMContractCallScript
                   | IEVMContractCallBySenderScript
-                let refundValue = BigInt(
+                const refundValue = BigInt(
                   Number(gasPrice) * (Number(gasLimit) - gasUsed)
                 )
                 if (refundValue) {
-                  let txoIndex = refundTxos.findIndex(
+                  const txoIndex = refundTxos.findIndex(
                     (txo) =>
                       txo.value === refundValue &&
                       txo.addressId === refunder?._id
                   )
                   if (txoIndex === -1) {
                     this.logger.error(
-                      `Contract Service: cannot find refund output: ${(tx.id as Buffer).toString(
+                      `Contract Service: cannot find refund output: ${tx.id.toString(
                         'hex'
                       )}`
                     )
@@ -1048,7 +1051,7 @@ class TransactionService extends Service implements ITransactionService {
                 exceptedMessage: exceptedMessage || '',
               })
               for (let j = 0; j < logs.length; ++j) {
-                let { address, topics, data } = logs[j]
+                const { address, topics, data } = logs[j]
                 receiptLogs.push({
                   receiptId: BigInt(receiptIndex),
                   logIndex: j,
@@ -1081,7 +1084,7 @@ class TransactionService extends Service implements ITransactionService {
         )
         await this.EVMReceiptMapping?.destroy({ truncate: true })
         if (this.EVMReceipt) {
-          let receiptIds = (
+          const receiptIds = (
             await this.EVMReceipt?.findAll({
               where: { blockHeight: block.height },
               attributes: ['_id'],
@@ -1092,7 +1095,7 @@ class TransactionService extends Service implements ITransactionService {
               ],
             })
           ).map((receipt) => receipt._id)
-          for (let log of receiptLogs) {
+          for (const log of receiptLogs) {
             log.receiptId = receiptIds[Number(log.receiptId)]
           }
           await this.EVMReceiptLog?.bulkCreate(receiptLogs, { validate: false })
@@ -1105,7 +1108,7 @@ class TransactionService extends Service implements ITransactionService {
     tx: TransactionModel | ITransactionAndModelSetting
   ): Promise<boolean | void> {
     if (this.Transaction) {
-      let prevTxs: Pick<
+      const prevTxs: Pick<
         TransactionModel,
         '_id' | 'id'
       >[] = await this.Transaction.findAll({
@@ -1119,10 +1122,10 @@ class TransactionService extends Service implements ITransactionService {
         },
         attributes: ['_id', 'id'],
       })
-      let inputTxos: (bigint | number)[][] = []
-      for (let input of tx.inputs) {
-        let prevTxId = (input as ITransactionInput).prevTxId || undefined
-        let item = prevTxs.find((tx) => {
+      const inputTxos: (bigint | number)[][] = []
+      for (const input of tx.inputs) {
+        const prevTxId = (input as ITransactionInput).prevTxId || undefined
+        const item = prevTxs.find((tx) => {
           return Buffer.compare(tx.id, prevTxId || Buffer.alloc(0)) === 0
         })
         if (!item) {
@@ -1133,10 +1136,10 @@ class TransactionService extends Service implements ITransactionService {
         }
       }
       if (this.db) {
-        let inputTxosString: string = inputTxos
+        const inputTxosString: string = inputTxos
           .map((value: (number | bigint)[]) => `(${value[0]}, ${value[1]})`)
           .join(', ')
-        let transactionsToRemove: bigint[] = (
+        const transactionsToRemove: bigint[] = (
           await this.db.query<{ id: bigint }>(
             sql([
               `SELECT DISTINCT(input_id) AS id FROM transaction_output
@@ -1145,7 +1148,7 @@ class TransactionService extends Service implements ITransactionService {
             { type: QueryTypes.SELECT }
           )
         ).map((tx: { id: bigint }) => tx.id)
-        for (let id of transactionsToRemove) {
+        for (const id of transactionsToRemove) {
           await this._removeMempoolTransaction(id)
         }
       }
@@ -1159,13 +1162,13 @@ class TransactionService extends Service implements ITransactionService {
       this.TransactionOutput &&
       this.BalanceChange
     ) {
-      let transactionsToRemove: bigint[] = (
+      const transactionsToRemove: bigint[] = (
         await this.TransactionOutput.findAll({
           where: { transactionId: Number(id) },
           attributes: ['inputId'],
         })
       ).map((tx: Pick<TransactionOutputModel, 'inputId'>) => tx.inputId)
-      for (let subId of transactionsToRemove) {
+      for (const subId of transactionsToRemove) {
         await this._removeMempoolTransaction(subId)
       }
       await this.db.query(
@@ -1195,9 +1198,9 @@ class TransactionService extends Service implements ITransactionService {
   groupWitnesses(
     tx: TransactionModel | ITransactionAndModelSetting
   ): WitnessCreationAttributes[] {
-    let witnesses: WitnessCreationAttributes[] = []
+    const witnesses: WitnessCreationAttributes[] = []
     for (let i = 0; i < tx.inputs.length; ++i) {
-      let input = tx.inputs[i]
+      const input = tx.inputs[i]
       if (input) {
         if ('witness' in input) {
           for (let j = 0; j < input.witness.length; ++j) {

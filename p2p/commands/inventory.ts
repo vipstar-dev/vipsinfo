@@ -50,13 +50,13 @@ class Inventory implements IInventory {
   }
 
   static fromBufferReader(reader: BufferReader) {
-    let type = reader.readUInt32LE()
-    let data = reader.read(32)
+    const type = reader.readUInt32LE()
+    const data = reader.read(32)
     return new Inventory({ type, data: data?.reverse() })
   }
 
   toBuffer(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }

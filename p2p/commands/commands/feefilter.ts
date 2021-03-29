@@ -23,13 +23,13 @@ class FeeFilterMessage extends Message implements IFeeFilterMessage {
     payload: Buffer,
     options: FeeFilterMessageOptions
   ): FeeFilterMessage {
-    let message = new FeeFilterMessage(options)
+    const message = new FeeFilterMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     if (this.feeRate) {
       writer.writeUInt64LE(this.feeRate)
     }
@@ -37,7 +37,7 @@ class FeeFilterMessage extends Message implements IFeeFilterMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
+    const reader = new BufferReader(payload)
     this.feeRate = reader.readUInt64LE()
     Message.checkFinished(reader)
   }

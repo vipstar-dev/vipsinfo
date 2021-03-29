@@ -68,7 +68,7 @@ export default class EvmReceipt extends Model<
   _senderType!: number
 
   get senderType(): string | null {
-    let senderType = this.getDataValue('_senderType')
+    const senderType = this.getDataValue('_senderType')
     return addressTypeMap[senderType] || null
   }
 

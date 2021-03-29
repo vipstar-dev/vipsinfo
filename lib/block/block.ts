@@ -51,9 +51,9 @@ class Block implements IBlock {
   }
 
   static fromBufferReader(reader: BufferReader): Block {
-    let header: IHeader = Header.fromBufferReader(reader)
-    let transactionCount: number = reader.readVarintNumber() || 0
-    let transactions: ITransaction[] = []
+    const header: IHeader = Header.fromBufferReader(reader)
+    const transactionCount: number = reader.readVarintNumber() || 0
+    const transactions: ITransaction[] = []
     for (let i = 0; i < transactionCount; ++i) {
       transactions.push(Transaction.fromBufferReader(reader))
     }
@@ -61,13 +61,13 @@ class Block implements IBlock {
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }
 
   toHashBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toHashBufferWriter(writer)
     return writer.toBuffer()
   }
@@ -75,7 +75,7 @@ class Block implements IBlock {
   toBufferWriter(writer: BufferWriter): void {
     this.header.toBufferWriter(writer)
     writer.writeVarintNumber(this.transactions.length)
-    for (let transaction of this.transactions) {
+    for (const transaction of this.transactions) {
       transaction.toBufferWriter(writer)
     }
   }
@@ -83,7 +83,7 @@ class Block implements IBlock {
   toHashBufferWriter(writer: BufferWriter): void {
     this.header.toBufferWriter(writer)
     writer.writeVarintNumber(this.transactions.length)
-    for (let transaction of this.transactions) {
+    for (const transaction of this.transactions) {
       transaction.toHashBufferWriter(writer)
     }
   }

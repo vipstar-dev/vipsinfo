@@ -127,7 +127,7 @@ class OutputScript extends Script implements IOutputScript {
         { code: Opcode.OP_RETURN, buffer: buffer.slice(1) },
       ])
     }
-    let chunks: ScriptChunk[] = Script.parseBuffer(buffer)
+    const chunks: ScriptChunk[] = Script.parseBuffer(buffer)
     for (const Class of [
       PublicKeyOutputScript,
       PublicKeyHashOutputScript,
@@ -149,7 +149,7 @@ class OutputScript extends Script implements IOutputScript {
   }
 
   toString(): string {
-    let chunks: (string | number | undefined)[] = this.chunks.map(
+    const chunks: (string | number | undefined)[] = this.chunks.map(
       ({ code, buffer }: ScriptChunk) => {
         if (buffer) {
           return buffer.toString('hex')
@@ -178,7 +178,7 @@ class OutputScript extends Script implements IOutputScript {
 }
 
 function parseNumberChunk(chunk: ScriptChunk): number | undefined {
-  let code = new Opcode(chunk.code)
+  const code = new Opcode(chunk.code)
   if (code.isSmallInt()) {
     return code.toSmallInt()
   } else if (chunk.buffer) {

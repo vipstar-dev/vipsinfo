@@ -24,7 +24,7 @@ class VipsNode {
   }
 
   async start(): Promise<void> {
-    let services: ServiceObject[] = (await this.setupServices()) || []
+    const services: ServiceObject[] = (await this.setupServices()) || []
     this.node = new Node({
       ...this.config,
       path: path.resolve(this.path, 'vipsinfo-node.json'),
@@ -47,9 +47,9 @@ class VipsNode {
   async setupServices(): Promise<ServiceObject[]> {
     const services: Services[] = this.config?.services || []
     const servicesConfig: ServicesConfig = this.config?.servicesConfig || {}
-    let result: ServiceObject[] = []
-    for (let serviceName of services) {
-      let service: ServiceObject = {
+    const result: ServiceObject[] = []
+    for (const serviceName of services) {
+      const service: ServiceObject = {
         name: serviceName,
       }
       if (servicesConfig[serviceName]) {

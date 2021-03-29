@@ -45,9 +45,9 @@ function getTypes(
   abi: IMethodABI | IEventABI | { inputs: EventABIsIO[] },
   category: 'inputs' | 'outputs'
 ): string[] {
-  let result: string[] = []
+  const result: string[] = []
   // @ts-ignore
-  for (let item of abi[category]) {
+  for (const item of abi[category]) {
     /* TODO: I cannot understand this code....
     if (item.type === 'tuple') {
       result.push(`(${getTypes({[category]: item.components}).join(',')})`)
@@ -123,13 +123,13 @@ export class EventABI implements IEventABI {
   }
 
   encode(params: any[]): { data: Buffer; topics: Buffer[] } {
-    let topics: Buffer[] = []
-    let unindexedInputs: EventABIsIO[] = this.inputs.filter(
+    const topics: Buffer[] = []
+    const unindexedInputs: EventABIsIO[] = this.inputs.filter(
       (input) => !input.indexed
     )
-    let unindexedParams: any[] = []
+    const unindexedParams: any[] = []
     for (let index = 0; index < this.inputs.length; ++index) {
-      let input = this.inputs[index]
+      const input = this.inputs[index]
       if (input.indexed) {
         topics.push(
           rawEncode(getTypes({ inputs: [input] }, 'inputs'), [params[index]])
@@ -139,7 +139,7 @@ export class EventABI implements IEventABI {
         unindexedParams.push(params[index])
       }
     }
-    let data = rawEncode(
+    const data = rawEncode(
       getTypes({ inputs: unindexedInputs }, 'inputs'),
       unindexedParams
     )
@@ -150,28 +150,28 @@ export class EventABI implements IEventABI {
   }
 
   decode({ data, topics }: { data: Buffer; topics: Buffer[] }): any[] {
-    let indexedInputs: EventABIsIO[] = this.inputs.filter(
+    const indexedInputs: EventABIsIO[] = this.inputs.filter(
       (input) => input.indexed
     )
-    let unindexedInputs: EventABIsIO[] = this.inputs.filter(
+    const unindexedInputs: EventABIsIO[] = this.inputs.filter(
       (input) => !input.indexed
     )
-    let indexedParams: any[] = []
+    const indexedParams: any[] = []
     for (let index = 0; index < topics.length; ++index) {
-      let input: EventABIsIO = indexedInputs[index]
-      let [param]: any[] = rawDecode(
+      const input: EventABIsIO = indexedInputs[index]
+      const [param]: any[] = rawDecode(
         getTypes({ inputs: [input] }, 'inputs'),
         topics[index]
       )
       indexedParams.push(param)
     }
-    let unindexedParams: any[] = rawDecode(
+    const unindexedParams: any[] = rawDecode(
       getTypes({ inputs: unindexedInputs }, 'inputs'),
       data
     )
-    let params: any[] = []
+    const params: any[] = []
     for (let index = 0, i = 0, j = 0; index < this.inputs.length; ++index) {
-      let input: EventABIsIO = this.inputs[index]
+      const input: EventABIsIO = this.inputs[index]
       if (input.indexed) {
         params.push(indexedParams[i++])
       } else {

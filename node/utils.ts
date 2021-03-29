@@ -28,9 +28,9 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
 
   process(): void {
     this.running = true
-    let wating = this.waiting.pop()
+    const wating = this.waiting.pop()
     if (wating) {
-      let { data, callback } = wating
+      const { data, callback } = wating
       this.fn?.(data).then((data: any) => {
         callback(String(null), data)
         if (this.waiting.length) {
@@ -46,7 +46,7 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
 type sqlArgs = string | number | bigint | Buffer | any[] | Object
 
 export function sql(strings: string[], ...args: sqlArgs[]): string {
-  let buffer: string[] = []
+  const buffer: string[] = []
   for (let i = 0; i < args.length; ++i) {
     buffer.push(strings[i].replace(/\s+/g, ' '), transformSQLArg(args[i]))
   }

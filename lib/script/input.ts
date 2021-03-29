@@ -107,7 +107,7 @@ class InputScript extends Script implements IInputScript {
     if (isCoinbase) {
       return new CoinbaseScript([{ code: -1, buffer }], scriptPubKey, witness)
     }
-    let chunks = Script.parseBuffer(buffer)
+    const chunks = Script.parseBuffer(buffer)
     if (scriptPubKey.type === OutputScript.UNKNOWN) {
       return new InputScript(chunks, scriptPubKey, witness)
     }
@@ -148,7 +148,7 @@ class InputScript extends Script implements IInputScript {
 }
 
 function signature2String(signature: Buffer): string {
-  let sighash: number = signature[signature.length - 1]
+  const sighash: number = signature[signature.length - 1]
   let sighashString: string = ''
   if (sighash & SIGHASH_ANYONECANPAY) {
     if (sighash & SIGHASH_ALL) {
@@ -198,7 +198,7 @@ class CoinbaseScript extends InputScript implements ICoinbaseScript {
 
   toString(): string {
     if (this.parsedChunks) {
-      let chunks: (string | number)[] = this.parsedChunks.map(
+      const chunks: (string | number)[] = this.parsedChunks.map(
         ({ code, buffer }) => {
           if (buffer) {
             return buffer.toString('hex')
@@ -209,7 +209,7 @@ class CoinbaseScript extends InputScript implements ICoinbaseScript {
           }
         }
       )
-      let code: IOpcode = new Opcode(this.parsedChunks[0].code)
+      const code: IOpcode = new Opcode(this.parsedChunks[0].code)
       if (code.isSmallInt()) {
         chunks[0] = code.toSmallInt() as number
       } else if ((this.parsedChunks[0].buffer?.length || 0) <= 4) {
@@ -309,7 +309,7 @@ class ScriptHashInputScript
   }
 
   toString(): string {
-    let redeemString: string = `(${this.redeemScript.toString()})`
+    const redeemString: string = `(${this.redeemScript.toString()})`
     switch (this.redeemScript.type) {
       case OutputScript.PUBKEY:
         return [
@@ -348,7 +348,7 @@ class ScriptHashInputScript
 
   get type(): string {
     if (this.redeemScript.type === OutputScript.WITNESS_V0_SCRIPTHASH) {
-      let witnessRedeemScript = OutputScript.fromBuffer(
+      const witnessRedeemScript = OutputScript.fromBuffer(
         this.witness[this.witness.length - 1] || Buffer.alloc(0)
       )
       if (witnessRedeemScript.isStandard()) {

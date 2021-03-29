@@ -62,7 +62,7 @@ class Peer extends EventEmitter {
       this.version = message.version
       this.subversion = message.subversion
       this.bestHeight = message.startHeight
-      let verackResponse = this.messages?.commands.verack?.({ chain })
+      const verackResponse = this.messages?.commands.verack?.({ chain })
       if (verackResponse) {
         this.sendMessage(verackResponse)
       }
@@ -122,7 +122,7 @@ class Peer extends EventEmitter {
   }
 
   sendVersion(): void {
-    let message = this.messages?.commands.version?.({ chain: this.chain })
+    const message = this.messages?.commands.version?.({ chain: this.chain })
     if (message) {
       this.versionSent = true
       this.sendMessage(message)
@@ -130,7 +130,7 @@ class Peer extends EventEmitter {
   }
 
   sendPong(nonce: Buffer): void {
-    let message = this.messages?.commands.pong?.({
+    const message = this.messages?.commands.pong?.({
       chain: this.chain,
       nonce,
     })
@@ -140,7 +140,7 @@ class Peer extends EventEmitter {
   }
 
   readMessage(): void {
-    let message = this.messages?.parseBuffer(this.receiveBuffer)
+    const message = this.messages?.parseBuffer(this.receiveBuffer)
     if (message) {
       this.emit(message.command, message)
       this.readMessage()

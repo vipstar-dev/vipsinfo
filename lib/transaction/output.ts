@@ -32,15 +32,15 @@ class Output implements ITransactionOutput {
   }
 
   static fromBufferReader(reader: BufferReader): Output {
-    let value: bigint = reader.readUInt64LE()
-    let scriptPubKey: IOutputScript = OutputScript.fromBuffer(
+    const value: bigint = reader.readUInt64LE()
+    const scriptPubKey: IOutputScript = OutputScript.fromBuffer(
       <Buffer>reader.readVarLengthBuffer()
     )
     return new Output({ value, scriptPubKey })
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }

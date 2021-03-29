@@ -74,17 +74,17 @@ class Header implements IHeader {
   }
 
   static fromBufferReader(reader: BufferReader): Header {
-    let version: number | undefined = reader.readInt32LE()
-    let prevHash: Buffer | undefined = reader.read(32)?.reverse()
-    let merkleRoot: Buffer | undefined = reader.read(32)?.reverse()
-    let timestamp: number | undefined = reader.readUInt32LE()
-    let bits: number | undefined = reader.readUInt32LE()
-    let nonce: number | undefined = reader.readUInt32LE()
-    let hashStateRoot: Buffer | undefined = reader.read(32)?.reverse()
-    let hashUTXORoot: Buffer | undefined = reader.read(32)?.reverse()
-    let stakePrevTxId: Buffer | undefined = reader.read(32)?.reverse()
-    let stakeOutputIndex: number | undefined = reader.readUInt32LE()
-    let signature: Buffer | undefined = reader.readVarLengthBuffer()
+    const version: number | undefined = reader.readInt32LE()
+    const prevHash: Buffer | undefined = reader.read(32)?.reverse()
+    const merkleRoot: Buffer | undefined = reader.read(32)?.reverse()
+    const timestamp: number | undefined = reader.readUInt32LE()
+    const bits: number | undefined = reader.readUInt32LE()
+    const nonce: number | undefined = reader.readUInt32LE()
+    const hashStateRoot: Buffer | undefined = reader.read(32)?.reverse()
+    const hashUTXORoot: Buffer | undefined = reader.read(32)?.reverse()
+    const stakePrevTxId: Buffer | undefined = reader.read(32)?.reverse()
+    const stakeOutputIndex: number | undefined = reader.readUInt32LE()
+    const signature: Buffer | undefined = reader.readVarLengthBuffer()
     return new Header({
       version,
       prevHash,
@@ -101,7 +101,7 @@ class Header implements IHeader {
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }

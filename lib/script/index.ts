@@ -36,26 +36,26 @@ class Script implements IScript {
   }
 
   static parseBuffer(buffer: Buffer): ScriptChunk[] {
-    let reader: BufferReader = new BufferReader(buffer)
-    let chunks: ScriptChunk[] = []
+    const reader: BufferReader = new BufferReader(buffer)
+    const chunks: ScriptChunk[] = []
     try {
       while (!reader.finished) {
-        let code: number | undefined = reader.readUInt8()
+        const code: number | undefined = reader.readUInt8()
         if (code) {
           if (code > 0 && code < Opcode.OP_PUSHDATA1) {
-            let buf = reader.read(code)
+            const buf = reader.read(code)
             chunks.push({ code, buffer: buf })
           } else if (code === Opcode.OP_PUSHDATA1) {
-            let length = reader.readUInt8()
-            let buf = reader.read(length ? length : 0)
+            const length = reader.readUInt8()
+            const buf = reader.read(length ? length : 0)
             chunks.push({ code, buffer: buf })
           } else if (code === Opcode.OP_PUSHDATA2) {
-            let length = reader.readUInt16LE()
-            let buf = reader.read(length ? length : 0)
+            const length = reader.readUInt16LE()
+            const buf = reader.read(length ? length : 0)
             chunks.push({ code, buffer: buf })
           } else if (code === Opcode.OP_PUSHDATA4) {
-            let length = reader.readUInt32LE()
-            let buf = reader.read(length ? length : 0)
+            const length = reader.readUInt32LE()
+            const buf = reader.read(length ? length : 0)
             chunks.push({ code, buffer: buf })
           } else {
             chunks.push({ code })
@@ -69,13 +69,13 @@ class Script implements IScript {
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }
 
   toBufferWriter(writer: BufferWriter): void {
-    for (let { code, buffer } of this.chunks) {
+    for (const { code, buffer } of this.chunks) {
       writer.writeUInt8(code)
       if (buffer) {
         if (code < Opcode.OP_PUSHDATA1) {
@@ -95,7 +95,7 @@ class Script implements IScript {
   }
 
   toString(): string {
-    let chunks: (string | number | undefined)[] = this.chunks.map(
+    const chunks: (string | number | undefined)[] = this.chunks.map(
       ({ code, buffer }: ScriptChunk) => {
         if (buffer) {
           return buffer.toString('hex')

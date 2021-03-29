@@ -45,15 +45,15 @@ class Input implements ITransactionInput {
   }
 
   static fromBufferReader(reader: BufferReader): Input {
-    let prevTxId: Buffer | undefined = reader.read(32)?.reverse()
-    let outputIndex: number | undefined = reader.readUInt32LE()
-    let scriptSig: Buffer | undefined = reader.readVarLengthBuffer()
-    let sequence: number | undefined = reader.readUInt32LE()
+    const prevTxId: Buffer | undefined = reader.read(32)?.reverse()
+    const outputIndex: number | undefined = reader.readUInt32LE()
+    const scriptSig: Buffer | undefined = reader.readVarLengthBuffer()
+    const sequence: number | undefined = reader.readUInt32LE()
     return new Input({ prevTxId, outputIndex, scriptSig, sequence })
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }
@@ -71,7 +71,7 @@ class Input implements ITransactionInput {
     depth: string,
     { indentationLvl }: { indentationLvl: number; [key: string]: any }
   ): string {
-    let indentation = ' '.repeat(indentationLvl && indentationLvl - 1)
+    const indentation = ' '.repeat(indentationLvl && indentationLvl - 1)
     return `Input {
   ${indentation}prevTxId: '${this.prevTxId?.toString('hex')}',
   ${indentation}outputIndex: ${this.outputIndex},

@@ -102,7 +102,7 @@ class ContractService extends Service implements IContractService {
 
   async start(): Promise<void> {
     this.db = this.node.addedMethods.getDatabase?.()
-    let getModel = this.node.addedMethods.getModel
+    const getModel = this.node.addedMethods.getModel
     if (getModel) {
       this.Address = getModel('address') as ModelCtor<AddressModel>
       this.Transaction = getModel('transaction') as ModelCtor<TransactionModel>
@@ -126,7 +126,7 @@ class ContractService extends Service implements IContractService {
       this.QRC721Token = getModel('qrc721_token') as ModelCtor<Qrc721TokenModel>
     }
     this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
-    let blockTip = await this.node.addedMethods.getBlockTip?.()
+    const blockTip = await this.node.addedMethods.getBlockTip?.()
     if (this.tip) {
       if (blockTip && this.tip.height > blockTip.height) {
         this.tip = { height: blockTip.height, hash: blockTip.hash }
@@ -138,16 +138,16 @@ class ContractService extends Service implements IContractService {
 
   async onBlock(block: BlockObject): Promise<void> {
     if (block.height === 0) {
-      for (let x of [0x80, 0x81, 0x82, 0x83, 0x84]) {
-        let dgpAddress = Buffer.alloc(20)
+      for (const x of [0x80, 0x81, 0x82, 0x83, 0x84]) {
+        const dgpAddress = Buffer.alloc(20)
         dgpAddress[19] = x
         if (this.node.addedMethods.getRpcClient?.()?.rpcMethods) {
-          let baseCode = await this.node.addedMethods
+          const baseCode = await this.node.addedMethods
             .getRpcClient()
             .rpcMethods.getcontractcode?.(dgpAddress.toString('hex'))
           if (baseCode) {
-            let code = Buffer.from(baseCode, 'hex')
-            let sha256sum = sha256(code)
+            const code = Buffer.from(baseCode, 'hex')
+            const sha256sum = sha256(code)
             await this.Contract?.create({
               address: dgpAddress,
               addressString: new Address({
@@ -172,12 +172,12 @@ class ContractService extends Service implements IContractService {
       }
       return
     }
-    for (let transaction of block.transactions as (
+    for (const transaction of block.transactions as (
       | TransactionModel
       | ITransaction
     )[]) {
       for (let i = 0; i < transaction.outputs.length; ++i) {
-        let output = transaction.outputs[i]
+        const output = transaction.outputs[i]
         if (output && output.scriptPubKey) {
           let scriptPubKey: IOutputScript
           if (Buffer.isBuffer(output.scriptPubKey)) {
@@ -186,13 +186,13 @@ class ContractService extends Service implements IContractService {
             scriptPubKey = output.scriptPubKey
           }
           if (scriptPubKey.type === OutputScript.EVM_CONTRACT_CREATE) {
-            let address: Buffer = Address.fromScript(
+            const address: Buffer = Address.fromScript(
               scriptPubKey as IEVMContractCreateScript,
               this.chain,
               transaction.id,
               i
             )?.data as Buffer
-            let findOneOfAddress:
+            const findOneOfAddress:
               | {
                   address: Pick<AddressModel, 'data'>
                 }
@@ -217,8 +217,8 @@ class ContractService extends Service implements IContractService {
               ],
             })
             if (findOneOfAddress) {
-              let owner = findOneOfAddress.address
-              let contract = await this._createContract(address, 'evm')
+              const owner = findOneOfAddress.address
+              const contract = await this._createContract(address, 'evm')
               if (contract && contract.type === 'qrc20') {
                 await this._updateBalances(
                   new Set([
@@ -230,13 +230,13 @@ class ContractService extends Service implements IContractService {
           } else if (
             scriptPubKey.type === OutputScript.EVM_CONTRACT_CREATE_SENDER
           ) {
-            let address = Address.fromScript(
+            const address = Address.fromScript(
               scriptPubKey as IEVMContractCreateBySenderScript,
               this.chain,
               transaction.id,
               i
             )?.data as Buffer
-            let owner = new Address({
+            const owner = new Address({
               type: [
                 null,
                 Address.PAY_TO_PUBLIC_KEY_HASH,
@@ -251,7 +251,7 @@ class ContractService extends Service implements IContractService {
                 .senderData,
               chain: this.chain,
             })
-            let contract = await this._createContract(address, 'evm')
+            const contract = await this._createContract(address, 'evm')
             if (contract && contract.type === 'qrc20') {
               await this._updateBalances(
                 new Set([
@@ -275,8 +275,8 @@ class ContractService extends Service implements IContractService {
   }
 
   async onReorg(height: number): Promise<void> {
-    let balanceChanges: Set<string> = new Set()
-    let balanceChangeResults:
+    const balanceChanges: Set<string> = new Set()
+    const balanceChangeResults:
       | Pick<EvmReceiptLogModel, 'address' | 'topic2' | 'topic3'>[]
       | undefined = await this.EVMReceiptLog?.findAll({
       where: { topic1: TransferABI.id, topic3: { [$ne]: null }, topic4: null },
@@ -292,7 +292,7 @@ class ContractService extends Service implements IContractService {
       ],
     })
     if (balanceChangeResults) {
-      for (let { address, topic2, topic3 } of balanceChangeResults) {
+      for (const { address, topic2, topic3 } of balanceChangeResults) {
         if (Buffer.compare(topic2, Buffer.alloc(32)) !== 0) {
           balanceChanges.add(
             `${address.toString('hex')}:${topic2.slice(12).toString('hex')}`
@@ -331,15 +331,15 @@ class ContractService extends Service implements IContractService {
   }
 
   async _syncContracts(): Promise<void> {
-    let result:
+    const result:
       | ListContractsResult
       | void
       | undefined = await this.node.addedMethods
       .getRpcClient?.()
       ?.rpcMethods.listcontracts?.('1', (1e8).toString())
     if (result && this.Contract) {
-      let contractsToCreate: Set<string> = new Set(Object.keys(result))
-      let originalContracts: string[] = (
+      const contractsToCreate: Set<string> = new Set(Object.keys(result))
+      const originalContracts: string[] = (
         await this.Contract.findAll({
           where: {},
           attributes: ['address'],
@@ -347,8 +347,8 @@ class ContractService extends Service implements IContractService {
       ).map((contract: Pick<ContractModel, 'address'>) =>
         contract.address.toString('hex')
       )
-      let contractsToRemove: string[] = []
-      for (let address of originalContracts) {
+      const contractsToRemove: string[] = []
+      for (const address of originalContracts) {
         if (contractsToCreate.has(address)) {
           contractsToCreate.delete(address)
         } else {
@@ -369,7 +369,7 @@ class ContractService extends Service implements IContractService {
           ])
         )
       }
-      for (let address of contractsToCreate) {
+      for (const address of contractsToCreate) {
         await this._createContract(Buffer.from(address, 'hex'), 'evm')
       }
     }
@@ -385,7 +385,7 @@ class ContractService extends Service implements IContractService {
     }
     let code: Buffer
     try {
-      let baseCode = await this.node.addedMethods
+      const baseCode = await this.node.addedMethods
         .getRpcClient?.()
         .rpcMethods.getcontractcode?.(address.toString('hex'))
       if (baseCode) {
@@ -396,7 +396,7 @@ class ContractService extends Service implements IContractService {
     } catch (err) {
       return
     }
-    let sha256sum = sha256(code)
+    const sha256sum = sha256(code)
     contract = new ContractModel({
       address,
       addressString: new Address({
@@ -408,7 +408,7 @@ class ContractService extends Service implements IContractService {
       bytecodeSha256sum: sha256sum,
     })
     if (isQRC721(code)) {
-      let results = await this._batchCallMethods([
+      const results = await this._batchCallMethods([
         {
           address,
           abi: qrc721ABIs.find(
@@ -429,9 +429,9 @@ class ContractService extends Service implements IContractService {
         },
       ])
       if (results) {
-        let [nameResult, symbolResult, totalSupplyResult] = results
+        const [nameResult, symbolResult, totalSupplyResult] = results
         try {
-          let [name, symbol, totalSupply] = await Promise.all([
+          const [name, symbol, totalSupply] = await Promise.all([
             nameResult.then((x) => x[0]),
             symbolResult.then((x) => x[0]),
             totalSupplyResult.then((x) => BigInt(x[0].toString())),
@@ -456,7 +456,7 @@ class ContractService extends Service implements IContractService {
         }
       }
     } else if (isQRC20(code)) {
-      let results = await this._batchCallMethods([
+      const results = await this._batchCallMethods([
         {
           address,
           abi: qrc20ABIs.find(
@@ -489,7 +489,7 @@ class ContractService extends Service implements IContractService {
         },
       ])
       if (results) {
-        let [
+        const [
           nameResult,
           symbolResult,
           decimalsResult,
@@ -501,7 +501,7 @@ class ContractService extends Service implements IContractService {
           try {
             version = (await versionResult)[0]
           } catch (err) {}
-          let [name, symbol, decimals, totalSupply] = await Promise.all([
+          const [name, symbol, decimals, totalSupply] = await Promise.all([
             nameResult.then((x) => x[0]),
             symbolResult.then((x) => x[0]),
             decimalsResult.then((x) => x[0].toString()),
@@ -542,14 +542,14 @@ class ContractService extends Service implements IContractService {
     abi: IMethodABI,
     ...args: any[]
   ): Promise<any[] | undefined> {
-    let callContractResult = await this.node.addedMethods
+    const callContractResult = await this.node.addedMethods
       .getRpcClient?.()
       ?.rpcMethods.callcontract?.(
         address.toString('hex'),
         Buffer.concat([abi.id, abi.encodeInputs(args)]).toString('hex')
       )
     if (callContractResult) {
-      let { executionResult } = callContractResult
+      const { executionResult } = callContractResult
       if (executionResult.excepted === 'None') {
         return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
       } else {
@@ -565,9 +565,9 @@ class ContractService extends Service implements IContractService {
       args?: string[]
     }[]
   ): Promise<Promise<any[]>[] | undefined> {
-    let client = this.node.addedMethods.getRpcClient?.()
-    let results = await client?.batch<CallContractResult>(() => {
-      for (let { address, abi, args = [] } of callList) {
+    const client = this.node.addedMethods.getRpcClient?.()
+    const results = await client?.batch<CallContractResult>(() => {
+      for (const { address, abi, args = [] } of callList) {
         if (client) {
           client.rpcMethods.callcontract?.(
             address.toString('hex'),
@@ -577,8 +577,8 @@ class ContractService extends Service implements IContractService {
       }
     })
     return results?.map(async (result, index) => {
-      let { abi } = callList[index]
-      let { executionResult } = await result
+      const { abi } = callList[index]
+      const { executionResult } = await result
       if (executionResult.excepted === 'None') {
         return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
       } else {
@@ -588,14 +588,14 @@ class ContractService extends Service implements IContractService {
   }
 
   async _processReceipts(block: BlockObject): Promise<void> {
-    let balanceChanges: Set<string> = new Set()
-    let tokenHolders: Map<string, Buffer> = new Map()
-    let totalSupplyChanges: Set<string> = new Set()
+    const balanceChanges: Set<string> = new Set()
+    const tokenHolders: Map<string, Buffer> = new Map()
+    const totalSupplyChanges: Set<string> = new Set()
     // This is not used in here...
     // let contractsToCreate: Set<string> = new Set()
     // for (let { contractAddress, logs } of block.receipts || []) {
-    for (let { logs } of block.receipts || []) {
-      for (let { address, topics } of logs) {
+    for (const { logs } of block.receipts || []) {
+      for (const { address, topics } of logs) {
         /* if (Buffer.compare(address, contractAddress) !== 0) {
           contractsToCreate.add(address.toString('hex'))
         } */
@@ -603,8 +603,8 @@ class ContractService extends Service implements IContractService {
           topics.length >= 3 &&
           Buffer.compare(topics[0], TransferABI.id) === 0
         ) {
-          let sender = topics[1].slice(12)
-          let receiver = topics[2].slice(12)
+          const sender = topics[1].slice(12)
+          const receiver = topics[2].slice(12)
           if (topics.length === 3) {
             if (Buffer.compare(sender, Buffer.alloc(20)) !== 0) {
               balanceChanges.add(
@@ -639,9 +639,9 @@ class ContractService extends Service implements IContractService {
     if (tokenHolders.size) {
       await this._updateTokenHolders(tokenHolders)
     }
-    for (let addressString of totalSupplyChanges) {
-      let address = Buffer.from(addressString, 'hex')
-      let contract = await this.Contract?.findOne({
+    for (const addressString of totalSupplyChanges) {
+      const address = Buffer.from(addressString, 'hex')
+      const contract = await this.Contract?.findOne({
         where: {
           address,
           type: { [$in]: ['qrc20', 'qrc721'] },
@@ -672,26 +672,26 @@ class ContractService extends Service implements IContractService {
   }
 
   async _updateBalances(balanceChanges: Set<string>): Promise<void> {
-    let newBalanceChanges: { contract: string; address: string }[] = [
+    const newBalanceChanges: { contract: string; address: string }[] = [
       ...balanceChanges,
     ].map((item) => {
-      let [contract, address] = item.split(':')
+      const [contract, address] = item.split(':')
       return { contract, address }
     })
-    let batchCalls = newBalanceChanges.map(({ contract, address }) => ({
+    const batchCalls = newBalanceChanges.map(({ contract, address }) => ({
       address: Buffer.from(contract, 'hex'),
       abi: balanceOfABI,
       args: [`0x${address}`],
     }))
-    let result = await this._batchCallMethods(batchCalls)
-    let operations: (
+    const result = await this._batchCallMethods(batchCalls)
+    const operations: (
       | Qrc20BalanceCreationAttributes
       | undefined
     )[] = await Promise.all(
       newBalanceChanges.map(async ({ contract, address }, index) => {
         try {
           if (result) {
-            let [balance] = await result[index]
+            const [balance] = await result[index]
             return {
               contractAddress: Buffer.from(contract, 'hex'),
               address: Buffer.from(address, 'hex'),
@@ -701,7 +701,7 @@ class ContractService extends Service implements IContractService {
         } catch (err) {}
       })
     )
-    let filteredOperations: Qrc20BalanceCreationAttributes[] = operations.filter(
+    const filteredOperations: Qrc20BalanceCreationAttributes[] = operations.filter(
       Boolean
     ) as Qrc20BalanceCreationAttributes[]
     if (filteredOperations.length) {
@@ -713,9 +713,9 @@ class ContractService extends Service implements IContractService {
   }
 
   async _updateTokenHolders(transfers: Map<string, Buffer>): Promise<void> {
-    let operations: Qrc721TokenCreationAttributes[] = []
-    for (let [key, holder] of transfers.entries()) {
-      let [contract, tokenId] = key.split(':')
+    const operations: Qrc721TokenCreationAttributes[] = []
+    for (const [key, holder] of transfers.entries()) {
+      const [contract, tokenId] = key.split(':')
       operations.push({
         contractAddress: Buffer.from(contract, 'hex'),
         tokenId: Buffer.from(tokenId, 'hex'),

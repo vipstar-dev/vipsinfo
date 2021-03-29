@@ -14,7 +14,7 @@ class BufferReader {
   }
 
   read(length: number): Buffer | undefined {
-    let buffer: Buffer | undefined = this.buffer?.slice(0, length)
+    const buffer: Buffer | undefined = this.buffer?.slice(0, length)
     this.buffer = this.buffer?.slice(length)
     return buffer
   }
@@ -24,63 +24,63 @@ class BufferReader {
   }
 
   readAll(): Buffer | undefined {
-    let buffer: Buffer | undefined = this.buffer
+    const buffer: Buffer | undefined = this.buffer
     this.buffer = Buffer.alloc(0)
     return buffer
   }
 
   readUInt8(): number | undefined {
-    let value: number | undefined = this.buffer?.readUInt8(0)
+    const value: number | undefined = this.buffer?.readUInt8(0)
     this.buffer = this.buffer?.slice(1)
     return value
   }
 
   readUInt16LE(): number | undefined {
-    let value: number | undefined = this.buffer?.readUInt16LE(0)
+    const value: number | undefined = this.buffer?.readUInt16LE(0)
     this.buffer = this.buffer?.slice(2)
     return value
   }
 
   readUInt16BE(): number | undefined {
-    let value: number | undefined = this.buffer?.readUInt16BE(0)
+    const value: number | undefined = this.buffer?.readUInt16BE(0)
     this.buffer = this.buffer?.slice(2)
     return value
   }
 
   readUInt32LE(): number | undefined {
-    let value: number | undefined = this.buffer?.readUInt32LE(0)
+    const value: number | undefined = this.buffer?.readUInt32LE(0)
     this.buffer = this.buffer?.slice(4)
     return value
   }
 
   readUInt32BE(): number | undefined {
-    let value: number | undefined = this.buffer?.readUInt32BE(0)
+    const value: number | undefined = this.buffer?.readUInt32BE(0)
     this.buffer = this.buffer?.slice(4)
     return value
   }
 
   readInt32LE(): number | undefined {
-    let value: number | undefined = this.buffer?.readInt32LE(0)
+    const value: number | undefined = this.buffer?.readInt32LE(0)
     this.buffer = this.buffer?.slice(4)
     return value
   }
 
   readInt32BE(): number | undefined {
-    let value: number | undefined = this.buffer?.readInt32BE(0)
+    const value: number | undefined = this.buffer?.readInt32BE(0)
     this.buffer = this.buffer?.slice(4)
     return value
   }
 
   readUInt64LE(): bigint {
-    let low: number | undefined = this.buffer?.readUInt32LE()
-    let high: number | undefined = this.buffer?.readUInt32LE(4)
-    let value: bigint = (BigInt(high) << BigInt(32)) + BigInt(low)
+    const low: number | undefined = this.buffer?.readUInt32LE()
+    const high: number | undefined = this.buffer?.readUInt32LE(4)
+    const value: bigint = (BigInt(high) << BigInt(32)) + BigInt(low)
     this.buffer = this.buffer?.slice(8)
     return value
   }
 
   readVarintNumber(): number | undefined {
-    let first: number | undefined = this.readUInt8()
+    const first: number | undefined = this.readUInt8()
     switch (first) {
       case 0xfd:
         return this.readUInt16LE()
@@ -94,7 +94,7 @@ class BufferReader {
   }
 
   readVarLengthBuffer(): Buffer | undefined {
-    let length: number | undefined = this.readVarintNumber()
+    const length: number | undefined = this.readVarintNumber()
     return this.read(typeof length === 'number' ? length : 0)
   }
 

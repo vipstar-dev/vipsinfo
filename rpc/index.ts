@@ -214,11 +214,11 @@ class RpcClient {
   }
 
   rpc<R extends QtumRpcResult>(_request: QtumPpcRequest): Promise<R> {
-    let request: string = JSON.stringify(_request)
-    let auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
+    const request: string = JSON.stringify(_request)
+    const auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
       'base64'
     )
-    let options = {
+    const options = {
       host: this.host,
       port: this.port,
       method: 'POST',
@@ -231,8 +231,8 @@ class RpcClient {
     }
 
     return new Promise((resolve, reject) => {
-      let req = this.protocol?.request(options, (res) => {
-        let buffer: Buffer[] = []
+      const req = this.protocol?.request(options, (res) => {
+        const buffer: Buffer[] = []
         res.on('data', (data: Buffer) => buffer.push(data))
         res.on('end', () => {
           if (res.statusCode === 401) {
@@ -247,7 +247,7 @@ class RpcClient {
             res.statusCode === 500 &&
             buffer.toString() === 'Work queue depth exceeded'
           ) {
-            let exceededError: Error &
+            const exceededError: Error &
               Partial<QtumPpcResponse['error']> = new Error(
               `Qtum JSON-RPC: ${buffer}`
             )
@@ -255,7 +255,7 @@ class RpcClient {
             reject(exceededError)
           } else {
             try {
-              let parsedBuffer: QtumPpcResponse = JSON.parse(
+              const parsedBuffer: QtumPpcResponse = JSON.parse(
                 Buffer.concat(buffer).toString()
               )
               if (parsedBuffer.error) {
@@ -304,14 +304,14 @@ class RpcClient {
   }
 
   generateRPCMethods() {
-    let self = this
+    const self = this
     function createRPCMethod(
       methodName: string,
       baseArgs: callTypes[]
     ): (
       ...args: (string | { toString: () => string })[]
     ) => Promise<QtumRpcResult> | void {
-      let fixedArgs: (string | number | boolean | object)[] = []
+      const fixedArgs: (string | number | boolean | object)[] = []
       return function (...args: { toString: () => string }[] | string[]) {
         if (baseArgs === ['int', 'int'] || baseArgs === ['int']) {
           for (let i = 0; i < args.length; i++) {
@@ -334,12 +334,12 @@ class RpcClient {
             method: methodName,
             params: fixedArgs,
             id: getRandomId(),
-          }) as Promise<QtumRpcResult>
+          })
         }
       }
     }
 
-    let types: typeConvert = {
+    const types: typeConvert = {
       str: (arg: { toString: () => string }) => arg.toString(),
       int: (arg: string) => Number.parseFloat(arg),
       float: (arg: string) => Number.parseFloat(arg),
@@ -348,8 +348,8 @@ class RpcClient {
       obj: (arg: any) => (typeof arg === 'string' ? JSON.parse(arg) : arg),
     }
 
-    for (let [key, value] of Object.entries(callspec)) {
-      let spec: callTypes[] = value.split(' ') as callTypes[]
+    for (const [key, value] of Object.entries(callspec)) {
+      const spec: callTypes[] = value.split(' ') as callTypes[]
       // @ts-ignore
       self.rpcMethods[key as callspecTypes] = createRPCMethod(key, spec)
     }

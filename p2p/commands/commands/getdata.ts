@@ -32,7 +32,7 @@ class GetDataMessage extends Message implements IGetDataMessage {
     payload: Buffer,
     options: GetDataMessageOptions
   ): GetDataMessage {
-    let message = new GetDataMessage(options)
+    const message = new GetDataMessage(options)
     message.payload = payload
     return message
   }
@@ -59,13 +59,13 @@ class GetDataMessage extends Message implements IGetDataMessage {
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writeInventories(writer, this.inventories)
     return writer.toBuffer()
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
+    const reader = new BufferReader(payload)
     this.inventories = parseInventories(reader)
     Message.checkFinished(reader)
   }

@@ -69,7 +69,7 @@ export default class Address extends Model<
   _type!: number
 
   get type(): string | null {
-    let type = this.getDataValue('_type')
+    const type = this.getDataValue('_type')
     return addressTypeMap[type] || null
   }
 

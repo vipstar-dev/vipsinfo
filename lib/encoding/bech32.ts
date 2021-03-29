@@ -23,8 +23,8 @@ export class Bech32 {
 
   private static polymod(values: number[]): number {
     let mod: number = 1
-    for (let x of values) {
-      let top: number = mod >>> 25
+    for (const x of values) {
+      const top: number = mod >>> 25
       mod = ((mod & 0x1ffffff) << 5) | x
       for (let i = 0; i < 5; ++i) {
         if ((top >>> i) & 1) {
@@ -36,7 +36,7 @@ export class Bech32 {
   }
 
   private static hrpExpand(hrp: string): number[] {
-    let result: number[] = []
+    const result: number[] = []
     for (let p = 0; p < hrp.length; ++p) {
       result.push(hrp.charCodeAt(p) >>> 5)
     }
@@ -48,7 +48,7 @@ export class Bech32 {
   }
 
   private createChecksum(): number[] {
-    let values: number[] = [
+    const values: number[] = [
       ...Bech32.hrpExpand(this.hrp),
       ...this.data,
       0,
@@ -58,8 +58,8 @@ export class Bech32 {
       0,
       0,
     ]
-    let mod: number = Bech32.polymod(values) ^ 1
-    let result: number[] = []
+    const mod: number = Bech32.polymod(values) ^ 1
+    const result: number[] = []
     for (let p = 0; p < 6; ++p) {
       result.push((mod >>> (5 * (5 - p))) & 31)
     }
@@ -67,7 +67,7 @@ export class Bech32 {
   }
 
   encode(): string {
-    let combined: number[] = this.data.concat(this.createChecksum())
+    const combined: number[] = this.data.concat(this.createChecksum())
     return `${this.hrp}1${combined.map((s: number) => CHARSET[s]).join('')}`
   }
 
@@ -79,7 +79,7 @@ export class Bech32 {
     let hasLower: boolean = false
     let hasUpper: boolean = false
     for (let p = 0; p < bechString.length; ++p) {
-      let code: number = bechString.charCodeAt(p)
+      const code: number = bechString.charCodeAt(p)
       if (code < 33 || code > 126) {
         throw new InvalidBech32StringError(bechString)
       }
@@ -94,7 +94,7 @@ export class Bech32 {
       throw new InvalidBech32StringError(bechString)
     }
     bechString = bechString.toLowerCase()
-    let position: number = bechString.lastIndexOf('1')
+    const position: number = bechString.lastIndexOf('1')
     if (
       position < 1 ||
       position + 7 > bechString.length ||
@@ -102,10 +102,10 @@ export class Bech32 {
     ) {
       throw new InvalidBech32StringError(bechString)
     }
-    let hrp: string = bechString.slice(0, position)
-    let data: number[] = []
-    for (let s of bechString.slice(position + 1)) {
-      let d = CHARSET.indexOf(s)
+    const hrp: string = bechString.slice(0, position)
+    const data: number[] = []
+    for (const s of bechString.slice(position + 1)) {
+      const d = CHARSET.indexOf(s)
       if (d === -1) {
         throw new InvalidBech32StringError(bechString)
       }

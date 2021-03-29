@@ -40,7 +40,7 @@ export default class Qrc20Balance extends Model<
   _balance!: Buffer
 
   get balance(): bigint | null {
-    let balance = this.getDataValue('_balance')
+    const balance = this.getDataValue('_balance')
     return balance == null ? null : BigInt(`0x${balance.toString('hex')}`)
   }
 

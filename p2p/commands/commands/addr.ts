@@ -22,15 +22,15 @@ class AddrMessage extends Message implements IAddrMessage {
   }
 
   static fromBuffer(payload: Buffer, options: AddrMessageOptions): AddrMessage {
-    let message = new AddrMessage(options)
+    const message = new AddrMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writer.writeVarintNumber(this.addresses.length)
-    for (let address of this.addresses) {
+    for (const address of this.addresses) {
       if (address.timestamp) {
         writer.writeUInt32LE(address.timestamp)
         writeAddress(writer, address)
@@ -40,13 +40,13 @@ class AddrMessage extends Message implements IAddrMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
-    let addressCount = reader.readVarintNumber()
+    const reader = new BufferReader(payload)
+    const addressCount = reader.readVarintNumber()
     this.addresses = []
     if (addressCount) {
       for (let i = 0; i < addressCount; ++i) {
-        let timestamp = reader.readUInt32LE()
-        let address = parseAddress(reader)
+        const timestamp = reader.readUInt32LE()
+        const address = parseAddress(reader)
         address.timestamp = timestamp
         this.addresses.push(address)
       }

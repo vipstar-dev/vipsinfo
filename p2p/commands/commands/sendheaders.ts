@@ -9,7 +9,7 @@ class SendHeadersMessage extends Message {
     payload: Buffer,
     options: MessageOptions
   ): SendHeadersMessage {
-    let message = new SendHeadersMessage(options)
+    const message = new SendHeadersMessage(options)
     message.payload = payload
     return message
   }

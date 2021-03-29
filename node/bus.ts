@@ -22,8 +22,8 @@ class Bus extends EventEmitter implements IBus {
 
   subscribe(name: string): void {
     if (this.node) {
-      for (let service of this.node.services.values()) {
-        for (let event of service.publishEvents) {
+      for (const service of this.node.services.values()) {
+        for (const event of service.publishEvents) {
           if (name === event.name) {
             event.subscribe(this)
           }
@@ -34,8 +34,8 @@ class Bus extends EventEmitter implements IBus {
 
   unsubscribe(name: string): void {
     if (this.node) {
-      for (let service of this.node.services.values()) {
-        for (let event of service.publishEvents) {
+      for (const service of this.node.services.values()) {
+        for (const event of service.publishEvents) {
           if (name === event.name) {
             event.unsubscribe(this)
           }
@@ -46,8 +46,8 @@ class Bus extends EventEmitter implements IBus {
 
   close(): void {
     if (this.node) {
-      for (let service of this.node.services.values()) {
-        for (let event of service.publishEvents) {
+      for (const service of this.node.services.values()) {
+        for (const event of service.publishEvents) {
           event.unsubscribe(this)
         }
       }

@@ -33,18 +33,18 @@ class GetHeadersMessage extends Message implements IGetHeadersMessage {
     payload: Buffer,
     options: GetHeadersMessageOptions
   ): GetHeadersMessage {
-    let message = new GetHeadersMessage(options)
+    const message = new GetHeadersMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     if (this.version) {
       writer.writeUInt32LE(this.version)
     }
     writer.writeVarintNumber(this.starts.length)
-    for (let start of this.starts) {
+    for (const start of this.starts) {
       writer.write(Buffer.from(start).reverse())
     }
     writer.write(Buffer.from(this.stop).reverse())
@@ -52,22 +52,22 @@ class GetHeadersMessage extends Message implements IGetHeadersMessage {
   }
 
   set payload(payload) {
-    let reader = new BufferReader(payload)
-    let version = reader.readUInt32LE()
+    const reader = new BufferReader(payload)
+    const version = reader.readUInt32LE()
     if (version) {
       this.version = version
     }
-    let startCount = reader.readVarintNumber()
+    const startCount = reader.readVarintNumber()
     this.starts = []
     if (startCount) {
       for (let i = 0; i < startCount; ++i) {
-        let start = reader.read(32)
+        const start = reader.read(32)
         if (start) {
           this.starts.push(start.reverse())
         }
       }
     }
-    let stop = reader.read(32)
+    const stop = reader.read(32)
     if (stop) {
       this.stop = stop.reverse()
     }

@@ -6,7 +6,7 @@ class GetAddrMessage extends Message {
   }
 
   static fromBuffer(payload: Buffer, options: MessageOptions): GetAddrMessage {
-    let message = new GetAddrMessage(options)
+    const message = new GetAddrMessage(options)
     message.payload = payload
     return message
   }

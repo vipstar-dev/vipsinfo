@@ -22,7 +22,7 @@ class BlockMessage extends Message implements IBlockMessage {
     payload: Buffer,
     options: BlockMessageOptions
   ): BlockMessage {
-    let message = new BlockMessage(options)
+    const message = new BlockMessage(options)
     message.payload = payload
     return message
   }

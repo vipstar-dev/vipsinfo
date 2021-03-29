@@ -73,10 +73,10 @@ class Transaction implements ITransaction {
   }
 
   static fromBufferReader(reader: BufferReader): Transaction {
-    let version: number | undefined = reader.readInt32LE()
-    let inputs: ITransactionInput[] = []
+    const version: number | undefined = reader.readInt32LE()
+    const inputs: ITransactionInput[] = []
     let flag: number | undefined = 0
-    let outputs: ITransactionOutput[] = []
+    const outputs: ITransactionOutput[] = []
     let lockTime: number | undefined
     let inputCount: number = reader.readVarintNumber() || 0
     if (!inputCount) {
@@ -86,13 +86,13 @@ class Transaction implements ITransaction {
     for (let i = 0; i < inputCount; ++i) {
       inputs.push(Input.fromBufferReader(reader))
     }
-    let outputCount = reader.readVarintNumber() || 0
+    const outputCount = reader.readVarintNumber() || 0
     for (let i = 0; i < outputCount; ++i) {
       outputs.push(Output.fromBufferReader(reader))
     }
     if (flag) {
       for (let i = 0; i < inputCount; ++i) {
-        let witnessCount = reader.readVarintNumber() || 0
+        const witnessCount = reader.readVarintNumber() || 0
         for (let j = 0; j < witnessCount; ++j) {
           inputs[i].witness.push(reader.readVarLengthBuffer())
         }
@@ -103,13 +103,13 @@ class Transaction implements ITransaction {
   }
 
   toBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toBufferWriter(writer)
     return writer.toBuffer()
   }
 
   toHashBuffer(): Buffer {
-    let writer: BufferWriter = new BufferWriter()
+    const writer: BufferWriter = new BufferWriter()
     this.toHashBufferWriter(writer)
     return writer.toBuffer()
   }
@@ -121,17 +121,17 @@ class Transaction implements ITransaction {
       writer.writeUInt8(this.flag)
     }
     writer.writeVarintNumber(this.inputs.length)
-    for (let input of this.inputs) {
+    for (const input of this.inputs) {
       input?.toBufferWriter(writer)
     }
     writer.writeVarintNumber(this.outputs.length)
-    for (let output of this.outputs) {
+    for (const output of this.outputs) {
       output?.toBufferWriter(writer)
     }
     if (this.flag) {
-      for (let input of this.inputs) {
+      for (const input of this.inputs) {
         writer.writeVarintNumber(input?.witness.length || 0)
-        for (let script of input?.witness || []) {
+        for (const script of input?.witness || []) {
           if (script instanceof Buffer) {
             writer.writeVarLengthBuffer(script)
           }
@@ -144,11 +144,11 @@ class Transaction implements ITransaction {
   toHashBufferWriter(writer: BufferWriter): void {
     writer.writeInt32LE(this.version || 0)
     writer.writeVarintNumber(this.inputs.length)
-    for (let input of this.inputs) {
+    for (const input of this.inputs) {
       input?.toBufferWriter(writer)
     }
     writer.writeVarintNumber(this.outputs.length)
-    for (let output of this.outputs) {
+    for (const output of this.outputs) {
       output?.toBufferWriter(writer)
     }
     writer.writeUInt32LE(this.lockTime || 0)

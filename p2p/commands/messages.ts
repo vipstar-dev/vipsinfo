@@ -38,7 +38,7 @@ class Messages {
   constructor(options: MessageOptions) {
     this.chain = options.chain
     this.commands = {}
-    for (let command of messageList) {
+    for (const command of messageList) {
       switch (command) {
         case 'addr':
           this.commands[command] = (args: MessageOptionsType<'addr'>) => {
@@ -143,17 +143,17 @@ class Messages {
     ) {
       return
     }
-    let payloadLength = reader.slice(PAYLOAD_START)?.readUInt32LE(0)
-    let messageLength = Number(payloadLength) + 24
+    const payloadLength = reader.slice(PAYLOAD_START)?.readUInt32LE(0)
+    const messageLength = Number(payloadLength) + 24
     if (Number(reader.length) < messageLength) {
       return
     }
-    let command: CommandNames = reader
+    const command: CommandNames = reader
       .slice(4, 16)
       ?.toString('ascii')
       .replace(/\0+$/, '') as CommandNames
-    let checksum = reader.slice(20, 24)
-    let payload = reader.slice(24, messageLength)
+    const checksum = reader.slice(20, 24)
+    const payload = reader.slice(24, messageLength)
     reader.skip(messageLength)
     if (
       Buffer.compare(
@@ -183,9 +183,9 @@ class Messages {
   }
 
   _buildFromBuffer(command: CommandNames, payload: Buffer) {
-    let executableCommand = this.commands[command]
+    const executableCommand = this.commands[command]
     if (executableCommand !== undefined) {
-      let message = executableCommand({ chain: this.chain })
+      const message = executableCommand({ chain: this.chain })
       if (message) {
         message.payload = payload
         return message

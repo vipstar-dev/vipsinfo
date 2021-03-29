@@ -38,12 +38,12 @@ class Pool extends EventEmitter {
     this.connectedPeers = new Map()
     this.dnsSeed = dnsSeed || this.dnsSeed
     this.maxSize = maxSize
-    for (let address of addresses) {
+    for (const address of addresses) {
       this.addAddress(address)
     }
 
     this.on('seed', (ips: string[]) => {
-      for (let ip of ips) {
+      for (const ip of ips) {
         this.addAddress({ ip: { v4: ip } })
       }
       if (this.keepAlive) {
@@ -70,7 +70,7 @@ class Pool extends EventEmitter {
 
   disconnect(): void {
     this.keepAlive = false
-    for (let peer of this.connectedPeers.values()) {
+    for (const peer of this.connectedPeers.values()) {
       peer.disconnect()
     }
   }
@@ -80,7 +80,7 @@ class Pool extends EventEmitter {
   }
 
   fillConnections(): void {
-    for (let address of this.addresses) {
+    for (const address of this.addresses) {
       if (this.connections >= this.maxSize) {
         break
       }
@@ -106,9 +106,9 @@ class Pool extends EventEmitter {
 
   connectPeer(address: AddressData): void {
     if (!this.connectedPeers.has(address.id as string)) {
-      let port = address.port || this.chain.port
-      let ip = address.ip.v4 || address.ip.v6
-      let peer = new Peer({ host: ip, port, chain: this.chain })
+      const port = address.port || this.chain.port
+      const ip = address.ip.v4 || address.ip.v6
+      const peer = new Peer({ host: ip, port, chain: this.chain })
       peer.on('connect', () => this.emit('peerconnect', peer, address))
       this.addPeerEventHandlers(peer, address)
       peer.connect()
@@ -118,7 +118,7 @@ class Pool extends EventEmitter {
 
   addConnectedPeer(socket: Socket, address: AddressData): void {
     if (!this.connectedPeers.has(address.id as string)) {
-      let peer = new Peer({ socket, chain: this.chain })
+      const peer = new Peer({ socket, chain: this.chain })
       this.addPeerEventHandlers(peer, address)
       this.connectedPeers.set(address.id as string, peer)
       this.emit('peerconnect', peer, address)
@@ -128,7 +128,7 @@ class Pool extends EventEmitter {
   addPeerEventHandlers(peer: Peer, address: AddressData): void {
     peer.on('disconnect', () => this.emit('peerdisconnect', peer, address))
     peer.on('ready', () => this.emit('peerready', peer, address))
-    for (let event of messageList) {
+    for (const event of messageList) {
       peer.on(event, (message: Message) =>
         this.emit(`peer${event}`, peer, message)
       )
@@ -136,11 +136,11 @@ class Pool extends EventEmitter {
   }
 
   deprioritizeAddress(address: AddressData): void {
-    let index = this.addresses.findIndex(
+    const index = this.addresses.findIndex(
       (item: AddressData) => item.id === address.id
     )
     if (index >= 0) {
-      let [item] = this.addresses.splice(index, 1)
+      const [item] = this.addresses.splice(index, 1)
       item.retryTime = Math.floor(Date.now() / 1000) + RETRY_SECONDS
       this.addresses.push(item)
     }
@@ -167,7 +167,7 @@ class Pool extends EventEmitter {
 
   addAddressesFromSeeds() {
     if (this.chain.dnsSeeds) {
-      for (let seed of this.chain.dnsSeeds) {
+      for (const seed of this.chain.dnsSeeds) {
         this.addAddressesFromSeed(seed)
       }
     }

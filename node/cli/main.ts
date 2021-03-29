@@ -10,7 +10,7 @@ process.on('unhandledRejection', (reason: object | null | undefined) =>
   console.error(reason)
 )
 
-let liftoff = new Liftoff({
+const liftoff = new Liftoff({
   name: 'vipsinfo',
   moduleName: 'vipsinfo-node',
   configName: 'vipsinfo-node',
@@ -38,12 +38,12 @@ liftoff.launch({ cwd: process.cwd() }, () => {
       'Specify the directory with Vipsinfo Node configuration'
     )
     .action(async (cmd: { [key: string]: string }) => {
-      let config: ConfigFile = require(path.resolve(
+      const config: ConfigFile = require(path.resolve(
         process.cwd(),
         ...(cmd.config ? [cmd.config] : []),
         'vipsinfo-node.json'
       )) as ConfigFile
-      let node = new VipsNode({ path: process.cwd(), config })
+      const node = new VipsNode({ path: process.cwd(), config })
       await node.start()
     })
 

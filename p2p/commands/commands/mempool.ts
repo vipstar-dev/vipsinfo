@@ -6,7 +6,7 @@ class MempoolMessage extends Message {
   }
 
   static fromBuffer(payload: Buffer, options: MessageOptions): MempoolMessage {
-    let message = new MempoolMessage(options)
+    const message = new MempoolMessage(options)
     message.payload = payload
     return message
   }

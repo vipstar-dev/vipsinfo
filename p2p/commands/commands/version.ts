@@ -65,7 +65,7 @@ class VersionMessage extends Message implements IVersionMessage {
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writer.writeUInt32LE(this.version)
     writer.writeUInt64LE(this.services)
     writer.writeUInt32LE(this.timestamp)
@@ -80,16 +80,16 @@ class VersionMessage extends Message implements IVersionMessage {
   }
 
   set payload(payload) {
-    let reader = new BufferReader(payload)
-    let version = reader.readUInt32LE()
-    let services = reader.readUInt64LE()
-    let timestamp = reader.readUInt32LE()
+    const reader = new BufferReader(payload)
+    const version = reader.readUInt32LE()
+    const services = reader.readUInt64LE()
+    const timestamp = reader.readUInt32LE()
     reader.read(4)
-    let myAddress = parseAddress(reader)
-    let yourAddress = parseAddress(reader)
-    let nonce = reader.read(8)
-    let subversion = reader.readVarLengthBuffer()?.toString()
-    let startHeight = reader.readUInt32LE()
+    const myAddress = parseAddress(reader)
+    const yourAddress = parseAddress(reader)
+    const nonce = reader.read(8)
+    const subversion = reader.readVarLengthBuffer()?.toString()
+    const startHeight = reader.readUInt32LE()
     if (
       version &&
       services &&

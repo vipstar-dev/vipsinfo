@@ -62,7 +62,7 @@ class MempoolService extends Service implements IMempoolService {
 
   async start() {
     this.db = this.node.addedMethods.getDatabase?.()
-    let getModel = this.node.addedMethods.getModel
+    const getModel = this.node.addedMethods.getModel
     if (getModel) {
       this.Transaction = getModel('transaction') as ModelCtor<TransactionModel>
       this.Witness = getModel('witness') as ModelCtor<WitnessModel>
@@ -136,7 +136,7 @@ class MempoolService extends Service implements IMempoolService {
             weight: tx.weight,
           })
         )._id
-        let witnesses = this.transaction.groupWitnesses(tx)
+        const witnesses = this.transaction.groupWitnesses(tx)
         await Promise.all([
           this.Witness.bulkCreate(witnesses, { validate: false }),
           this.transaction.processTxos([tx]),
@@ -144,7 +144,7 @@ class MempoolService extends Service implements IMempoolService {
         await this.transaction.processBalanceChanges({ transactions: [tx] })
         await this.transaction.processReceipts([tx])
 
-        for (let subscription of this.subscriptions.transaction) {
+        for (const subscription of this.subscriptions.transaction) {
           subscription.emit('mempool/transaction', tx)
         }
       }
@@ -157,7 +157,7 @@ class MempoolService extends Service implements IMempoolService {
     tx: TransactionModel | ITransactionAndModelSetting
   ): Promise<boolean | void> {
     if (this.Transaction && this.db) {
-      let prevTxs: Pick<
+      const prevTxs: Pick<
         TransactionModel,
         '_id' | 'id'
       >[] = await this.Transaction.findAll({
@@ -171,10 +171,10 @@ class MempoolService extends Service implements IMempoolService {
         },
         attributes: ['_id', 'id'],
       })
-      let txos = []
-      for (let input of tx.inputs) {
-        let prevTxId = (input as ITransactionInput).prevTxId || undefined
-        let item = prevTxs.find(
+      const txos = []
+      for (const input of tx.inputs) {
+        const prevTxId = (input as ITransactionInput).prevTxId || undefined
+        const item = prevTxs.find(
           (tx: Pick<TransactionModel, '_id' | 'id'>) =>
             Buffer.compare(tx.id, prevTxId || Buffer.alloc(0)) === 0
         )
@@ -183,7 +183,7 @@ class MempoolService extends Service implements IMempoolService {
         }
         txos.push([item._id, input?.outputIndex as number])
       }
-      let [{ count }] = await this.db.query(
+      const [{ count }] = await this.db.query(
         sql([
           `SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN ${txos}`,
         ]),

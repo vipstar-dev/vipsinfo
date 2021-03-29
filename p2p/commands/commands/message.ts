@@ -30,11 +30,11 @@ class Message implements IMessage {
   set payload(payload: Buffer) {}
 
   toBuffer(): Buffer {
-    let command: Buffer = Buffer.alloc(12)
+    const command: Buffer = Buffer.alloc(12)
     command.write(this.command, 'ascii')
-    let payload: Buffer = this.payload
-    let checksum: Buffer = sha256d(payload).slice(0, 4)
-    let writer: BufferWriter = new BufferWriter()
+    const payload: Buffer = this.payload
+    const checksum: Buffer = sha256d(payload).slice(0, 4)
+    const writer: BufferWriter = new BufferWriter()
     writer.write(this.chain.networkMagic)
     writer.write(command)
     writer.writeUInt32LE(payload.length)

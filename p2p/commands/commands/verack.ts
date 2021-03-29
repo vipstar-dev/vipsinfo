@@ -6,7 +6,7 @@ class VerackMessage extends Message {
   }
 
   static fromBuffer(payload: Buffer, options: MessageOptions): VerackMessage {
-    let message = new VerackMessage(options)
+    const message = new VerackMessage(options)
     message.payload = payload
     return message
   }

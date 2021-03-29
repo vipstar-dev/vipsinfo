@@ -43,7 +43,7 @@ export default class Qrc721 extends Model<
   _totalSupply!: Buffer
 
   get totalSupply(): bigint | null {
-    let totalSupply = this.getDataValue('_totalSupply')
+    const totalSupply = this.getDataValue('_totalSupply')
     return totalSupply == null
       ? null
       : BigInt(`0x${totalSupply.toString('hex')}`)

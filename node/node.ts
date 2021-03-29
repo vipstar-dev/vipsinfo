@@ -92,33 +92,33 @@ class Node extends EventEmitter {
   }
 
   getAllAPIMethods(): object {
-    let methods = {}
-    for (let service of this.services.values()) {
+    const methods = {}
+    for (const service of this.services.values()) {
       Object.assign(methods, service.APIMethods)
     }
     return methods
   }
 
   getAllPublishEvents(): Event[] {
-    let events: Event[] = []
-    for (let service of this.services.values()) {
+    const events: Event[] = []
+    for (const service of this.services.values()) {
       events.push(...service.publishEvents)
     }
     return events
   }
 
   static getServiceOrder(services: ServiceObject[]): ServiceObject[] {
-    let names: Services[] = []
-    let servicesByName: ServiceObjectByName = {}
-    for (let service of services) {
+    const names: Services[] = []
+    const servicesByName: ServiceObjectByName = {}
+    for (const service of services) {
       names.push(service.name)
       servicesByName[service.name] = service
     }
-    let stack: ServiceObject[] = []
-    let stackNames: Set<Services> = new Set()
+    const stack: ServiceObject[] = []
+    const stackNames: Set<Services> = new Set()
     function addToStack(names: Services[]): void {
-      for (let name of names) {
-        let service: ServiceObject | undefined = servicesByName[name]
+      for (const name of names) {
+        const service: ServiceObject | undefined = servicesByName[name]
         if (service) {
           addToStack(service.module?.dependencies || [])
           if (!stackNames.has(name)) {
@@ -133,17 +133,17 @@ class Node extends EventEmitter {
   }
 
   getServicesByOrder(): IService[] {
-    let names: Services[] = []
-    let servicesByName: ServiceByName = {}
-    for (let [name, service] of this.services) {
+    const names: Services[] = []
+    const servicesByName: ServiceByName = {}
+    for (const [name, service] of this.services) {
       names.push(name)
       servicesByName[name] = service
     }
-    let stack: IService[] = []
-    let stackNames: Set<Services> = new Set()
+    const stack: IService[] = []
+    const stackNames: Set<Services> = new Set()
     function addToStack(names: Services[]) {
-      for (let name of names) {
-        let service: IService | undefined = servicesByName[name]
+      for (const name of names) {
+        const service: IService | undefined = servicesByName[name]
         if (service) {
           addToStack(service.dependencies)
           if (!stackNames.has(name)) {
@@ -160,18 +160,18 @@ class Node extends EventEmitter {
   async startService(serviceInfo: ServiceObject) {
     if (serviceInfo.module) {
       this.logger.info('Starting', serviceInfo.name)
-      let config: Required<ServiceConfigType> = Object.assign(
+      const config: Required<ServiceConfigType> = Object.assign(
         serviceInfo.config || {},
         {
           node: this,
           name: serviceInfo.name,
         } as BaseConfig
       )
-      let service: IService = new serviceInfo.module(config)
+      const service: IService = new serviceInfo.module(config)
       this.services.set(serviceInfo.name, service)
       await service.start()
-      let methodNames = new Set()
-      for (let [name, method] of Object.entries(service.APIMethods)) {
+      const methodNames = new Set()
+      for (const [name, method] of Object.entries(service.APIMethods)) {
         assert(!methodNames.has(name), `API method name conflicts: ${name}`)
         methodNames.add(name)
         this.addedMethods[name as keyof AddedMethods] = method
@@ -183,7 +183,7 @@ class Node extends EventEmitter {
   async start(): Promise<void> {
     this.logger.info('Using config:', this.configPath)
     this.logger.info('Using chain:', this.chain?.name)
-    for (let service of Node.getServiceOrder(this.unloadedServices)) {
+    for (const service of Node.getServiceOrder(this.unloadedServices)) {
       await this.startService(service)
     }
     this.emit('ready')
@@ -195,10 +195,10 @@ class Node extends EventEmitter {
     }
     try {
       this.logger.info('Beginning shutdown')
-      let services = Node.getServiceOrder(this.unloadedServices).reverse()
+      const services = Node.getServiceOrder(this.unloadedServices).reverse()
       this.stopping = true
       this.emit('stopping')
-      for (let service of services) {
+      for (const service of services) {
         if (this.services.has(service.name)) {
           this.logger.info('Stopping', service.name)
           await this.services.get(service.name)?.stop()

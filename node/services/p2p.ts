@@ -153,12 +153,12 @@ class P2PService extends Service implements IP2PService {
     blockHash: Buffer
     filter: BlockFilter
   }): Promise<IBlock> {
-    let block = this.blockCache.get(blockHash)
+    const block = this.blockCache.get(blockHash)
     if (block) {
       return block
     }
     // let blockFilter = this._setResourceFilter(filter, 'blocks')
-    let blockFilter = this._setResourceFilter(filter)
+    const blockFilter = this._setResourceFilter(filter)
     if (
       this.peer &&
       this.messages &&
@@ -171,7 +171,7 @@ class P2PService extends Service implements IP2PService {
     }
     return new Promise((resolve, reject) => {
       let timeout: Timeout
-      let callback = (block: IBlock) => {
+      const callback = (block: IBlock) => {
         clearTimeout(timeout)
         resolve(block)
       }
@@ -185,7 +185,7 @@ class P2PService extends Service implements IP2PService {
 
   getHeaders(filter: BlockFilter): void {
     // let headerFilter = this._setResourceFilter(filter, 'headers')
-    let headerFilter = this._setResourceFilter(filter)
+    const headerFilter = this._setResourceFilter(filter)
     if (
       this.peer &&
       this.messages &&
@@ -215,11 +215,11 @@ class P2PService extends Service implements IP2PService {
   }
 
   async sendRawTransaction(data: Buffer): Promise<Buffer | undefined> {
-    let rpcClient:
+    const rpcClient:
       | RpcClient
       | undefined = this.node?.addedMethods.getRpcClient?.()
     if (rpcClient && rpcClient.rpcMethods.sendrawtransaction) {
-      let id:
+      const id:
         | string
         | undefined = (await rpcClient.rpcMethods.sendrawtransaction(
         data.toString('hex')
@@ -253,7 +253,7 @@ class P2PService extends Service implements IP2PService {
     name: string,
     entity: IBlock | Header[] | Transaction
   ): void {
-    for (let emitter of subscribers) {
+    for (const emitter of subscribers) {
       emitter.emit(name, entity)
     }
   }
@@ -278,7 +278,7 @@ class P2PService extends Service implements IP2PService {
       return 0
     }
     let maxHeight = -Infinity
-    for (let peer of this.peers) {
+    for (const peer of this.peers) {
       if (peer.bestHeight > maxHeight) {
         maxHeight = peer.bestHeight
         this.peer = peer
@@ -301,7 +301,7 @@ class P2PService extends Service implements IP2PService {
   }
 
   _initPool(): void {
-    let options: PoolConstructor = {
+    const options: PoolConstructor = {
       dnsSeed: false,
       // maxPeers: this.maxPeers,
       maxSize: this.maxPeers,
@@ -339,10 +339,10 @@ class P2PService extends Service implements IP2PService {
 
   _onPeerGetData(peer: Peer, message: GetDataMessage): void {
     if (message.inventories[0] && message.inventories[0].data) {
-      let txId: string = Buffer.from(message.inventories[0].data)
+      const txId: string = Buffer.from(message.inventories[0].data)
         .reverse()
         .toString('hex')
-      let tx = this.outgoingTransactions.get(txId)
+      const tx = this.outgoingTransactions.get(txId)
       if (tx && this.messages?.commands.tx) {
         peer.sendMessage(
           this.messages.commands.tx({ chain: this.chain, transaction: tx })
@@ -356,8 +356,8 @@ class P2PService extends Service implements IP2PService {
   }
 
   _onPeerInventories(peer: Peer, message: InvMessage): void {
-    let newDataNeeded: InventoryConstructor[] = []
-    for (let inventory of message.inventories) {
+    const newDataNeeded: InventoryConstructor[] = []
+    for (const inventory of message.inventories) {
       if (
         inventory.data &&
         !this.inventories.get(inventory.data.toString('hex'))
@@ -414,7 +414,7 @@ class P2PService extends Service implements IP2PService {
       `best height: ${peer.bestHeight}`
     )
     this._addPeer(peer)
-    let bestHeight = this._getBestHeight()
+    const bestHeight = this._getBestHeight()
     if (bestHeight >= 0) {
       this.emit('bestHeight', bestHeight)
     }

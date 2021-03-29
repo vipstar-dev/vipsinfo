@@ -24,15 +24,15 @@ class HeadersMessage extends Message implements IHeadersMessage {
     payload: Buffer,
     options: HeadersMessageOptions
   ): HeadersMessage {
-    let message = new HeadersMessage(options)
+    const message = new HeadersMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writer.writeVarintNumber(this.headers.length)
-    for (let header of this.headers) {
+    for (const header of this.headers) {
       header.toBufferWriter(writer)
       writer.writeUInt8(0)
     }
@@ -40,8 +40,8 @@ class HeadersMessage extends Message implements IHeadersMessage {
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
-    let count = reader.readVarintNumber()
+    const reader = new BufferReader(payload)
+    const count = reader.readVarintNumber()
     this.headers = []
     if (count) {
       for (let i = 0; i < count; ++i) {

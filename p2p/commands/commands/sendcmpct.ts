@@ -22,20 +22,20 @@ class SendCmpctMessage extends Message implements ISendCmpctMessage {
     payload: Buffer,
     options: MessageOptions
   ): SendCmpctMessage {
-    let message = new SendCmpctMessage(options)
+    const message = new SendCmpctMessage(options)
     message.payload = payload
     return message
   }
 
   get payload(): Buffer {
-    let writer = new BufferWriter()
+    const writer = new BufferWriter()
     writer.writeUInt8(Number(this.useCmpctBlock))
     writer.writeUInt64LE(BigInt(this.cmpctBlockVersion))
     return writer.toBuffer()
   }
 
   set payload(payload: Buffer) {
-    let reader = new BufferReader(payload)
+    const reader = new BufferReader(payload)
     this.useCmpctBlock = Boolean(reader.readUInt8())
     this.cmpctBlockVersion = reader.readUInt64LE()
     Message.checkFinished(reader)
