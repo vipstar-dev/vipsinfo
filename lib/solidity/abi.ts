@@ -29,10 +29,10 @@ export interface MethodABIConstructor {
 
 export interface IMethodABI extends MethodABIConstructor {
   id: Buffer
-  encodeInputs(params: any[]): Buffer
-  decodeInputs(data: Buffer): any[]
-  encodeOutputs(params: any[]): Buffer
-  decodeOutputs(data: Buffer): any[]
+  encodeInputs(params: (rawEncodeArgument | rawEncodeArgument[])[]): Buffer
+  decodeInputs(data: Buffer): (rawDecodeResults | rawDecodeResults[])[]
+  encodeOutputs(params: (rawEncodeArgument | rawEncodeArgument[])[]): Buffer
+  decodeOutputs(data: Buffer): (rawDecodeResults | rawDecodeResults[])[]
 }
 
 export interface EventABIConstructor {
@@ -93,7 +93,7 @@ export class MethodABI implements IMethodABI {
     return this._id
   }
 
-  encodeInputs(params: rawEncodeArgument[]): Buffer {
+  encodeInputs(params: (rawEncodeArgument | rawEncodeArgument[])[]): Buffer {
     return rawEncode(getTypes(this, 'inputs'), params)
   }
 
@@ -101,7 +101,7 @@ export class MethodABI implements IMethodABI {
     return rawDecode(getTypes(this, 'inputs'), data)
   }
 
-  encodeOutputs(params: rawEncodeArgument[]): Buffer {
+  encodeOutputs(params: (rawEncodeArgument | rawEncodeArgument[])[]): Buffer {
     return rawEncode(getTypes(this, 'outputs'), params)
   }
 
