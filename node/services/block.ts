@@ -183,7 +183,8 @@ class BlockService extends Service implements IBlockService {
     )
     const headerModel = this.header?.getLastHeader()
     if (headerModel) {
-      let { hash, height } = headerModel
+      const { hash } = headerModel
+      let { height } = headerModel
       this.logger.info('Block Service: retrieved all the headers of lookups')
       let block: BlockModel | null | undefined
       do {
@@ -316,14 +317,16 @@ class BlockService extends Service implements IBlockService {
 
   _queueBlock(block: IBlock): void {
     ++this.blocksInQueue
-    this.blockProcessor?.push(block, async (...err: (string | number)[]) => {
-      if (err) {
-        this._handleError(...err)
-      } else {
-        // this._logSynced(block.hash)
-        await this._logSynced()
-        --this.blocksInQueue
-      }
+    this.blockProcessor?.push(block, (...err: (string | number)[]) => {
+      void new Promise((resolve, reject) => {
+        if (err) {
+          reject(this._handleError(...err))
+        } else {
+          // this._logSynced(block.hash)
+          --this.blocksInQueue
+          resolve(this._logSynced())
+        }
+      })
     })
   }
 
@@ -380,20 +383,24 @@ class BlockService extends Service implements IBlockService {
 
   async _onHeaders(): Promise<void> {
     await this._resetTip()
-    return new Promise((resolve, reject) => {
-      const interval = setInterval(async () => {
-        if (this.blocksInQueue === 0) {
-          clearInterval(interval)
-          this._removeAllSubscriptions()
-          try {
-            await this._checkTip()
-            this.reorging = false
-            await this._startSync()
-            resolve()
-          } catch (err) {
-            reject(err)
+    return new Promise((_resolve, _reject) => {
+      const interval = setInterval(() => {
+        void new Promise<void>((resolve, reject) => {
+          if (this.blocksInQueue === 0) {
+            clearInterval(interval)
+            this._removeAllSubscriptions()
+            try {
+              void this._checkTip()
+              this.reorging = false
+              void this._startSync()
+              resolve()
+              _resolve()
+            } catch (err) {
+              reject(err)
+              _reject(err)
+            }
           }
-        }
+        })
       }, 1000).unref()
     })
   }
@@ -616,7 +623,7 @@ class BlockService extends Service implements IBlockService {
   _handleError(...err: (string | number)[]): void {
     if (!this.node.stopping) {
       this.logger.error('Block Service: handle error', ...err)
-      this.node.stop().then()
+      void this.node.stop().then()
     }
   }
 
@@ -738,8 +745,16 @@ class BlockService extends Service implements IBlockService {
         'block(s) from the peer-to-peer network'
       )
       if (numNeeded > 0) {
-        this.on('next block', () => this._sync())
-        this.on('synced', () => this._onSynced())
+        this.on('next block', () => {
+          void new Promise((resolve) => {
+            resolve(this._sync())
+          })
+        })
+        this.on('synced', () => {
+          void new Promise((resolve) => {
+            resolve(this._onSynced())
+          })
+        })
         if (this.reportInterval) {
           clearInterval(this.reportInterval)
         }
