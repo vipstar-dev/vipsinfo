@@ -2,7 +2,7 @@ import secp256k1 from 'secp256k1'
 
 import BufferWriter from '@/lib/encoding/buffer-writer'
 import Script, { IScript, ScriptChunk } from '@/lib/script'
-import Opcode, { OpcodeReversedMap } from '@/lib/script/opcode'
+import Opcode, { OpcodeReversedMap, OpcodeTypes } from '@/lib/script/opcode'
 
 export type OutputTypes =
   | 'UNKNOWN'
@@ -321,12 +321,9 @@ export class MultisigOutputScript
     signaturesRequired: number
   ): MultisigOutputScript {
     return new MultisigOutputScript([
-      // @ts-ignore
-      { code: Opcode[`OP_${signaturesRequired}`] },
-      // @ts-ignore
-      ...this.publicKeys?.map(Script.buildChunk),
-      // @ts-ignore
-      { code: Opcode[`OP_${this.publicKeys.length}`] },
+      { code: Opcode[`OP_${signaturesRequired}` as OpcodeTypes] },
+      ...publicKeys.map((pk: Buffer) => Script.buildChunk(pk)),
+      { code: Opcode[`OP_${publicKeys.length}` as OpcodeTypes] },
       { code: Opcode.OP_CHECKMULTISIG },
     ])
   }
