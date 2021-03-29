@@ -14,7 +14,7 @@ export interface IChain {
   dnsSeeds?: string[]
 }
 
-const chains: Map<chainType, IChain> = new Map()
+const chains = new Map<chainType, IChain>()
 
 class Chain implements IChain {
   name: chainType
