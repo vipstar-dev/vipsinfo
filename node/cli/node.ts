@@ -7,6 +7,7 @@ import Node, {
   Services,
   ServicesConfig,
 } from '@/node/node'
+import Service from '@/node/services/base'
 
 class VipsNode {
   private readonly path: string
@@ -23,8 +24,8 @@ class VipsNode {
     return this.node?.logger
   }
 
-  async start(): Promise<void> {
-    const services: ServiceObject[] = (await this.setupServices()) || []
+  start(): void {
+    const services: ServiceObject[] = this.setupServices() || []
     this.node = new Node({
       ...this.config,
       path: path.resolve(this.path, 'vipsinfo-node.json'),
@@ -44,7 +45,7 @@ class VipsNode {
     })
   }
 
-  async setupServices(): Promise<ServiceObject[]> {
+  setupServices(): ServiceObject[] {
     const services: Services[] = this.config?.services || []
     const servicesConfig: ServicesConfig = this.config?.servicesConfig || {}
     const result: ServiceObject[] = []
@@ -55,7 +56,9 @@ class VipsNode {
       if (servicesConfig[serviceName]) {
         service.config = servicesConfig[serviceName]
       }
-      service.module = require(`@/node/services/${service.name}`).default
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      service.module = require(`@/node/services/${service.name}`)
+        .default as typeof Service
       result.push(service)
     }
     return result

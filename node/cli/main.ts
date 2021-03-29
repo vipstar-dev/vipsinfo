@@ -37,14 +37,14 @@ liftoff.launch({ cwd: process.cwd() }, () => {
       '-c, --config <dir>',
       'Specify the directory with Vipsinfo Node configuration'
     )
-    .action(async (cmd: { [key: string]: string }) => {
+    .action((cmd: { [key: string]: string }) => {
       const config: ConfigFile = require(path.resolve(
         process.cwd(),
         ...(cmd.config ? [cmd.config] : []),
         'vipsinfo-node.json'
       )) as ConfigFile
       const node = new VipsNode({ path: process.cwd(), config })
-      await node.start()
+      node.start()
     })
 
   program.parse(process.argv)
