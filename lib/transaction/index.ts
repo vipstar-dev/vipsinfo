@@ -77,7 +77,6 @@ class Transaction implements ITransaction {
     const inputs: ITransactionInput[] = []
     let flag: number | undefined = 0
     const outputs: ITransactionOutput[] = []
-    let lockTime: number | undefined
     let inputCount: number = reader.readVarintNumber() || 0
     if (!inputCount) {
       flag = reader.readUInt8()
@@ -98,7 +97,7 @@ class Transaction implements ITransaction {
         }
       }
     }
-    lockTime = reader.readUInt32LE()
+    const lockTime: number | undefined = reader.readUInt32LE()
     return new Transaction({ version, flag, inputs, outputs, lockTime })
   }
 
