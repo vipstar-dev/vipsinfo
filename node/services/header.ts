@@ -270,7 +270,7 @@ class HeaderService extends Service implements IHeaderService {
             hash: header.hash,
             height: 0,
             version: header.version as number,
-            prevHash: header.prevHash,
+            prevHash: header.prevHash?.reverse(),
             merkleRoot: header.merkleRoot as Buffer,
             timestamp: header.timestamp as number,
             bits: header.bits as number,
