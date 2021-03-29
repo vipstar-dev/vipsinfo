@@ -29,7 +29,7 @@ export interface IHeaderService extends IService, HeaderAPIMethods {
   _persistHeader(block: BlockModel): Promise<void>
   _syncBlock(block: BlockModel): Promise<void>
   _onHeader(header: HeaderCreationAttributes): void
-  _onHeaders(headers: HeaderModel[]): Promise<void>
+  _onHeaders(headers: IHeader[]): Promise<void>
   _handleError(...err: (string | number)[]): void
   _onHeadersSave(): Promise<void>
   _stopHeaderSubscription(): void
@@ -163,7 +163,11 @@ class HeaderService extends Service implements IHeaderService {
     this.subscribedHeaders = true
     this.logger.info('Header Service: subscribe to p2p headers')
     if (this.bus) {
-      this.bus.on('p2p/headers', (headers) => this._onHeaders(headers))
+      this.bus.on('p2p/headers', (headers: IHeader[]) => {
+        void new Promise((resolve) => {
+          resolve(this._onHeaders(headers))
+        })
+      })
       this.bus.subscribe('p2p/headers')
     }
   }
@@ -250,7 +254,7 @@ class HeaderService extends Service implements IHeaderService {
     }
   }
 
-  async _onHeaders(headers: HeaderModel[]): Promise<void> {
+  async _onHeaders(headers: IHeader[]): Promise<void> {
     try {
       this.lastHeaderCount = headers.length
       if (headers.length === 0) {
@@ -262,20 +266,20 @@ class HeaderService extends Service implements IHeaderService {
           'header(s)'
         )
         const transformedHeaders: HeaderCreationAttributes[] = headers.map(
-          (header: HeaderModel) => ({
+          (header: IHeader) => ({
             hash: header.hash,
             height: 0,
-            version: header.version,
+            version: header.version as number,
             prevHash: header.prevHash,
-            merkleRoot: header.merkleRoot,
-            timestamp: header.timestamp,
-            bits: header.bits,
-            nonce: header.nonce,
-            hashStateRoot: header.hashStateRoot,
-            hashUTXORoot: header.hashUTXORoot,
-            stakePrevTxId: header.stakePrevTxId,
-            stakeOutputIndex: header.stakeOutputIndex,
-            signature: header.signature,
+            merkleRoot: header.merkleRoot as Buffer,
+            timestamp: header.timestamp as number,
+            bits: header.bits as number,
+            nonce: header.nonce as number,
+            hashStateRoot: header.hashStateRoot as Buffer,
+            hashUTXORoot: header.hashUTXORoot as Buffer,
+            stakePrevTxId: header.stakePrevTxId as Buffer,
+            stakeOutputIndex: header.stakeOutputIndex as number,
+            signature: header.signature as Buffer,
             chainwork: BigInt(0),
           })
         )
@@ -305,7 +309,7 @@ class HeaderService extends Service implements IHeaderService {
 
   _handleError(...err: (string | number)[]): void {
     this.logger.error('Header Service:', ...err)
-    this.node.stop().then()
+    void this.node.stop().then()
   }
 
   async _onHeadersSave(): Promise<void> {
