@@ -49,7 +49,7 @@ class VersionMessage extends Message implements IVersionMessage {
     services = BigInt(13),
     nonce = getNonce(),
     timestamp = Math.floor(Date.now() / 1000),
-    subversion = `/qtuminfo:${packageInfo.version}/`,
+    subversion = `/vipsinfo:${packageInfo.version}/`,
     startHeight = 0,
     relay = true,
     ...options
