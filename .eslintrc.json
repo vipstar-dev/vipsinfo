@@ -33,6 +33,7 @@
           "./", "../", "~/"
         ]
       }
-    ]
+    ],
+    "@typescript-eslint/restrict-template-expressions": "off"
   }
 }
