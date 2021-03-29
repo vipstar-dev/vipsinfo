@@ -4,7 +4,10 @@ import { IChain } from '@/lib/chain'
 import { IBus } from '@/node/bus'
 import { ILogger } from '@/node/logger'
 import Node, { Services } from '@/node/node'
-import { BlockObject } from '@/node/services/block'
+import { BlockAPIMethods, BlockObject } from '@/node/services/block'
+import { DBAPIMethods } from '@/node/services/db'
+import { HeaderAPIMethods } from '@/node/services/header'
+import { P2PAPIMethods } from '@/node/services/p2p'
 
 export interface BaseConfig {
   node: Node
@@ -15,6 +18,12 @@ export interface Subscriptions {
   [key: string]: IBus[]
 }
 
+export interface APIMethods
+  extends P2PAPIMethods,
+    DBAPIMethods,
+    HeaderAPIMethods,
+    BlockAPIMethods {}
+
 export interface IService extends EventEmitter {
   options: BaseConfig
   node: Node | undefined
@@ -23,7 +32,7 @@ export interface IService extends EventEmitter {
   logger: ILogger | undefined
   subscriptions: Subscriptions
   dependencies: Services[]
-  APIMethods: object
+  APIMethods: Partial<APIMethods>
   publishEvents: Event[]
   routePrefix: any
   start(): Promise<void>
@@ -67,7 +76,7 @@ class Service extends EventEmitter implements IService {
     return Service.dependencies
   }
 
-  get APIMethods(): object {
+  get APIMethods(): Partial<APIMethods> {
     return {}
   }
 

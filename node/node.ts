@@ -5,11 +5,14 @@ import { Optional } from 'sequelize'
 import Chain, { chainType, IChain } from '@/lib/chain'
 import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
-import Base, { BaseConfig, Event, IService } from '@/node/services/base'
-import { BlockAPIMethods } from '@/node/services/block'
-import { DBAPIMethods, DbConfig } from '@/node/services/db'
-import { HeaderAPIMethods } from '@/node/services/header'
-import { P2PAPIMethods, P2pConfig } from '@/node/services/p2p'
+import Base, {
+  APIMethods,
+  BaseConfig,
+  Event,
+  IService,
+} from '@/node/services/base'
+import { DbConfig } from '@/node/services/db'
+import { P2pConfig } from '@/node/services/p2p'
 import { ServerConfig } from '@/node/services/server'
 
 export type Services =
@@ -63,12 +66,6 @@ interface NodeConfig extends ServiceAnyConfig {
   path: string
 }
 
-interface AddedMethods
-  extends P2PAPIMethods,
-    DBAPIMethods,
-    HeaderAPIMethods,
-    BlockAPIMethods {}
-
 class Node extends EventEmitter {
   private readonly configPath: string
   public logger: ILogger
@@ -76,7 +73,7 @@ class Node extends EventEmitter {
   public unloadedServices: ServiceObject[]
   public services: Map<Services, IService>
   public stopping: boolean = false
-  public addedMethods: Partial<AddedMethods> = {}
+  public addedMethods: Partial<APIMethods> = {}
 
   constructor(config: NodeConfig) {
     super()
@@ -84,7 +81,7 @@ class Node extends EventEmitter {
     this.logger = new Logger({ formatting: config.formatLogs })
     this.chain = Chain.get(config.chain)
     this.unloadedServices = config.services || []
-    this.services = new Map()
+    this.services = new Map<Services, IService>()
   }
 
   openBus(): IBus {
@@ -170,13 +167,16 @@ class Node extends EventEmitter {
       const service: IService = new serviceInfo.module(config)
       this.services.set(serviceInfo.name, service)
       await service.start()
-      const methodNames = new Set()
-      for (const [name, method] of Object.entries(service.APIMethods)) {
-        assert(!methodNames.has(name), `API method name conflicts: ${name}`)
-        methodNames.add(name)
-        this.addedMethods[name as keyof AddedMethods] = method
-        // this[name] = method
+      const methodNames = new Set<string>()
+      for (const name of Object.keys(service.APIMethods)) {
+        const has: boolean = methodNames.has(name)
+        assert(!has, `API method name conflicts: ${name}`)
+        if (has) {
+          methodNames.add(name)
+          // this[name] = method
+        }
       }
+      Object.assign(this.addedMethods, service.APIMethods)
     }
   }
 
