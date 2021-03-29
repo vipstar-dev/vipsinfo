@@ -93,7 +93,7 @@ class HeaderService extends Service implements IHeaderService {
     /*
     return {getBestHeight: this.getBestHeight.bind(this)}
      */
-    return { getBestHeight: this.getBestHeight.bind(this) }
+    return { getBestHeight: () => this.getBestHeight() }
   }
 
   getBestHeight(): number | undefined {
