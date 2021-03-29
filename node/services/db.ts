@@ -217,13 +217,11 @@ class DBService extends Service implements IDBService {
   }
 
   async updateServiceTip(serviceName: string, tip: ITip): Promise<void> {
-    await this.Tip?.upsert(
-      new Tip({
-        service: serviceName,
-        height: tip.height,
-        hash: tip.hash,
-      })
-    )
+    await this.Tip?.upsert({
+      service: serviceName,
+      height: tip.height,
+      hash: tip.hash,
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
