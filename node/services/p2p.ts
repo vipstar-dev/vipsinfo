@@ -166,7 +166,11 @@ class P2PService extends Service implements IP2PService {
       this.chain
     ) {
       this.peer.sendMessage(
-        this.messages.commands.getblocks({ chain: this.chain, ...blockFilter })
+        this.messages.commands.getblocks({
+          protocolVersion: this.peer.version,
+          chain: this.chain,
+          ...blockFilter,
+        })
       )
     }
     return new Promise((resolve, reject) => {
@@ -194,6 +198,7 @@ class P2PService extends Service implements IP2PService {
     ) {
       this.peer.sendMessage(
         this.messages.commands.getheaders({
+          protocolVersion: this.peer.version,
           chain: this.chain,
           ...headerFilter,
         })
