@@ -226,6 +226,7 @@ class DBService extends Service implements IDBService {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async start() {
     this.sequelize = new Sequelize(this.options.mysql.uri, {
       // databaseVersion: 1,
