@@ -1,8 +1,8 @@
 import BN from 'bn.js'
 
 declare module 'ethereumjs-abi' {
-  export type rawDecodeResults = string | boolean | BN
-  export type rawEncodeArgument = string | number | boolean
+  export type rawDecodeResults = string | boolean | Buffer | BN
+  export type rawEncodeArgument = string | number | boolean | Buffer
 
   export function eventID(name: string, types: string[]): Buffer
 
