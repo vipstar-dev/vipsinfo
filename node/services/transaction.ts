@@ -501,16 +501,16 @@ class TransactionService extends Service implements ITransactionService {
       addressItems.push([AddressModel.parseType(type), data])
     }
     if (addressItems.length && this.db) {
-      for (const { _id, _type, data } of await this.db.query<
-        Pick<AddressModelAttributes, '_id' | '_type' | 'data'>
+      for (const { _id, type, data } of await this.db.query<
+        Pick<AddressModelAttributes, '_id' | 'data'> & { type: number }
       >(
         sql([
-          `SELECT _id, _type, data FROM address
+          `SELECT _id, type, data FROM address
              WHERE (type, data) IN ${addressItems}`,
         ]),
         { type: QueryTypes.SELECT }
       )) {
-        const key = `${data.toString('hex')}/${AddressModel.getType(_type)}`
+        const key = `${data.toString('hex')}/${AddressModel.getType(type)}`
         const item = addressMap.get(key)
         if (item) {
           for (const [index, outputIndex] of item.indices) {
@@ -954,7 +954,7 @@ class TransactionService extends Service implements ITransactionService {
                     model: this.Address,
                     as: 'address',
                     required: true,
-                    attributes: ['_id', '_type', 'data'],
+                    attributes: ['_id', 'type', 'data'],
                   },
                 ],
               })
@@ -965,7 +965,7 @@ class TransactionService extends Service implements ITransactionService {
                 item.transaction.id.toString('hex'),
                 {
                   _id: item.address._id,
-                  type: AddressModel.getType(item.address._type),
+                  type: item.address.type,
                   data: item.address.data,
                 },
               ]

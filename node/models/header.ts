@@ -27,7 +27,6 @@ export interface HeaderModelAttributes {
   stakePrevTxId: Buffer
   stakeOutputIndex: number
   signature: Buffer
-  _chainwork: Buffer
   block: Block
   chainwork: bigint
   isProofOfStake: boolean
@@ -37,7 +36,7 @@ export interface HeaderModelAttributes {
 export interface HeaderCreationAttributes
   extends Optional<
     HeaderModelAttributes,
-    'prevHash' | '_chainwork' | 'block' | 'isProofOfStake' | 'difficulty'
+    'prevHash' | 'block' | 'isProofOfStake' | 'difficulty'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -57,7 +56,7 @@ export default class Header extends Model<
   @Column(DataType.INTEGER)
   version!: number
 
-  @Default(Buffer.alloc(32))
+  @Default(Buffer.alloc(32).toString('hex'))
   @Column(DataType.STRING(32).BINARY)
   prevHash!: Buffer
 
@@ -92,21 +91,21 @@ export default class Header extends Model<
   signature!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  _chainwork!: Buffer
-
-  @HasOne(() => Block)
-  block!: Block
-
   get chainwork(): bigint {
-    return BigInt(`0x${this.getDataValue('_chainwork').toString('hex')}`)
+    // @ts-ignore
+    return BigInt(`0x${this.getDataValue('chainwork').toString('hex')}`)
   }
 
   set chainwork(value: bigint) {
     this.setDataValue(
-      '_chainwork',
+      'chainwork',
+      // @ts-ignore
       Buffer.from(value.toString(16).padStart(64, '0'), 'hex')
     )
   }
+
+  @HasOne(() => Block)
+  block!: Block
 
   static findByHeight<M extends Header>(
     height: number,

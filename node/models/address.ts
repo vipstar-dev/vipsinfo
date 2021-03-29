@@ -39,7 +39,6 @@ export const addressTypeMap: { [key: number]: string } = {
 
 export interface AddressModelAttributes {
   _id: bigint
-  _type: number
   type: string | null
   data: Buffer
   string: string
@@ -51,7 +50,7 @@ export interface AddressModelAttributes {
 export interface AddressCreationAttributes
   extends Optional<
     AddressModelAttributes,
-    '_id' | '_type' | 'minedBlocks' | 'balanceChanges'
+    '_id' | 'minedBlocks' | 'balanceChanges'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -66,16 +65,17 @@ export default class Address extends Model<
 
   @Unique('address')
   @Column(DataType.INTEGER.UNSIGNED)
-  _type!: number
-
   get type(): string | null {
-    const type = this.getDataValue('_type')
+    const type = this.getDataValue('type')
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return addressTypeMap[type] || null
   }
 
   set type(type: string | null) {
     if (type != null) {
-      this.setDataValue('_type', addressTypes[type] || 0)
+      // @ts-ignore
+      this.setDataValue('type', addressTypes[type] || 0)
     }
   }
 

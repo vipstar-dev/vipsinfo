@@ -22,7 +22,6 @@ export interface EvmReceiptModelAttributes {
   outputIndex: number
   blockHeight: number
   indexInBlock: number
-  _senderType: number
   senderType: string | null
   senderData: Buffer
   gasUsed: number
@@ -34,10 +33,7 @@ export interface EvmReceiptModelAttributes {
 }
 
 export interface EvmReceiptCreationAttributes
-  extends Optional<
-    EvmReceiptModelAttributes,
-    '_id' | '_senderType' | 'transaction' | 'logs'
-  > {}
+  extends Optional<EvmReceiptModelAttributes, '_id' | 'transaction' | 'logs'> {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class EvmReceipt extends Model<
@@ -65,16 +61,17 @@ export default class EvmReceipt extends Model<
   indexInBlock!: number
 
   @Column(DataType.INTEGER.UNSIGNED)
-  _senderType!: number
-
   get senderType(): string | null {
-    const senderType = this.getDataValue('_senderType')
+    const senderType = this.getDataValue('senderType')
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return addressTypeMap[senderType] || null
   }
 
   set senderType(senderType: string | null) {
     if (senderType != null) {
-      this.setDataValue('_senderType', addressTypes[senderType] || 0)
+      // @ts-ignore
+      this.setDataValue('senderType', addressTypes[senderType] || 0)
     }
   }
 

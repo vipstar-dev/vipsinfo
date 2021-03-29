@@ -17,14 +17,13 @@ export interface Qrc20ModelAttributes {
   name: Buffer
   symbol: Buffer
   decimals: number
-  _totalSupply: Buffer
   totalSupply: bigint | null
   version: Buffer | null
   contract: Contract
 }
 
 export interface Qrc20CreationAttributes
-  extends Optional<Qrc20ModelAttributes, '_totalSupply' | 'contract'> {}
+  extends Optional<Qrc20ModelAttributes, 'contract'> {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Qrc20 extends Model<
@@ -46,19 +45,18 @@ export default class Qrc20 extends Model<
   decimals!: number
 
   @Column(DataType.STRING(32).BINARY)
-  _totalSupply!: Buffer
-
   get totalSupply(): bigint | null {
-    const totalSupply = this.getDataValue('_totalSupply')
+    const totalSupply = this.getDataValue('totalSupply')
     return totalSupply == null
-      ? null
+      ? null // @ts-ignore
       : BigInt(`0x${totalSupply.toString('hex')}`)
   }
 
   set totalSupply(totalSupply: bigint | null) {
     if (totalSupply != null) {
       this.setDataValue(
-        '_totalSupply',
+        'totalSupply',
+        // @ts-ignore
         Buffer.from(totalSupply.toString(16).padStart(64, '0'), 'hex')
       )
     }

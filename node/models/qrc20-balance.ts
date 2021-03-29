@@ -14,13 +14,12 @@ import Contract from '@/node/models/contract'
 export interface Qrc20BalanceModelAttributes {
   contractAddress: Buffer
   address: Buffer
-  _balance: Buffer
   balance: bigint | null
   contract: Contract
 }
 
 export interface Qrc20BalanceCreationAttributes
-  extends Optional<Qrc20BalanceModelAttributes, '_balance' | 'contract'> {}
+  extends Optional<Qrc20BalanceModelAttributes, 'contract'> {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
 export default class Qrc20Balance extends Model<
@@ -37,17 +36,17 @@ export default class Qrc20Balance extends Model<
   address!: Buffer
 
   @Column(DataType.STRING(32).BINARY)
-  _balance!: Buffer
-
   get balance(): bigint | null {
-    const balance = this.getDataValue('_balance')
+    const balance = this.getDataValue('balance')
+    // @ts-ignore
     return balance == null ? null : BigInt(`0x${balance.toString('hex')}`)
   }
 
   set balance(balance: bigint | null) {
     if (balance != null) {
       this.setDataValue(
-        '_balance',
+        'balance',
+        // @ts-ignore
         Buffer.from(balance.toString(16).padStart(64, '0'), 'hex')
       )
     }
