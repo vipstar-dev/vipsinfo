@@ -46,7 +46,10 @@ export function parseAddress(reader: BufferReader): AddressData {
   return { services, ip, port }
 }
 
-export function writeAddress(writer: BufferWriter, address: AddressData): void {
+export function writeAddress(
+  writer: BufferWriter,
+  address?: AddressData
+): void {
   if (address) {
     writer.writeUInt64LE(address.services)
     writeIP(writer, address.ip)

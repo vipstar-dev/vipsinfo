@@ -66,18 +66,16 @@ class VersionMessage extends Message implements IVersionMessage {
 
   get payload(): Buffer {
     let writer = new BufferWriter()
-    if (this.myAddress && this.yourAddress) {
-      writer.writeUInt32LE(this.version)
-      writer.writeUInt64LE(this.services)
-      writer.writeUInt32LE(this.timestamp)
-      writer.write(Buffer.alloc(4))
-      writeAddress(writer, this.myAddress)
-      writeAddress(writer, this.yourAddress)
-      writer.write(this.nonce)
-      writer.writeVarLengthBuffer(Buffer.from(this.subversion, 'ascii'))
-      writer.writeUInt32LE(this.startHeight)
-      writer.writeUInt8(Number(this.relay))
-    }
+    writer.writeUInt32LE(this.version)
+    writer.writeUInt64LE(this.services)
+    writer.writeUInt32LE(this.timestamp)
+    writer.write(Buffer.alloc(4))
+    writeAddress(writer, this.myAddress)
+    writeAddress(writer, this.yourAddress)
+    writer.write(this.nonce)
+    writer.writeVarLengthBuffer(Buffer.from(this.subversion, 'ascii'))
+    writer.writeUInt32LE(this.startHeight)
+    writer.writeUInt8(Number(this.relay))
     return writer.toBuffer()
   }
 
