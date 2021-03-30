@@ -21,7 +21,12 @@ export interface Qrc721TokenModelAttributes {
 export interface Qrc721TokenCreationAttributes
   extends Optional<Qrc721TokenModelAttributes, 'contract'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'qrc721_token',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class Qrc721Token extends Model<
   Qrc721TokenModelAttributes,
   Qrc721TokenCreationAttributes

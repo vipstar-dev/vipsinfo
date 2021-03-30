@@ -22,7 +22,12 @@ export interface ContractTagModelAttributes {
 export interface ContractTagCreationAttributes
   extends Optional<ContractTagModelAttributes, '_id' | 'contract'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'contract_tag',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class ContractTag extends Model<
   ContractTagModelAttributes,
   ContractTagCreationAttributes

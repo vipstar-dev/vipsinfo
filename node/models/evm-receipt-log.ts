@@ -29,7 +29,12 @@ export interface EvmReceiptLogModelAttributes {
 export interface EvmReceiptLogCreationAttributes
   extends Optional<EvmReceiptLogModelAttributes, '_id' | 'receipt'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'evm_receipt_log',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class EvmReceiptLog extends Model<
   EvmReceiptLogModelAttributes,
   EvmReceiptLogCreationAttributes

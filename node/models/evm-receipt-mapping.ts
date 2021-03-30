@@ -16,7 +16,12 @@ export interface EvmReceiptMappingModelAttributes {
   exceptedMessage: string
 }
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'evm_receipt_mapping',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class EvmReceiptMapping extends Model<EvmReceiptMappingModelAttributes> {
   @PrimaryKey
   @Column(DataType.BIGINT.UNSIGNED)

@@ -8,7 +8,12 @@ export interface TransactionOutputMappingModelAttributes {
   outputIndex: number
 }
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'transaction_output_mapping',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class TransactionOutputMapping extends Model<TransactionOutputMappingModelAttributes> {
   @Column({ type: DataType.STRING(32), field: '_id' })
   _id!: string

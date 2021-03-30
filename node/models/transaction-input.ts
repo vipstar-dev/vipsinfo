@@ -32,7 +32,12 @@ export interface TransactionInputCreationAttributes
     'transaction' | 'address'
   > {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'transaction_input',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class TransactionInput extends Model<
   TransactionInputModelAttributes,
   TransactionInputCreationAttributes

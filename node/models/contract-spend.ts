@@ -24,7 +24,12 @@ export interface ContractSpendCreationAttributes
     'sourceTransaction' | 'destTransaction'
   > {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'contract_spend',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class ContractSpend extends Model<
   ContractSpendModelAttributes,
   ContractSpendCreationAttributes

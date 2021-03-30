@@ -25,7 +25,12 @@ export interface GasRefundModelAttributes {
 export interface GasRefundCreationAttributes
   extends Optional<GasRefundModelAttributes, 'transaction' | 'refundTo'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'gas_refund',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class GasRefund extends Model<
   GasRefundModelAttributes,
   GasRefundCreationAttributes

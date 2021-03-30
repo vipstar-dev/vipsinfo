@@ -35,7 +35,12 @@ export interface TransactionOutputCreationAttributes
     'transaction' | 'refund'
   > {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'transaction_output',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class TransactionOutput extends Model<
   TransactionOutputModelAttributes,
   TransactionOutputCreationAttributes

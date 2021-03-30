@@ -25,7 +25,12 @@ export interface BalanceChangeModelAttributes {
 export interface BalanceChangeCreationAttributes
   extends Optional<BalanceChangeModelAttributes, 'transaction' | 'address'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'balance_change',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class BalanceChange extends Model<
   BalanceChangeModelAttributes,
   BalanceChangeCreationAttributes

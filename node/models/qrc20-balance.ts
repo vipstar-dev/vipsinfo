@@ -21,7 +21,12 @@ export interface Qrc20BalanceModelAttributes {
 export interface Qrc20BalanceCreationAttributes
   extends Optional<Qrc20BalanceModelAttributes, 'contract'> {}
 
-@Table({ freezeTableName: true, underscored: true, timestamps: false })
+@Table({
+  tableName: 'qrc20_balance',
+  freezeTableName: true,
+  underscored: true,
+  timestamps: false,
+})
 export default class Qrc20Balance extends Model<
   Qrc20BalanceModelAttributes,
   Qrc20BalanceCreationAttributes
