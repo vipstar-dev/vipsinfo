@@ -30,7 +30,7 @@ export interface IHeaderService extends IService, HeaderAPIMethods {
   _syncBlock(block: BlockModel): Promise<void>
   _onHeader(header: HeaderCreationAttributes): void
   _onHeaders(headers: IHeader[]): Promise<void>
-  _handleError(...err: (string | number)[]): void
+  _handleError(methodName: string, ...err: (string | number | null)[]): void
   _onHeadersSave(): Promise<void>
   _stopHeaderSubscription(): void
   _startBlockSubscription(): void
@@ -173,9 +173,9 @@ class HeaderService extends Service implements IHeaderService {
   }
 
   _queueBlock(block: BlockModel): void {
-    this.blockProcessor?.push(block, (...err: (string | number)[]) => {
-      if (err) {
-        this._handleError(...err)
+    this.blockProcessor?.push(block, (...err: (string | number | null)[]) => {
+      if (err[0]) {
+        this._handleError('_queueBlock', ...err)
       } else {
         this.logger.debug(
           `Header Service: completed processing block: ${block.hash.toString(
@@ -202,7 +202,7 @@ class HeaderService extends Service implements IHeaderService {
         await this._persistHeader(block)
       }
     } catch (err) {
-      this._handleError(err)
+      this._handleError('_processBlocks', err)
     }
   }
 
@@ -258,7 +258,9 @@ class HeaderService extends Service implements IHeaderService {
     try {
       this.lastHeaderCount = headers.length
       if (headers.length === 0) {
-        this._onHeadersSave().catch((err) => this._handleError(err))
+        this._onHeadersSave().catch((err) =>
+          this._handleError('_onHeaders1', err)
+        )
       } else {
         this.logger.debug(
           'Header Service: received:',
@@ -303,12 +305,12 @@ class HeaderService extends Service implements IHeaderService {
       }
       await this._onHeadersSave()
     } catch (err) {
-      this._handleError(err)
+      this._handleError('_onHeaders2', err)
     }
   }
 
-  _handleError(...err: (string | number)[]): void {
-    this.logger.error('Header Service:', ...err)
+  _handleError(methodName: string, ...err: (string | number | null)[]): void {
+    this.logger.error('Header Service:', `handle error(${methodName}):`, ...err)
     void this.node.stop().then()
   }
 

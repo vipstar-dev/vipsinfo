@@ -1,4 +1,4 @@
-export type errCallback = (...err: (string | number)[]) => void
+export type errCallback = (...err: (string | number | null)[]) => void
 
 export interface IAsyncQueue<T> {
   length: number
@@ -32,7 +32,7 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
     if (wating) {
       const { data, callback } = wating
       this.fn?.(data).then((data: any) => {
-        callback(String(null), data)
+        callback(null, data)
         if (this.waiting.length) {
           this.process()
         } else {

@@ -59,7 +59,7 @@ export interface IBlockService extends IService, BlockAPIMethods {
   _onBlock(rawBlock: BlockObjectFromIBlock): Promise<void>
   _processBlock(block: BlockObjectFromIBlock): Promise<void>
   _saveBlock(rawBlock: BlockObject): Promise<void>
-  _handleError(...err: (string | number)[]): void
+  _handleError(methodName: string, ...err: (string | number | null)[]): void
   _syncBlock(block: BlockObject): Promise<void>
   __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined>
   _setTip(tip: ITip): Promise<void>
@@ -317,10 +317,10 @@ class BlockService extends Service implements IBlockService {
 
   _queueBlock(block: IBlock): void {
     ++this.blocksInQueue
-    this.blockProcessor?.push(block, (...err: (string | number)[]) => {
+    this.blockProcessor?.push(block, (...err: (string | number | null)[]) => {
       void new Promise((resolve, reject) => {
-        if (err) {
-          reject(this._handleError(...err))
+        if (err[0]) {
+          reject(this._handleError('_queueBlock', ...err))
         } else {
           // this._logSynced(block.hash)
           --this.blocksInQueue
@@ -346,7 +346,7 @@ class BlockService extends Service implements IBlockService {
         await service.onReorg(targetHeight)
       }
     } catch (err) {
-      this._handleError(err)
+      this._handleError('_onReorg', err)
     }
   }
 
@@ -572,7 +572,7 @@ class BlockService extends Service implements IBlockService {
       }
     } catch (err) {
       this.processingBlock = false
-      this._handleError(err)
+      this._handleError('_onBlock', err)
     }
   }
 
@@ -620,9 +620,13 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  _handleError(...err: (string | number)[]): void {
+  _handleError(methodName: string, ...err: (string | number | null)[]): void {
     if (!this.node.stopping) {
-      this.logger.error('Block Service: handle error', ...err)
+      this.logger.error(
+        'Block Service:',
+        `handle error(${methodName}):`,
+        ...err
+      )
       void this.node.stop().then()
     }
   }
