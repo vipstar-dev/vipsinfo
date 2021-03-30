@@ -294,6 +294,7 @@ class TransactionService extends Service implements ITransactionService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async onSynced(): Promise<void> {
     this.synced = true
   }
@@ -437,7 +438,7 @@ class TransactionService extends Service implements ITransactionService {
   async processTxos(
     transactions: (TransactionModel | ITransactionAndModelSetting)[]
   ): Promise<void> {
-    const addressMap: Map<
+    const addressMap = new Map<
       string,
       {
         type: string
@@ -446,7 +447,7 @@ class TransactionService extends Service implements ITransactionService {
         createHeight: number
         indices: number[][]
       }
-    > = new Map()
+    >()
     const addressIds: bigint[][] = []
     for (let index = 0; index < transactions.length; ++index) {
       addressIds.push([])
@@ -878,7 +879,7 @@ class TransactionService extends Service implements ITransactionService {
         const client = this.node.addedMethods.getRpcClient?.()
         if (client) {
           const blockReceipts: GetTransactionReceiptResult[][] = await Promise.all(
-            await client.batch<GetTransactionReceiptResult[]>(() => {
+            client.batch<GetTransactionReceiptResult[]>(() => {
               const transactions:
                 | TransactionModel[]
                 | ITransaction[]
@@ -889,7 +890,7 @@ class TransactionService extends Service implements ITransactionService {
                 client.rpcMethods.gettransactionreceipt
               ) {
                 for (const index of receiptIndices) {
-                  client.rpcMethods.gettransactionreceipt(
+                  void client.rpcMethods.gettransactionreceipt(
                     transactions[index].id.toString('hex')
                   )
                 }
@@ -974,9 +975,16 @@ class TransactionService extends Service implements ITransactionService {
           let receiptIndex = -1
           for (let index = 0; index < receiptIndices.length; ++index) {
             const indexInBlock = receiptIndices[index]
-            const tx = block.transactions[indexInBlock]
+            const tx: TransactionModel | ITransaction =
+              block.transactions[indexInBlock]
             const indices = []
-            for (let i = 0; i < tx.outputs.length; ++i) {
+            for (
+              let i = 0;
+              i <
+              (tx.outputs as (TransactionOutputModel | ITransactionOutput)[])
+                .length;
+              ++i
+            ) {
               if (
                 [
                   OutputScript.EVM_CONTRACT_CREATE,

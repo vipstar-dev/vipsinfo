@@ -60,6 +60,7 @@ class MempoolService extends Service implements IMempoolService {
     return MempoolService.dependencies
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async start() {
     this.db = this.node.addedMethods.getDatabase?.()
     const getModel = this.node.addedMethods.getModel
@@ -93,6 +94,7 @@ class MempoolService extends Service implements IMempoolService {
     this.enabled = true
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async onSynced(): Promise<void> {
     this.enable()
   }
@@ -108,7 +110,7 @@ class MempoolService extends Service implements IMempoolService {
   _handleError(err: string | number): void {
     if (!this.node.stopping) {
       this.logger.error('Mempool Service: handle error', err)
-      this.node.stop().then()
+      void this.node.stop().then()
     }
   }
 

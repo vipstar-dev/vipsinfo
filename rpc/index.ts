@@ -157,13 +157,6 @@ type floatConvert = (arg: string) => number
 type boolConvert = (arg: string | number | boolean) => boolean
 type objConvert = (arg: string | object) => object
 
-export type typeConvertFunctions =
-  | strConvert
-  | intConvert
-  | floatConvert
-  | boolConvert
-  | objConvert
-
 export interface typeConvert {
   str: strConvert
   int: intConvert
@@ -257,7 +250,7 @@ class RpcClient {
             try {
               const parsedBuffer: QtumPpcResponse = JSON.parse(
                 Buffer.concat(buffer).toString()
-              )
+              ) as QtumPpcResponse
               if (parsedBuffer.error) {
                 reject(parsedBuffer.error)
               } else {
@@ -265,12 +258,14 @@ class RpcClient {
               }
             } catch (err) {
               if (this.log) {
-                this.log.error(err.stack)
+                this.log.error((err as Error).stack)
                 this.log.error(buffer.toString())
                 this.log.error(`HTTP Status code: ${res.statusCode}`)
               }
               reject(
-                new Error(`Qtum JSON-RPC: Error Parsing JSON: ${err.message}`)
+                new Error(
+                  `Qtum JSON-RPC: Error Parsing JSON: ${(err as Error).message}`
+                )
               )
             }
           }
@@ -289,9 +284,7 @@ class RpcClient {
     })
   }
 
-  async batch<R extends QtumRpcResult>(
-    batchCallback: () => void
-  ): Promise<Promise<R>[]> {
+  batch<R extends QtumRpcResult>(batchCallback: () => void): Promise<R>[] {
     this.batchedCalls = []
     batchCallback()
     try {
@@ -345,7 +338,9 @@ class RpcClient {
       float: (arg: string) => Number.parseFloat(arg),
       bool: (arg: string | number | boolean) =>
         [true, 1, '1'].includes(arg) || arg.toString().toLowerCase() === 'true',
-      obj: (arg: any) => (typeof arg === 'string' ? JSON.parse(arg) : arg),
+      obj: (arg: string | object) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        typeof arg === 'string' ? JSON.parse(arg) : arg,
     }
 
     for (const [key, value] of Object.entries(callspec)) {

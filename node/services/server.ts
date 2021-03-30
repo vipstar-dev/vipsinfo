@@ -34,6 +34,7 @@ class ServerService extends Service implements IServerService {
     return ServerService.dependencies
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async start() {
     // this.bus = this.node?.openBus({ remoteAddress: 'localhost-server' })
     this.bus = this.node?.openBus()
@@ -50,6 +51,7 @@ class ServerService extends Service implements IServerService {
     this.io.on('connection', this._onConnection.bind(this))
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async stop(): Promise<void> {
     this.io?.close()
   }

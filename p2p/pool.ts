@@ -22,7 +22,7 @@ export interface PoolConstructor {
 class Pool extends EventEmitter {
   private readonly chain: IChain
   private keepAlive: boolean = false
-  private connectedPeers: Map<string, Peer> = new Map()
+  private connectedPeers: Map<string, Peer> = new Map<string, Peer>()
   private addresses: AddressData[] = []
   private readonly dnsSeed: boolean = false
   private readonly maxSize: number = MAX_CONNECTED_PEERS
@@ -35,7 +35,7 @@ class Pool extends EventEmitter {
   }: PoolConstructor) {
     super()
     this.chain = chain
-    this.connectedPeers = new Map()
+    this.connectedPeers = new Map<string, Peer>()
     this.dnsSeed = dnsSeed || this.dnsSeed
     this.maxSize = maxSize
     for (const address of addresses) {

@@ -71,7 +71,7 @@ export interface IContractService extends IService {
       abi: IMethodABI
       args?: string[]
     }[]
-  ): Promise<Promise<any[]>[] | undefined>
+  ): Promise<any[]>[] | undefined
   _processReceipts(block: BlockObject): Promise<void>
   _updateBalances(balanceChanges: Set<string>): Promise<void>
   _updateTokenHolders(transfers: Map<string, Buffer>): Promise<void>
@@ -409,7 +409,7 @@ class ContractService extends Service implements IContractService {
       bytecodeSha256sum: sha256sum,
     })
     if (isQRC721(code)) {
-      const results = await this._batchCallMethods([
+      const results = this._batchCallMethods([
         {
           address,
           abi: qrc721ABIs.find(
@@ -457,7 +457,7 @@ class ContractService extends Service implements IContractService {
         }
       }
     } else if (isQRC20(code)) {
-      const results = await this._batchCallMethods([
+      const results = this._batchCallMethods([
         {
           address,
           abi: qrc20ABIs.find(
@@ -559,15 +559,15 @@ class ContractService extends Service implements IContractService {
     }
   }
 
-  async _batchCallMethods(
+  _batchCallMethods(
     callList: {
       address: Buffer
       abi: IMethodABI
       args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<Promise<(rawDecodeResults | rawDecodeResults[])[]>[] | undefined> {
+  ): Promise<(rawDecodeResults | rawDecodeResults[])[]>[] | undefined {
     const client = this.node.addedMethods.getRpcClient?.()
-    const results = await client?.batch<CallContractResult>(() => {
+    const results = client?.batch<CallContractResult>(() => {
       for (const { address, abi, args = [] } of callList) {
         if (client) {
           client.rpcMethods.callcontract?.(
@@ -684,7 +684,7 @@ class ContractService extends Service implements IContractService {
       abi: balanceOfABI,
       args: [`0x${address}`],
     }))
-    const result = await this._batchCallMethods(batchCalls)
+    const result = this._batchCallMethods(batchCalls)
     const operations: (
       | Qrc20BalanceCreationAttributes
       | undefined

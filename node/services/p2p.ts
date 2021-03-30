@@ -174,6 +174,7 @@ class P2PService extends Service implements IP2PService {
       )
     }
     return new Promise((resolve, reject) => {
+      // eslint-disable-next-line prefer-const
       let timeout: Timeout
       const callback = (block: IBlock) => {
         clearTimeout(timeout)
@@ -236,6 +237,7 @@ class P2PService extends Service implements IP2PService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async start(): Promise<void> {
     this._initCache()
     this._initPool()
@@ -399,7 +401,7 @@ class P2PService extends Service implements IP2PService {
       `P2P Service: configured chain: "${this.chain.name}"`,
       `does not match our peer's reported network: "${chain.name}"`
     )
-    this.node.stop().then()
+    void this.node.stop().then()
   }
 
   _onPeerReady(peer: Peer, address: AddressData): void {

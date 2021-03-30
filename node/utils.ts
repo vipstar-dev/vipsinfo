@@ -66,7 +66,7 @@ function transformSQLArg(arg: sqlArgs): string {
       ? '(NULL)'
       : `(${arg.map(transformSQLArg).join(', ')})`
   } else if (arg && 'raw' in (arg as Object)) {
-    return (arg as { raw: any; [key: string]: any }).raw
+    return (arg as { raw: string; [key: string]: any }).raw
   }
   return arg.toString()
 }
