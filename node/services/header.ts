@@ -1,9 +1,9 @@
 import assert from 'assert'
 import { ModelCtor, Op } from 'sequelize'
 
+import { IBlock } from '@/lib'
 import Header, { IHeader } from '@/lib/block/header'
 import { IBus } from '@/node/bus'
-import BlockModel from '@/node/models/block'
 import HeaderModel, { HeaderCreationAttributes } from '@/node/models/header'
 import { Services } from '@/node/node'
 import Service, { BaseConfig, IService } from '@/node/services/base'
@@ -24,10 +24,10 @@ export interface IHeaderService extends IService, HeaderAPIMethods {
   _adjustTipBackToCheckpoint(): void
   _setGenesisBlock(): Promise<void>
   _startHeaderSubscription(): void
-  _queueBlock(block: BlockModel): void
-  _processBlocks(block: BlockModel): Promise<void>
-  _persistHeader(block: BlockModel): Promise<void>
-  _syncBlock(block: BlockModel): Promise<void>
+  _queueBlock(block: IBlock): void
+  _processBlocks(block: IBlock): Promise<void>
+  _persistHeader(block: IBlock): Promise<void>
+  _syncBlock(block: IBlock): Promise<void>
   _onHeader(header: HeaderCreationAttributes): void
   _onHeaders(headers: IHeader[]): Promise<void>
   _handleError(methodName: string, ...err: (string | number | null)[]): void
@@ -35,8 +35,8 @@ export interface IHeaderService extends IService, HeaderAPIMethods {
   _stopHeaderSubscription(): void
   _startBlockSubscription(): void
   _syncComplete: boolean
-  _detectReorg(block: BlockModel): boolean
-  _handleReorg(block: BlockModel): Promise<void>
+  _detectReorg(block: IBlock): boolean
+  _handleReorg(block: IBlock): Promise<void>
   _onBestHeight(height: number): void
   _startSync(): void
   _removeAllSubscriptions(): void
@@ -65,7 +65,7 @@ class HeaderService extends Service implements IHeaderService {
   private lastHeaderCount: number = 2000
   private bus: IBus | undefined
   private reorging: boolean = false
-  private blockProcessor: AsyncQueue<BlockModel, 'block'> | undefined
+  private blockProcessor: AsyncQueue<IBlock, 'block'> | undefined
   private subscribedHeaders: boolean = false
   private lastTipHeightReported: number | undefined
   private Header: ModelCtor<HeaderModel> | undefined
@@ -110,7 +110,7 @@ class HeaderService extends Service implements IHeaderService {
       await this._setGenesisBlock()
     }
     await this._adjustHeadersForCheckpointTip()
-    this.blockProcessor = new AsyncQueue((block: BlockModel) =>
+    this.blockProcessor = new AsyncQueue((block: IBlock) =>
       this._processBlocks(block)
     )
     this.p2p?.on('bestHeight', this._onBestHeight.bind(this))
@@ -172,7 +172,7 @@ class HeaderService extends Service implements IHeaderService {
     }
   }
 
-  _queueBlock(block: BlockModel): void {
+  _queueBlock(block: IBlock): void {
     this.blockProcessor?.push(block, (...err: (string | number | null)[]) => {
       if (err[0]) {
         this._handleError('_queueBlock', ...err)
@@ -188,7 +188,7 @@ class HeaderService extends Service implements IHeaderService {
     })
   }
 
-  async _processBlocks(block: BlockModel): Promise<void> {
+  async _processBlocks(block: IBlock): Promise<void> {
     if (this.node.stopping || this.reorging) {
       return
     }
@@ -206,7 +206,7 @@ class HeaderService extends Service implements IHeaderService {
     }
   }
 
-  async _persistHeader(block: BlockModel): Promise<void> {
+  async _persistHeader(block: IBlock): Promise<void> {
     if (!this._detectReorg(block)) {
       await this._syncBlock(block)
       return
@@ -217,25 +217,30 @@ class HeaderService extends Service implements IHeaderService {
     this._startSync()
   }
 
-  async _syncBlock(block: BlockModel): Promise<void> {
+  async _syncBlock(block: IBlock): Promise<void> {
     this.logger.debug('Header Service: new block:', block.hash.toString('hex'))
-    if (this.Header) {
-      const header = new HeaderModel({
+    if (this.lastHeader) {
+      const headerCreationObject: HeaderCreationAttributes = {
         hash: block.header.hash,
-        height: block.header.height,
-        version: block.header.version,
-        prevHash: block.header.prevHash,
-        merkleRoot: block.header.merkleRoot,
-        timestamp: block.header.timestamp,
-        bits: block.header.bits,
-        nonce: block.header.nonce,
-        hashStateRoot: block.header.hashStateRoot,
-        hashUTXORoot: block.header.hashUTXORoot,
-        stakePrevTxId: block.header.stakePrevTxId,
-        stakeOutputIndex: block.header.stakeOutputIndex,
-        signature: block.header.signature,
-        chainwork: block.header.chainwork,
-      })
+        height: this.lastHeader.height + 1,
+        version: block.header.version as number,
+        prevHash: block.header.prevHash?.reverse(),
+        merkleRoot: block.header.merkleRoot as Buffer,
+        timestamp: block.header.timestamp as number,
+        bits: block.header.bits as number,
+        nonce: block.header.nonce as number,
+        hashStateRoot: block.header.hashStateRoot as Buffer,
+        hashUTXORoot: block.header.hashUTXORoot as Buffer,
+        stakePrevTxId: block.header.stakePrevTxId as Buffer,
+        stakeOutputIndex: block.header.stakeOutputIndex as number,
+        signature: block.header.signature as Buffer,
+        chainwork: BigInt(0),
+      }
+      headerCreationObject.chainwork = this._getChainwork(
+        headerCreationObject,
+        this.lastHeader
+      )
+      const header = new HeaderModel(headerCreationObject)
       this._onHeader(header)
       await header.save()
       if (this.node.addedMethods.updateServiceTip && this.tip) {
@@ -354,7 +359,7 @@ class HeaderService extends Service implements IHeaderService {
       this._subscribedBlock = true
       this.logger.info('Header Service: starting p2p block subscription')
       if (this.bus) {
-        this.bus.on('p2p/block', (block: BlockModel) => this._queueBlock(block))
+        this.bus.on('p2p/block', (block: IBlock) => this._queueBlock(block))
         this.bus.subscribe('p2p/block')
       }
     }
@@ -364,14 +369,19 @@ class HeaderService extends Service implements IHeaderService {
     return this.lastHeaderCount < 2000
   }
 
-  _detectReorg(block: BlockModel): boolean {
-    if (this.lastHeader) {
-      return Buffer.compare(this.lastHeader.hash, block.header.prevHash) !== 0
+  _detectReorg(block: IBlock): boolean {
+    if (this.lastHeader && block.header.prevHash) {
+      return (
+        Buffer.compare(
+          this.lastHeader.hash,
+          block.header.prevHash.reverse()
+        ) !== 0
+      )
     }
     return false
   }
 
-  async _handleReorg(block: BlockModel): Promise<void> {
+  async _handleReorg(block: IBlock): Promise<void> {
     this.logger.warn(
       `Header Service: reorganization detected, current tip hash: ${this.tip?.hash.toString(
         'hex'
