@@ -60,7 +60,7 @@ export interface IBlockService extends IService, BlockAPIMethods {
   _processBlock(block: BlockObjectFromIBlock): Promise<void>
   _saveBlock(rawBlock: BlockObject): Promise<void>
   _handleError(methodName: string, ...err: (string | number | null)[]): void
-  _syncBlock(block: BlockObject): Promise<void>
+  _syncBlock(block: BlockObjectFromIBlock): Promise<void>
   __onBlock(rawBlock: BlockObject): Promise<BlockModel | undefined>
   _setTip(tip: ITip): Promise<void>
   _logSynced(): Promise<void>
@@ -631,7 +631,7 @@ class BlockService extends Service implements IBlockService {
     }
   }
 
-  async _syncBlock(block: BlockObject): Promise<void> {
+  async _syncBlock(block: BlockObjectFromIBlock): Promise<void> {
     if (this.getBlocksTimer) {
       clearTimeout(this.getBlocksTimer)
     }
