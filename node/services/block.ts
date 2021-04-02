@@ -181,6 +181,13 @@ class BlockService extends Service implements IBlockService {
     this.logger.warn(
       'Block Service: resetting tip due to a non-exist tip block...'
     )
+    const tip: ITip | undefined = await this.node.addedMethods.getServiceTip?.(
+      'block'
+    )
+    if (tip && tip.height === 0) {
+      await this._setTip(tip)
+      return
+    }
     const headerModel = this.header?.getLastHeader()
     if (headerModel) {
       const { hash } = headerModel
@@ -199,12 +206,13 @@ class BlockService extends Service implements IBlockService {
             'was not found, proceeding to older blocks'
           )
         }
-        const header: BlockModel | null | undefined = await this.Block?.findOne(
-          {
-            where: { height: --height },
-            attributes: ['hash'],
-          }
-        )
+        const header:
+          | HeaderModel
+          | null
+          | undefined = await this.Header?.findOne({
+          where: { height: --height },
+          attributes: ['hash'],
+        })
         assert(header, 'Header not found for reset')
         if (!block) {
           this.logger.debug(
