@@ -60,7 +60,7 @@ export default class Address extends Model<
 > {
   @PrimaryKey
   @AutoIncrement
-  @Column(DataType.BIGINT.UNSIGNED)
+  @Column({ type: DataType.BIGINT.UNSIGNED, field: '_id' })
   _id!: bigint
 
   @Unique('address')
