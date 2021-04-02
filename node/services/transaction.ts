@@ -66,7 +66,7 @@ const { gt: $gt, in: $in } = Op
 
 export interface ITransactionAndModelSetting
   extends ITransaction,
-    Partial<Pick<TransactionModel, '_id' | 'blockHeight' | 'indexInBlock'>> {}
+    Partial<Pick<TransactionModel, 'blockHeight' | 'indexInBlock'>> {}
 
 export interface ITransactionService extends IService {
   _processBlock(
