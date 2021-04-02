@@ -15,6 +15,7 @@ export interface TransactionConstructor {
 }
 
 export interface ITransaction extends TransactionConstructor {
+  _id: bigint | undefined
   id: Buffer
   hash: Buffer
   size: number
@@ -33,7 +34,8 @@ class Transaction implements ITransaction {
   public inputs: (ITransactionInput | undefined)[]
   public outputs: (ITransactionOutput | undefined)[]
   public lockTime: number | undefined
-  private _id: Buffer | null = null
+  public _id: bigint | undefined
+  private __id: Buffer | null = null
   private _hash: Buffer | null = null
 
   constructor({
@@ -51,8 +53,8 @@ class Transaction implements ITransaction {
   }
 
   get id(): Buffer {
-    this._id = this._id || sha256d(this.toHashBuffer()).reverse()
-    return this._id
+    this.__id = this.__id || sha256d(this.toHashBuffer()).reverse()
+    return this.__id
   }
 
   get hash(): Buffer {
