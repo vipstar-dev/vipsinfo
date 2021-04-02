@@ -585,14 +585,18 @@ class TransactionService extends Service implements ITransactionService {
         ) {
           mappings.push(
             sql([
-              `${[
-                mappingId,
-                tx.id,
+              `(${[
+                "'" + mappingId + "'",
+                "X'" + tx.id.toString('hex') + "'",
                 inputIndex,
-                (tx.inputs[0] as ITransactionInput | undefined)?.prevTxId ||
-                  Buffer.alloc(32),
+                "X'" +
+                  (
+                    (tx.inputs[0] as ITransactionInput | undefined)?.prevTxId ||
+                    Buffer.alloc(32)
+                  ).toString('hex') +
+                  "'",
                 input?.outputIndex as number,
-              ]}`,
+              ].join(', ')})`,
             ])
           )
         }
@@ -614,27 +618,31 @@ class TransactionService extends Service implements ITransactionService {
         this.TransactionOutput?.bulkCreate(outputTxos, { validate: false }),
         this.TransactionInput?.bulkCreate(inputTxos, { validate: false }),
       ]
-      if (mappings.length)
+      if (mappings.length) {
         promiseList.push(
           this.db.query(
             sql([
-              `INSERT INTO transaction_output_mapping (_id, input_transaction_id, input_index, output_transaction_id, output_index)
-               VALUES ${{ raw: mappings.join(', ') }}`,
+              `INSERT INTO transaction_output_mapping (_id, input_transaction_id, input_index, output_transaction_id, output_index) VALUES ${mappings.join(
+                ', '
+              )}`,
             ])
           )
         )
+      }
       await Promise.all(promiseList)
-      await this.db.query(
-        sql([
-          `UPDATE transaction_output output, transaction_input input, transaction_output_mapping mapping, transaction tx1, transaction tx2
-           SET input.value = output.value, input.address_id = output.address_id,
-             input.output_id = output.transaction_id, input.output_index = output.output_index,
-             output.input_id = input.transaction_id, output.input_index = input.input_index, output.input_height = input.block_height
-           WHERE tx1.id = mapping.input_transaction_id AND input.transaction_id = tx1._id AND input.input_index = mapping.input_index
-             AND tx2.id = mapping.output_transaction_id AND output.transaction_id = tx2._id AND output.output_index = mapping.output_index
-             AND mapping._id = ${mappingId}`,
-        ])
-      )
+      if (mappings.length) {
+        await this.db.query(
+          sql([
+            `UPDATE transaction_output output, transaction_input input, transaction_output_mapping mapping, transaction tx1, transaction tx2
+             SET input.value = output.value, input.address_id = output.address_id,
+               input.output_id = output.transaction_id, input.output_index = output.output_index,
+               output.input_id = input.transaction_id, output.input_index = input.input_index, output.input_height = input.block_height
+             WHERE tx1.id = mapping.input_transaction_id AND input.transaction_id = tx1._id AND input.input_index = mapping.input_index
+               AND tx2.id = mapping.output_transaction_id AND output.transaction_id = tx2._id AND output.output_index = mapping.output_index
+               AND mapping._id = '${mappingId}'`,
+          ])
+        )
+      }
       const t = await this.db.transaction({
         isolationLevel: SequelizeTransaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
       })
@@ -697,13 +705,8 @@ class TransactionService extends Service implements ITransactionService {
            FROM (
              SELECT transaction_id, address_id, SUM(value) AS value
              FROM (
-               SELECT transaction_id, address_id, value FROM transaction_output WHERE ${{
-                 raw: filter,
-               }}
-               UNION ALL
-               SELECT transaction_id, address_id, -value AS value FROM transaction_input WHERE ${{
-                 raw: filter,
-               }}
+               SELECT transaction_id, address_id, value FROM transaction_output WHERE ${filter} UNION ALL
+               SELECT transaction_id, address_id, -value AS value FROM transaction_input WHERE ${filter}
              ) AS block_balance
              GROUP BY transaction_id, address_id
            ) AS list
