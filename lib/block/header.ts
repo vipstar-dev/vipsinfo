@@ -75,14 +75,24 @@ class Header implements IHeader {
 
   static fromBufferReader(reader: BufferReader): Header {
     const version: number | undefined = reader.readInt32LE()
-    const prevHash: Buffer | undefined = reader.read(32)?.reverse()
-    const merkleRoot: Buffer | undefined = reader.read(32)?.reverse()
+    const prevHash: Buffer | undefined = Buffer.from(
+      reader.read(32) as Buffer
+    ).reverse()
+    const merkleRoot: Buffer | undefined = Buffer.from(
+      reader.read(32) as Buffer
+    ).reverse()
     const timestamp: number | undefined = reader.readUInt32LE()
     const bits: number | undefined = reader.readUInt32LE()
     const nonce: number | undefined = reader.readUInt32LE()
-    const hashStateRoot: Buffer | undefined = reader.read(32)?.reverse()
-    const hashUTXORoot: Buffer | undefined = reader.read(32)?.reverse()
-    const stakePrevTxId: Buffer | undefined = reader.read(32)?.reverse()
+    const hashStateRoot: Buffer | undefined = Buffer.from(
+      reader.read(32) as Buffer
+    ).reverse()
+    const hashUTXORoot: Buffer | undefined = Buffer.from(
+      reader.read(32) as Buffer
+    ).reverse()
+    const stakePrevTxId: Buffer | undefined = Buffer.from(
+      reader.read(32) as Buffer
+    ).reverse()
     const stakeOutputIndex: number | undefined = reader.readUInt32LE()
     const signature: Buffer | undefined = reader.readVarLengthBuffer()
     return new Header({
@@ -108,14 +118,14 @@ class Header implements IHeader {
 
   toBufferWriter(writer: BufferWriter): void {
     writer.writeInt32LE(this.version || 0)
-    writer.write(this.prevHash?.reverse())
-    writer.write(this.merkleRoot?.reverse() || Buffer.alloc(0))
+    writer.write(Buffer.from(this.prevHash).reverse())
+    writer.write(Buffer.from(this.merkleRoot as Buffer).reverse())
     writer.writeUInt32LE(this.timestamp || 0)
     writer.writeUInt32LE(this.bits || 0)
     writer.writeUInt32LE(this.nonce || 0)
-    writer.write(this.hashStateRoot?.reverse() || Buffer.alloc(0))
-    writer.write(this.hashUTXORoot?.reverse() || Buffer.alloc(0))
-    writer.write(this.stakePrevTxId?.reverse() || Buffer.alloc(0))
+    writer.write(Buffer.from(this.hashStateRoot as Buffer).reverse())
+    writer.write(Buffer.from(this.hashUTXORoot as Buffer).reverse())
+    writer.write(Buffer.from(this.stakePrevTxId as Buffer).reverse())
     writer.writeUInt32LE(this.stakeOutputIndex || 0)
     writer.writeVarLengthBuffer(this.signature || Buffer.alloc(0))
   }
