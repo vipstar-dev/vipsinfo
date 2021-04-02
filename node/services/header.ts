@@ -224,7 +224,7 @@ class HeaderService extends Service implements IHeaderService {
         hash: block.header.hash,
         height: this.lastHeader.height + 1,
         version: block.header.version as number,
-        prevHash: block.header.prevHash?.reverse(),
+        prevHash: block.header.prevHash,
         merkleRoot: block.header.merkleRoot as Buffer,
         timestamp: block.header.timestamp as number,
         bits: block.header.bits as number,
@@ -277,7 +277,7 @@ class HeaderService extends Service implements IHeaderService {
             hash: header.hash,
             height: 0,
             version: header.version as number,
-            prevHash: header.prevHash?.reverse(),
+            prevHash: header.prevHash,
             merkleRoot: header.merkleRoot as Buffer,
             timestamp: header.timestamp as number,
             bits: header.bits as number,
@@ -374,7 +374,7 @@ class HeaderService extends Service implements IHeaderService {
       return (
         Buffer.compare(
           this.lastHeader.hash,
-          block.header.prevHash.reverse()
+          block.header.prevHash
         ) !== 0
       )
     }
