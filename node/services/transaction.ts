@@ -502,15 +502,30 @@ class TransactionService extends Service implements ITransactionService {
       addressItems.push([AddressModel.parseType(type), data])
     }
     if (addressItems.length && this.db) {
-      for (const { _id, type, data } of await this.db.query<
-        Pick<AddressModelAttributes, '_id' | 'data'> & { type: number }
-      >(
-        sql([
-          `SELECT _id, type, data FROM address
-             WHERE (type, data) IN ${addressItems}`,
-        ]),
-        { type: QueryTypes.SELECT }
-      )) {
+      const addressItemsStr = addressItems
+        .map(
+          (value: (number | Buffer)[]) =>
+            `(${value[0]}, X'${(value[1] as Buffer).toString('hex')}')`
+        )
+        .join(', ')
+      let addressHistory: (Pick<AddressModelAttributes, '_id' | 'data'> & {
+        type: number
+      })[]
+      try {
+        addressHistory = await this.db.query<
+          Pick<AddressModelAttributes, '_id' | 'data'> & { type: number }
+        >(
+          sql([
+            `SELECT _id, type, data FROM address
+             WHERE (type, data) IN (${addressItemsStr})`,
+          ]),
+          { type: QueryTypes.SELECT }
+        )
+      } catch (e) {
+        this.logger.debug('Get address history is failed...')
+        addressHistory = []
+      }
+      for (const { _id, type, data } of addressHistory) {
         const key = `${data.toString('hex')}/${AddressModel.getType(type)}`
         const item = addressMap.get(key)
         if (item) {
