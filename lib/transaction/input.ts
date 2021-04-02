@@ -59,7 +59,12 @@ class Input implements ITransactionInput {
   }
 
   toBufferWriter(writer: BufferWriter): void {
-    if (this.prevTxId && this.outputIndex && this.scriptSig && this.sequence) {
+    if (
+      this.prevTxId &&
+      this.outputIndex !== undefined &&
+      this.scriptSig &&
+      this.sequence !== undefined
+    ) {
       writer.write(Buffer.from(this.prevTxId).reverse())
       writer.writeUInt32LE(this.outputIndex)
       writer.writeVarLengthBuffer(this.scriptSig)

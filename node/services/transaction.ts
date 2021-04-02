@@ -282,7 +282,7 @@ class TransactionService extends Service implements ITransactionService {
       }
       await this.processReceipts(newTransactions)
       await this._processContracts(block)
-      if (block.height) {
+      if (block.height !== undefined) {
         this.tip = { height: block.height, hash: block.hash }
       }
       if (this.tip) {
@@ -308,7 +308,12 @@ class TransactionService extends Service implements ITransactionService {
     )[] = []
     const txs: TransactionCreationAttributes[] = []
     const witnesses: WitnessCreationAttributes[] = []
-    if (this.synced && block.transactions && block.header && block.height) {
+    if (
+      this.synced &&
+      block.transactions &&
+      block.header &&
+      block.height !== undefined
+    ) {
       const mempoolTransactions: Pick<TransactionModel, '_id' | 'id'>[] =
         (await this.Transaction?.findAll({
           where: {
@@ -391,7 +396,11 @@ class TransactionService extends Service implements ITransactionService {
         updateOnDuplicate: ['blockHeight', 'indexInBlock'],
         validate: false,
       })
-    } else if (block.transactions && block.header && block.height) {
+    } else if (
+      block.transactions &&
+      block.header &&
+      block.height !== undefined
+    ) {
       for (let index = 0; index < block.transactions.length; ++index) {
         const tx: TransactionModel | ITransactionAndModelSetting =
           block.transactions[index]

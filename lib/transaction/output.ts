@@ -46,7 +46,7 @@ class Output implements ITransactionOutput {
   }
 
   toBufferWriter(writer: BufferWriter): void {
-    if (this.value && this.scriptPubKey) {
+    if (this.value !== undefined && this.scriptPubKey) {
       writer.writeUInt64LE(this.value)
       writer.writeVarLengthBuffer(this.scriptPubKey.toBuffer())
     }
