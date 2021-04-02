@@ -460,11 +460,11 @@ class TransactionService extends Service implements ITransactionService {
       ) {
         addressIds[index].push(BigInt(0))
         const address = Address.fromScript(
-          (OutputScript.fromBuffer(
-            (tx as TransactionModel).outputs[outputIndex].scriptPubKey
-          ) ||
-            (tx as ITransactionAndModelSetting).outputs?.[outputIndex]
-              ?.scriptPubKey) as
+          ((tx as ITransactionAndModelSetting).outputs?.[outputIndex]
+            ?.scriptPubKey ||
+            OutputScript.fromBuffer(
+              (tx as TransactionModel).outputs[outputIndex].scriptPubKey
+            )) as
             | IPublicKeyOutputScript
             | IPublicKeyHashOutputScript
             | IScriptHashOutputScript
@@ -729,8 +729,8 @@ class TransactionService extends Service implements ITransactionService {
       ) {
         const output = tx.outputs[outputIndex]
         const outputScriptPubKey: IOutputScript | undefined =
-          OutputScript.fromBuffer(output?.scriptPubKey as Buffer) ||
-          output?.scriptPubKey
+          (output?.scriptPubKey as IOutputScript | undefined) ||
+          OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
         if (
           [
             OutputScript.EVM_CONTRACT_CREATE,
