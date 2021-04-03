@@ -182,7 +182,10 @@ function parseNumberChunk(chunk: ScriptChunk): number | undefined {
   if (code.isSmallInt()) {
     return code.toSmallInt()
   } else if (chunk.buffer) {
-    return Number.parseInt(chunk.buffer.reverse().toString('hex'), 16)
+    return Number.parseInt(
+      Buffer.from(chunk.buffer).reverse().toString('hex'),
+      16
+    )
   }
 }
 

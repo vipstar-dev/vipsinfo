@@ -46,11 +46,11 @@ class GetBlocksMessage extends Message implements IGetBlocksMessage {
     writer.writeVarintNumber(this.starts.length)
     for (const start of this.starts) {
       if (start) {
-        writer.write(start?.reverse())
+        writer.write(Buffer.from(start).reverse())
       }
     }
     if (this.stop) {
-      writer.write(this.stop?.reverse())
+      writer.write(Buffer.from(this.stop).reverse())
     }
     return writer.toBuffer()
   }
