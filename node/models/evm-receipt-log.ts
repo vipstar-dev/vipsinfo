@@ -1,13 +1,15 @@
 import { Optional } from 'sequelize'
 import {
+  AllowNull,
   AutoIncrement,
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
   Model,
   PrimaryKey,
-  Table,
+  Table
 } from 'sequelize-typescript'
 
 import EvmReceipt from '@/node/models/evm-receipt'
@@ -18,10 +20,10 @@ export interface EvmReceiptLogModelAttributes {
   logIndex: number
   blockHeight: number
   address: Buffer
-  topic1: Buffer
-  topic2: Buffer
-  topic3: Buffer
-  topic4: Buffer
+  topic1: Buffer | null
+  topic2: Buffer | null
+  topic3: Buffer | null
+  topic4: Buffer | null
   data: Buffer
   receipt: EvmReceipt
 }
@@ -57,17 +59,21 @@ export default class EvmReceiptLog extends Model<
   @Column(DataType.STRING(32).BINARY)
   address!: Buffer
 
+  @AllowNull
   @Column(DataType.STRING(32).BINARY)
-  topic1!: Buffer
+  topic1!: Buffer | null
 
+  @AllowNull
   @Column(DataType.STRING(32).BINARY)
-  topic2!: Buffer
+  topic2!: Buffer | null
 
+  @AllowNull
   @Column(DataType.STRING(32).BINARY)
-  topic3!: Buffer
+  topic3!: Buffer | null
 
+  @AllowNull
   @Column(DataType.STRING(32).BINARY)
-  topic4!: Buffer
+  topic4!: Buffer | null
 
   @Column(DataType.BLOB)
   data!: Buffer

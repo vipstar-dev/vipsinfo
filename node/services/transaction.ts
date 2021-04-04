@@ -1092,10 +1092,10 @@ class TransactionService extends Service implements ITransactionService {
                   logIndex: j,
                   blockHeight: block.height as number,
                   address: Buffer.from(address, 'hex'),
-                  topic1: Buffer.from(topics[0], 'hex'),
-                  topic2: Buffer.from(topics[1], 'hex'),
-                  topic3: Buffer.from(topics[2], 'hex'),
-                  topic4: Buffer.from(topics[3], 'hex'),
+                  topic1: topics[0] ? Buffer.from(topics[0], 'hex') : null,
+                  topic2: topics[1] ? Buffer.from(topics[1], 'hex') : null,
+                  topic3: topics[2] ? Buffer.from(topics[2], 'hex') : null,
+                  topic4: topics[3] ? Buffer.from(topics[3], 'hex') : null,
                   data: Buffer.from(data, 'hex'),
                 })
               }

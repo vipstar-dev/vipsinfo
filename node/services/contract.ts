@@ -294,12 +294,12 @@ class ContractService extends Service implements IContractService {
     })
     if (balanceChangeResults) {
       for (const { address, topic2, topic3 } of balanceChangeResults) {
-        if (Buffer.compare(topic2, Buffer.alloc(32)) !== 0) {
+        if (topic2 && Buffer.compare(topic2, Buffer.alloc(32)) !== 0) {
           balanceChanges.add(
             `${address.toString('hex')}:${topic2.slice(12).toString('hex')}`
           )
         }
-        if (Buffer.compare(topic3, Buffer.alloc(32)) !== 0) {
+        if (topic3 && Buffer.compare(topic3, Buffer.alloc(32)) !== 0) {
           balanceChanges.add(
             `${address.toString('hex')}:${topic3.slice(12).toString('hex')}`
           )
