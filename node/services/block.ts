@@ -116,6 +116,8 @@ class BlockService extends Service implements IBlockService {
   private Block: ModelCtor<BlockModel> | undefined
   private Transaction: ModelCtor<TransactionModel> | undefined
   private TransactionOutput: ModelCtor<TransactionOutputModel> | undefined
+  private prevLogTime: number | undefined
+  private prevLogProgress: number | undefined
 
   constructor(options: BlockConfig) {
     super(options)
@@ -840,11 +842,42 @@ class BlockService extends Service implements IBlockService {
     const headerBestHeight = this.node.addedMethods.getBestHeight?.()
     if (headerBestHeight && this.tip) {
       const bestHeight = Math.max(headerBestHeight, this.tip.height)
+      const nowTime = Date.now() / 1000
       const progress =
         bestHeight && ((this.tip.height / bestHeight) * 100).toFixed(4)
+      let remainTimeString: string | undefined
+      if (
+        this.prevLogTime !== undefined &&
+        this.prevLogProgress !== undefined
+      ) {
+        const remainTime =
+          (100 - Number(progress)) /
+          ((Number(progress) - this.prevLogProgress) /
+            (nowTime - this.prevLogTime))
+        let hours = (remainTime / 3600).toFixed(0)
+        let minutes = ((remainTime % 3600) / 60).toFixed(0)
+        let seconds = (remainTime % 60).toFixed(0)
+        if (hours.length === 1) {
+          hours = '0' + hours
+        }
+        if (minutes.length === 1) {
+          minutes = '0' + minutes
+        }
+        if (seconds.length === 1) {
+          seconds = '0' + seconds
+        }
+        remainTimeString = `${hours}:${minutes}:${seconds}`
+      } else {
+        this.prevLogTime = nowTime
+        this.prevLogProgress = Number(progress)
+      }
       this.logger.info(
         'Block Service: download progress:',
-        `${this.tip.height}/${bestHeight} (${progress}%)`
+        `${this.tip.height}/${bestHeight} (${progress}%${
+          remainTimeString
+            ? ', Estimated Block Sync Remaining Time: ' + remainTimeString
+            : ''
+        })`
       )
     }
   }
