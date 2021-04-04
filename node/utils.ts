@@ -1,3 +1,5 @@
+import { ITip } from '@/node/services/db'
+
 export type errCallback = (...err: (string | number | null)[]) => void
 
 export interface IAsyncQueue<T> {
@@ -69,6 +71,31 @@ function transformSQLArg(arg: sqlArgs): string {
     return (arg as { raw: string; [key: string]: any }).raw
   }
   return arg.toString()
+}
+
+export function caluculateRemainingTime(
+  tip: ITip,
+  bestHeight: number,
+  prevLogHeight: number,
+  nowTime: number,
+  prevLogTime: number
+): string {
+  const remainTime =
+    (bestHeight - tip.height) /
+    ((tip.height - prevLogHeight) / (nowTime - prevLogTime))
+  let hours = Math.floor(remainTime / 3600).toString()
+  let minutes = Math.floor((remainTime % 3600) / 60).toString()
+  let seconds = Math.floor(remainTime % 60).toString()
+  if (hours.length === 1) {
+    hours = '0' + hours
+  }
+  if (minutes.length === 1) {
+    minutes = '0' + minutes
+  }
+  if (seconds.length === 1) {
+    seconds = '0' + seconds
+  }
+  return `${hours}:${minutes}:${seconds}`
 }
 
 export default AsyncQueue

@@ -15,7 +15,7 @@ import Service, {
 } from '@/node/services/base'
 import { ITip } from '@/node/services/db'
 import { IHeaderService } from '@/node/services/header'
-import AsyncQueue from '@/node/utils'
+import AsyncQueue, { caluculateRemainingTime } from '@/node/utils'
 import Timeout = NodeJS.Timeout
 import { Services } from '@/node/node'
 import { Log } from '@/rpc'
@@ -117,7 +117,7 @@ class BlockService extends Service implements IBlockService {
   private Transaction: ModelCtor<TransactionModel> | undefined
   private TransactionOutput: ModelCtor<TransactionOutputModel> | undefined
   private prevLogTime: number | undefined
-  private prevLogBlock: number | undefined
+  private prevLogHeight: number | undefined
 
   constructor(options: BlockConfig) {
     super(options)
@@ -846,32 +846,24 @@ class BlockService extends Service implements IBlockService {
       const progress =
         bestHeight && ((this.tip.height / bestHeight) * 100).toFixed(4)
       let remainTimeString: string | undefined
-      if (this.prevLogTime !== undefined && this.prevLogBlock !== undefined) {
-        const remainTime =
-          (bestHeight - this.tip.height) /
-          ((this.tip.height - this.prevLogBlock) / (nowTime - this.prevLogTime))
-        let hours = (remainTime / 3600).toFixed(0)
-        let minutes = ((remainTime % 3600) / 60).toFixed(0)
-        let seconds = (remainTime % 60).toFixed(0)
-        if (hours.length === 1) {
-          hours = '0' + hours
-        }
-        if (minutes.length === 1) {
-          minutes = '0' + minutes
-        }
-        if (seconds.length === 1) {
-          seconds = '0' + seconds
-        }
-        remainTimeString = `${hours}:${minutes}:${seconds}`
+      if (this.prevLogTime !== undefined && this.prevLogHeight !== undefined) {
+        remainTimeString = caluculateRemainingTime(
+          this.tip,
+          bestHeight,
+          this.prevLogHeight,
+          nowTime,
+          this.prevLogTime
+        )
       } else {
         this.prevLogTime = nowTime
-        this.prevLogBlock = this.tip.height
+        this.prevLogHeight = this.tip.height
       }
       this.logger.info(
         'Block Service: download progress:',
-        `${this.tip.height}/${bestHeight} (${progress}%${
+        `${this.tip.height}/${bestHeight}`,
+        `(${progress}%${
           remainTimeString
-            ? ', Estimated Block Sync Remaining Time: ' + remainTimeString
+            ? ', estimated block sync remaining time: ' + remainTimeString
             : ''
         })`
       )
