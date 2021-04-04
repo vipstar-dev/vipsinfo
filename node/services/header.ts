@@ -371,12 +371,7 @@ class HeaderService extends Service implements IHeaderService {
 
   _detectReorg(block: IBlock): boolean {
     if (this.lastHeader && block.header.prevHash) {
-      return (
-        Buffer.compare(
-          this.lastHeader.hash,
-          block.header.prevHash
-        ) !== 0
-      )
+      return Buffer.compare(this.lastHeader.hash, block.header.prevHash) !== 0
     }
     return false
   }
