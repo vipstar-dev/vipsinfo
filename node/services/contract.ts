@@ -33,7 +33,7 @@ import { Services } from '@/node/node'
 import Service, { IService } from '@/node/services/base'
 import { BlockObject } from '@/node/services/block'
 import { ITip } from '@/node/services/db'
-import { sql } from '@/node/utils'
+import { sleep, sql } from '@/node/utils'
 import { CallContractResult, ListContractsResult } from '@/rpc'
 
 const { ne: $ne, gt: $gt, in: $in } = Op
@@ -69,9 +69,9 @@ export interface IContractService extends IService {
     callList: {
       address: Buffer
       abi: IMethodABI
-      args?: string[]
+      args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<any[]>[] | undefined
+  ): Promise<(rawDecodeResults | rawDecodeResults[])[][] | undefined>
   _processReceipts(block: BlockObject): Promise<void>
   _updateBalances(balanceChanges: Set<string>): Promise<void>
   _updateTokenHolders(transfers: Map<string, Buffer>): Promise<void>
@@ -411,7 +411,7 @@ class ContractService extends Service implements IContractService {
       bytecodeSha256sum: sha256sum,
     })
     if (isQRC721(code)) {
-      const results = this._batchCallMethods([
+      const results = await this._batchCallMethods([
         {
           address,
           abi: qrc721ABIs.find(
@@ -435,9 +435,9 @@ class ContractService extends Service implements IContractService {
         const [nameResult, symbolResult, totalSupplyResult] = results
         try {
           const [name, symbol, totalSupply] = await Promise.all([
-            nameResult.then((x) => x[0]),
-            symbolResult.then((x) => x[0]),
-            totalSupplyResult.then((x) => BigInt(x[0].toString())),
+            nameResult[0],
+            symbolResult[0],
+            BigInt(totalSupplyResult[0].toString()),
           ])
           contract.type = 'qrc721'
           await contract.save()
@@ -459,7 +459,7 @@ class ContractService extends Service implements IContractService {
         }
       }
     } else if (isQRC20(code)) {
-      const results = this._batchCallMethods([
+      const results = await this._batchCallMethods([
         {
           address,
           abi: qrc20ABIs.find(
@@ -502,13 +502,13 @@ class ContractService extends Service implements IContractService {
         try {
           let version
           try {
-            version = (await versionResult)[0]
+            version = versionResult[0]
           } catch (err) {}
           const [name, symbol, decimals, totalSupply] = await Promise.all([
-            nameResult.then((x) => x[0]),
-            symbolResult.then((x) => x[0]),
-            decimalsResult.then((x) => x[0].toString()),
-            totalSupplyResult.then((x) => BigInt(x[0].toString())),
+            nameResult[0],
+            symbolResult[0],
+            decimalsResult[0].toString(),
+            BigInt(totalSupplyResult[0].toString()),
           ])
           contract.type = 'qrc20'
           await contract.save()
@@ -561,33 +561,51 @@ class ContractService extends Service implements IContractService {
     }
   }
 
-  _batchCallMethods(
+  async _batchCallMethods(
     callList: {
       address: Buffer
       abi: IMethodABI
       args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<(rawDecodeResults | rawDecodeResults[])[]>[] | undefined {
+  ): Promise<(rawDecodeResults | rawDecodeResults[])[][] | undefined> {
     const client = this.node.addedMethods.getRpcClient?.()
-    const results = client?.batch<CallContractResult>(() => {
-      for (const { address, abi, args = [] } of callList) {
-        if (client) {
-          client.rpcMethods.callcontract?.(
-            address.toString('hex'),
-            Buffer.concat([abi.id, abi.encodeInputs(args)]).toString('hex')
-          )
-        }
-      }
-    })
-    return results?.map(async (result, index) => {
-      const { abi } = callList[index]
-      const { executionResult } = await result
-      if (executionResult.excepted === 'None') {
-        return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
+    if (client) {
+      const batchFunc = () =>
+        client.batch<CallContractResult>(() => {
+          for (const { address, abi, args = [] } of callList) {
+            if (client) {
+              client.rpcMethods.callcontract?.(
+                address.toString('hex'),
+                Buffer.concat([abi.id, abi.encodeInputs(args)]).toString('hex')
+              )
+            }
+          }
+        })
+      const results = await Promise.all(batchFunc()).catch((reason) => {
+        this.logger.error('callcontract rpc call is failed.', `${reason}`)
+        void sleep(5000)
+        this.logger.info('Retry callcontract rpc call...')
+        return Promise.all(batchFunc())
+      })
+      const excepted: string[] = []
+      results.map((result) => {
+        if (result.executionResult.excepted !== 'None')
+          excepted.push(result.executionResult.excepted)
+      })
+      if (excepted.length === 0) {
+        return results.map((result, index) => {
+          const { abi } = callList[index]
+          const { executionResult } = result
+          return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
+        })
       } else {
-        throw executionResult.excepted
+        this.logger.error(
+          'Contract Service:',
+          'batchCallMethods found excepted:',
+          `${excepted.join(', ')}`
+        )
       }
-    })
+    }
   }
 
   async _processReceipts(block: BlockObject): Promise<void> {
@@ -686,15 +704,15 @@ class ContractService extends Service implements IContractService {
       abi: balanceOfABI,
       args: [`0x${address}`],
     }))
-    const result = this._batchCallMethods(batchCalls)
+    const result = await this._batchCallMethods(batchCalls)
     const operations: (
       | Qrc20BalanceCreationAttributes
       | undefined
     )[] = await Promise.all(
-      newBalanceChanges.map(async ({ contract, address }, index) => {
+      newBalanceChanges.map(({ contract, address }, index) => {
         try {
           if (result) {
-            const [balance] = await result[index]
+            const [balance] = result[index]
             return {
               contractAddress: Buffer.from(contract, 'hex'),
               address: Buffer.from(address, 'hex'),

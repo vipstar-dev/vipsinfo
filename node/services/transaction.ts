@@ -59,7 +59,7 @@ import { Services } from '@/node/node'
 import Service, { IService } from '@/node/services/base'
 import { BlockObject } from '@/node/services/block'
 import { ITip } from '@/node/services/db'
-import { sql } from '@/node/utils'
+import { sleep, sql } from '@/node/utils'
 import { GetTransactionReceiptResult, Log } from '@/rpc'
 
 const { gt: $gt, in: $in } = Op
@@ -905,7 +905,7 @@ class TransactionService extends Service implements ITransactionService {
         const receiptLogs: EvmReceiptLogCreationAttributes[] = []
         const client = this.node.addedMethods.getRpcClient?.()
         if (client) {
-          const blockReceipts: GetTransactionReceiptResult[][] = await Promise.all(
+          const batchFunc = () =>
             client.batch<GetTransactionReceiptResult[]>(() => {
               const transactions:
                 | TransactionModel[]
@@ -923,7 +923,17 @@ class TransactionService extends Service implements ITransactionService {
                 }
               }
             })
-          )
+          const blockReceipts: GetTransactionReceiptResult[][] = await Promise.all(
+            batchFunc()
+          ).catch((reason) => {
+            this.logger.error(
+              'getransactionreceipt rpc call is failed.',
+              `${reason}`
+            )
+            void sleep(5000)
+            this.logger.info('Retry getransactionreceipt rpc call...')
+            return Promise.all(batchFunc())
+          })
           block.receipts = []
           blockReceipts.map((receipts: GetTransactionReceiptResult[]) => {
             receipts.map(

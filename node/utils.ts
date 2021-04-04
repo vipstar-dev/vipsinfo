@@ -73,6 +73,14 @@ function transformSQLArg(arg: sqlArgs): string {
   return arg.toString()
 }
 
+export function sleep(time: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve()
+    }, time)
+  })
+}
+
 export function caluculateRemainingTime(
   tip: ITip,
   bestHeight: number,
