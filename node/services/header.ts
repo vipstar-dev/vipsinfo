@@ -9,7 +9,7 @@ import { Services } from '@/node/node'
 import Service, { BaseConfig, IService } from '@/node/services/base'
 import { ITip } from '@/node/services/db'
 import { IP2PService } from '@/node/services/p2p'
-import AsyncQueue from '@/node/utils'
+import AsyncQueue, { caluculateRemainingTime } from '@/node/utils'
 
 const { gt: $gt, between: $between } = Op
 
@@ -71,6 +71,8 @@ class HeaderService extends Service implements IHeaderService {
   private Header: ModelCtor<HeaderModel> | undefined
   private _subscribedBlock: boolean = false
   private _bestHeight: number | undefined
+  private prevLogTime: number | undefined
+  private prevLogHeight: number | undefined
 
   constructor(options: BaseConfig) {
     super(options)
@@ -442,12 +444,30 @@ class HeaderService extends Service implements IHeaderService {
         Number(this._bestHeight),
         Number(this.lastHeader?.height)
       )
+      const nowTime = Date.now() / 1000
       const progress =
         bestHeight === 0 ? 0 : ((this.tip.height / bestHeight) * 100).toFixed(2)
+      let remainTimeString: string | undefined
+      if (this.prevLogTime !== undefined && this.prevLogHeight !== undefined) {
+        remainTimeString = caluculateRemainingTime(
+          this.tip,
+          bestHeight,
+          this.prevLogHeight,
+          nowTime,
+          this.prevLogTime
+        )
+      } else {
+        this.prevLogTime = nowTime
+        this.prevLogHeight = this.tip.height
+      }
       this.logger.info(
         'Header Service: download progress:',
         `${this.tip.height}/${bestHeight}`,
-        `(${progress}%)`
+        `(${progress}%${
+          remainTimeString
+            ? ', estimated header sync remaining time: ' + remainTimeString
+            : ''
+        })`
       )
       this.lastTipHeightReported = this.tip.height
     }
