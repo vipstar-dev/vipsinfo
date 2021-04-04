@@ -316,12 +316,14 @@ class ContractService extends Service implements IContractService {
          FROM evm_receipt receipt, evm_receipt_log log
          INNER JOIN (
            SELECT address, topic4, MIN(_id) AS _id FROM evm_receipt_log
-           WHERE topic4 IS NOT NULL AND topic1 = ${TransferABI.id}
+           WHERE topic4 IS NOT NULL AND topic1 = X'${TransferABI.id.toString(
+             'hex'
+           )}'
            GROUP BY address, topic4
          ) results ON log._id = results._id
-         WHERE receipt._id = log.receipt_id AND receipt.block_height > ${height} AND log.topic2 != ${Buffer.alloc(
+         WHERE receipt._id = log.receipt_id AND receipt.block_height > ${height} AND log.topic2 != X'${Buffer.alloc(
           32
-        )}
+        ).toString('hex')}'
         ON DUPLICATE KEY UPDATE holder = VALUES(holder)`,
       ])
     )
@@ -366,7 +368,7 @@ class ContractService extends Service implements IContractService {
              LEFT JOIN qrc20_balance ON qrc20_balance.contract_address = contract.address
              LEFT JOIN qrc721 ON qrc721.contract_address = contract.address
              LEFT JOIN qrc721_token ON qrc721_token.contract_address = contract.address
-             WHERE contract.address IN ${contractsToRemove}`,
+             WHERE contract.address IN (${contractsToRemove.join(', ')})`,
           ])
         )
       }
