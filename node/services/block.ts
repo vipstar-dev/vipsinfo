@@ -659,7 +659,7 @@ class BlockService extends Service implements IBlockService {
         this.emit('synced')
       }
     } catch (err) {
-      this._handleError(err)
+      this._handleError('_syncBlock', err)
     }
   }
 
@@ -731,7 +731,7 @@ class BlockService extends Service implements IBlockService {
         diff
       )
     } catch (err) {
-      this._handleError(err)
+      this._handleError('_logSynced', err)
     }
   }
 
