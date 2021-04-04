@@ -13,13 +13,13 @@ vipsinfo is splitted into 3 repos:
 
 ## Deploy VIPSTARCOIN Core
 1. `git clone --recursive https://github.com/vipstar-dev/VIPSTARCOIN.git --branch=vipsinfo`
-2. Follow the instructions of [https://github.com/vipstar-dev/VIPSTARCOIN/blob/master/README.md#building-vipstarcoin-core](https://github.com/vipstar-dev/VIPSTARCOIN/blob/master/README.md#building-vipstarcoin-core) to build VIPSTARCOIN
-3. Run `vipstarcoind` with `-logevents=1` enabled
+2. Follow the instructions of [https://github.com/vipstar-dev/VIPSTARCOIN/blob/master-1.2/README.md#quickstart](https://github.com/vipstar-dev/VIPSTARCOIN/blob/master-1.2/README.md#quickstart) to build VIPSTARCOIN
+3. Run `vipstarcoind` with `-logevents=1` and `-rpcworkqueue=100` enabled (or write in config file)
 
 ## Deploy vipsinfo
 1. `git clone https://github.com/vipstar-dev/vipsinfo.git`
 2. `cd vipsinfo && yarn install`
-3. Create a mysql database and import [docs/structure.sql](structure.sql)  
+3. Create a mysql database and import [doc/structure.sql](structure.sql)  
    ex.) 
    ```
    mysql> create database vips_mainnet;
