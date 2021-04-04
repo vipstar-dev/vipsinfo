@@ -117,7 +117,7 @@ class BlockService extends Service implements IBlockService {
   private Transaction: ModelCtor<TransactionModel> | undefined
   private TransactionOutput: ModelCtor<TransactionOutputModel> | undefined
   private prevLogTime: number | undefined
-  private prevLogProgress: number | undefined
+  private prevLogBlock: number | undefined
 
   constructor(options: BlockConfig) {
     super(options)
@@ -846,14 +846,10 @@ class BlockService extends Service implements IBlockService {
       const progress =
         bestHeight && ((this.tip.height / bestHeight) * 100).toFixed(4)
       let remainTimeString: string | undefined
-      if (
-        this.prevLogTime !== undefined &&
-        this.prevLogProgress !== undefined
-      ) {
+      if (this.prevLogTime !== undefined && this.prevLogBlock !== undefined) {
         const remainTime =
-          (100 - Number(progress)) /
-          ((Number(progress) - this.prevLogProgress) /
-            (nowTime - this.prevLogTime))
+          (bestHeight - this.tip.height) /
+          ((this.tip.height - this.prevLogBlock) / (nowTime - this.prevLogTime))
         let hours = (remainTime / 3600).toFixed(0)
         let minutes = ((remainTime % 3600) / 60).toFixed(0)
         let seconds = (remainTime % 60).toFixed(0)
@@ -869,7 +865,7 @@ class BlockService extends Service implements IBlockService {
         remainTimeString = `${hours}:${minutes}:${seconds}`
       } else {
         this.prevLogTime = nowTime
-        this.prevLogProgress = Number(progress)
+        this.prevLogBlock = this.tip.height
       }
       this.logger.info(
         'Block Service: download progress:',
