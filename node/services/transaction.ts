@@ -615,7 +615,7 @@ class TransactionService extends Service implements ITransactionService {
                 inputIndex,
                 "X'" +
                   (
-                    (tx.inputs[0] as ITransactionInput | undefined)?.prevTxId ||
+                    (input as ITransactionInput | undefined)?.prevTxId ||
                     Buffer.alloc(32)
                   ).toString('hex') +
                   "'",
