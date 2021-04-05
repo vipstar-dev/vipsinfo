@@ -72,7 +72,7 @@ Chain.add({
   networkMagic: Buffer.from([0x01, 0x2c, 0xe7, 0xb5]),
   pubkeyhash: 70,
   privatekey: 0x80,
-  scripthash: 60,
+  scripthash: 50,
   witnesshrp: 'vips',
   evm: 0x21,
   genesis: Buffer.from(
