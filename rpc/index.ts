@@ -306,7 +306,7 @@ class RpcClient {
     ) => Promise<QtumRpcResult> | void {
       const fixedArgs: (string | number | boolean | object)[] = []
       return function (...args: { toString: () => string }[] | string[]) {
-        if (baseArgs === ['int', 'int'] || baseArgs === ['int']) {
+        if (baseArgs.includes('int')) {
           for (let i = 0; i < args.length; i++) {
             fixedArgs[i] = types.int(args[i] as string)
           }
