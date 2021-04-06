@@ -187,7 +187,9 @@ class MempoolService extends Service implements IMempoolService {
       }
       const [{ count }] = await this.db.query(
         sql([
-          `SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN ${txos}`,
+          `SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN (${txos.join(
+            ', '
+          )})`,
         ]),
         { type: QueryTypes.SELECT }
       )
