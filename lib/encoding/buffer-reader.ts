@@ -98,7 +98,7 @@ class BufferReader {
     return this.read(typeof length === 'number' ? length : 0)
   }
 
-  push(buffer: Buffer) {
+  push(buffer: Buffer): void {
     if (typeof this.buffer === 'undefined' || this.buffer === null) {
       this.buffer = buffer
     } else {
@@ -106,11 +106,11 @@ class BufferReader {
     }
   }
 
-  skip(offset: number) {
+  skip(offset: number): void {
     this.buffer = this.buffer?.slice(offset)
   }
 
-  slice(...args: number[]) {
+  slice(...args: number[]): Buffer | undefined {
     return this.buffer?.slice(...args)
   }
 }

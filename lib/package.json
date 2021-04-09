@@ -1,0 +1,42 @@
+{
+  "name": "vipsinfo-lib",
+  "private": true,
+  "version": "0.0.1",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vipstar-dev/vipsinfo.git",
+    "directory": "lib"
+  },
+  "scripts": {
+    "build": "yarn run clean && yarn compile",
+    "clean": "rm -rf dist",
+    "compile": "tsc -p .",
+    "lint": "eslint --ext .js,.ts --ignore-path .eslintignore ."
+  },
+  "author": "y-chan <y-chan@y-chan.dev>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vipstar-dev/vipsinfo/issues"
+  },
+  "homepage": "https://github.com/vipstar-dev/vipsinfo#readme",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@types/ethereumjs-abi": "^0.6.3",
+    "@types/node": "^14.14.32",
+    "ethereumjs-abi": "^0.6.8",
+    "secp256k1": "^3.7.1",
+    "typescript": "^4.2.3",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-simple-import-sort": "^7.0.0"
+  }
+}

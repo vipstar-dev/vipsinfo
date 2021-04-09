@@ -1,8 +1,7 @@
+import BufferWriter from '@lib/encoding/buffer-writer'
+import Script, { IScript, ScriptChunk } from '@lib/script'
+import Opcode, { OpcodeReversedMap, OpcodeTypes } from '@lib/script/opcode'
 import secp256k1 from 'secp256k1'
-
-import BufferWriter from '@/lib/encoding/buffer-writer'
-import Script, { IScript, ScriptChunk } from '@/lib/script'
-import Opcode, { OpcodeReversedMap, OpcodeTypes } from '@/lib/script/opcode'
 
 export type OutputTypes =
   | 'UNKNOWN'

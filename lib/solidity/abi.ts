@@ -1,3 +1,5 @@
+import qrc20List from '@lib/solidity/qrc20-abi.json'
+import qrc721List from '@lib/solidity/qrc721-abi.json'
 import {
   eventID,
   methodID,
@@ -6,9 +8,6 @@ import {
   rawEncode,
   rawEncodeArgument,
 } from 'ethereumjs-abi'
-
-import qrc20List from '@/lib/solidity/qrc20-abi.json'
-import qrc721List from '@/lib/solidity/qrc721-abi.json'
 
 export interface MethodABIsIO {
   type: string

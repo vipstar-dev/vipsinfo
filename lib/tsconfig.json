@@ -1,0 +1,23 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@lib/*": [
+        "./*"
+      ]
+    },
+    "declaration": true,
+    "typeRoots": [
+      "types"
+    ],
+    "outDir": "dist",
+    "noEmit": false
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "./dist"
+  ]
+}
