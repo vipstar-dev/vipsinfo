@@ -1,8 +1,7 @@
 {
   "name": "vipsinfo",
-  "private": true,
   "version": "0.0.1",
-  "description": "",
+  "description": "vipsinfo core node and libraries",
   "scripts": {
     "dev": "yarn build:live",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore .",
