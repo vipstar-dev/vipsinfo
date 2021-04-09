@@ -1,7 +1,8 @@
-import BufferReader from '@lib/encoding/buffer-reader'
-import BufferWriter from '@lib/encoding/buffer-writer'
-import Opcode, { OpcodeReversedMap } from '@lib/script/opcode'
 import util from 'util'
+
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
+import Opcode, { OpcodeReversedMap } from '@/lib/script/opcode'
 
 export class InvalidScriptError extends Error {
   constructor(...args: string[]) {

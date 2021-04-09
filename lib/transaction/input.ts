@@ -1,6 +1,7 @@
-import BufferReader from '@lib/encoding/buffer-reader'
-import BufferWriter from '@lib/encoding/buffer-writer'
 import util from 'util'
+
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 
 export interface ITransactionInput {
   prevTxId: Buffer | undefined

@@ -33,7 +33,7 @@
       "@types/validator"
     ],
     "typeRoots": [
-      "lib/types"
+      "types"
     ],
     /* Advanced Options */
     "resolveJsonModule": true,

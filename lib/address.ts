@@ -1,13 +1,15 @@
-import { IChain } from '@lib/chain'
-import { hash160 } from '@lib/crypto/hash'
+import util from 'util'
+
+import { IChain } from '@/lib/chain'
+import { hash160 } from '@/lib/crypto/hash'
 import {
   Base58Check,
   InvalidBase58ChecksumError,
   InvalidBase58Error,
-} from '@lib/encoding/base58'
+} from '@/lib/encoding/base58'
 import SegwitAddress, {
   InvalidSegwitAddressError,
-} from '@lib/encoding/segwit-address'
+} from '@/lib/encoding/segwit-address'
 import OutputScript, {
   IContractOutputScript,
   IEVMContractCallBySenderScript,
@@ -20,8 +22,7 @@ import OutputScript, {
   IScriptHashOutputScript,
   IWitnessV0KeyHashOutputScript,
   IWitnessV0ScriptHashOut,
-} from '@lib/script/output'
-import util from 'util'
+} from '@/lib/script/output'
 
 export type AddressTypes =
   | 'PAY_TO_PUBLIC_KEY_HASH'

@@ -1,4 +1,4 @@
-import { sha256d } from '@lib/crypto/hash'
+import { sha256d } from '@/lib/crypto/hash'
 
 const ALPHABET: string =
   '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'

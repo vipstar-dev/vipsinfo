@@ -1,4 +1,4 @@
-import { Bech32, InvalidBech32StringError } from '@lib/encoding/bech32'
+import { Bech32, InvalidBech32StringError } from '@/lib/encoding/bech32'
 
 export class InvalidSegwitAddressError extends Error {
   constructor(...args: string[]) {

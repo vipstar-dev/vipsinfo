@@ -1,9 +1,10 @@
-import { sha256d } from '@lib/crypto/hash'
-import BufferReader from '@lib/encoding/buffer-reader'
-import BufferWriter from '@lib/encoding/buffer-writer'
-import Input, { ITransactionInput } from '@lib/transaction/input'
-import Output, { ITransactionOutput } from '@lib/transaction/output'
 import util from 'util'
+
+import { sha256d } from '@/lib/crypto/hash'
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
+import Input, { ITransactionInput } from '@/lib/transaction/input'
+import Output, { ITransactionOutput } from '@/lib/transaction/output'
 
 export interface TransactionConstructor {
   version: number | undefined

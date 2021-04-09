@@ -1,8 +1,9 @@
-import Header, { IHeader } from '@lib/block/header'
-import BufferReader from '@lib/encoding/buffer-reader'
-import BufferWriter from '@lib/encoding/buffer-writer'
-import Transaction, { ITransaction } from '@lib/transaction'
 import util from 'util'
+
+import Header, { IHeader } from '@/lib/block/header'
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
+import Transaction, { ITransaction } from '@/lib/transaction'
 
 export interface BlockConstructor {
   header: IHeader

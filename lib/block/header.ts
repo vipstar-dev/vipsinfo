@@ -1,7 +1,8 @@
-import { sha256d } from '@lib/crypto/hash'
-import BufferReader from '@lib/encoding/buffer-reader'
-import BufferWriter from '@lib/encoding/buffer-writer'
 import util from 'util'
+
+import { sha256d } from '@/lib/crypto/hash'
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 
 const GENESIS_BITS = 0x1d00ffff
 
