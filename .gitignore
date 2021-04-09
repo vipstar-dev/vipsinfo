@@ -59,3 +59,6 @@ typings/
 
 # IDE / Editer
 .idea
+
+# Output folder
+dist
