@@ -74,6 +74,7 @@
   },
   "workspaces": [
     "lib/*",
-    "p2p/*"
+    "p2p/*",
+    "rpc/*"
   ]
 }
