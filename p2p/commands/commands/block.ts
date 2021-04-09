@@ -1,8 +1,8 @@
+import Block, { IBlock } from '@/lib/block/block'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@p2p/commands/commands/message'
-import Block, { IBlock } from 'vipsinfo-lib/block/block'
+} from '@/p2p/commands/commands/message'
 
 export interface BlockMessageOptions extends MessageOptions {
   block?: IBlock

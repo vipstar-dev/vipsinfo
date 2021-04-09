@@ -1,8 +1,8 @@
 import assert from 'assert'
-import { IChain } from 'vipsinfo-lib/chain'
-import { sha256d } from 'vipsinfo-lib/crypto/hash'
-import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
-import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
+
+import { IChain, sha256d } from '@/lib'
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 
 export interface MessageOptions {
   chain: IChain

@@ -1,10 +1,10 @@
+import Header from '@/lib/block/header'
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@p2p/commands/commands/message'
-import Header from 'vipsinfo-lib/block/header'
-import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
-import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
+} from '@/p2p/commands/commands/message'
 
 export interface HeadersMessageOptions extends MessageOptions {
   headers?: Header[]

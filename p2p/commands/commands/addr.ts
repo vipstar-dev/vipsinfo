@@ -1,11 +1,11 @@
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@p2p/commands/commands/message'
-import { AddressData } from '@p2p/commands/commands/utils'
-import { parseAddress, writeAddress } from '@p2p/commands/commands/utils'
-import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
-import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
+} from '@/p2p/commands/commands/message'
+import { AddressData } from '@/p2p/commands/commands/utils'
+import { parseAddress, writeAddress } from '@/p2p/commands/commands/utils'
 
 export interface AddrMessageOptions extends MessageOptions {
   addresses?: AddressData[]

@@ -1,4 +1,4 @@
-import Message, { MessageOptions } from '@p2p/commands/commands/message'
+import Message, { MessageOptions } from '@/p2p/commands/commands/message'
 
 class MempoolMessage extends Message {
   constructor(options: MessageOptions) {

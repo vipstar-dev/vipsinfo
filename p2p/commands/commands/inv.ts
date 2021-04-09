@@ -1,14 +1,14 @@
+import BufferReader from '@/lib/encoding/buffer-reader'
+import BufferWriter from '@/lib/encoding/buffer-writer'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@p2p/commands/commands/message'
+} from '@/p2p/commands/commands/message'
 import {
   parseInventories,
   writeInventories,
-} from '@p2p/commands/commands/utils'
-import Inventory, { InventoryConstructor } from '@p2p/commands/inventory'
-import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
-import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
+} from '@/p2p/commands/commands/utils'
+import Inventory, { InventoryConstructor } from '@/p2p/commands/inventory'
 
 export interface InvMessageOptions extends MessageOptions {
   inventories?: InventoryConstructor[]
