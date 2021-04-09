@@ -12,7 +12,9 @@
     ],
     "allowJs": true,
     "strict": true,
-    "noEmit": true,
+    "declaration": true,
+    "newLine": "lf",
+    "noEmit": false,
     "esModuleInterop": true,
     "noImplicitThis": true,
     "experimentalDecorators": true,
@@ -35,6 +37,12 @@
     "typeRoots": [
       "types"
     ],
+    "rootDirs": [
+      "lib",
+      "p2p",
+      "rpc"
+    ],
+    "outDir": "dist",
     /* Advanced Options */
     "resolveJsonModule": true,
     "skipLibCheck": true,
