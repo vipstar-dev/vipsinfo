@@ -465,4 +465,4 @@ class ContractSpendScript extends InputScript implements IInputScript {
   }
 }
 
-exports = module.exports = InputScript
+export default InputScript
