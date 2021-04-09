@@ -1,5 +1,5 @@
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
+import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
+import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
 
 export interface InventoryConstructor {
   type?: number

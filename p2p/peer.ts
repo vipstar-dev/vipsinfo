@@ -1,13 +1,12 @@
+import Message from '@p2p/commands/commands/message'
+import PingMessage from '@p2p/commands/commands/ping'
+import RejectMessage from '@p2p/commands/commands/reject'
+import VersionMessage from '@p2p/commands/commands/version'
+import Messages from '@p2p/commands/messages'
 import EventEmitter from 'events'
 import { Socket } from 'net'
-
-import { IChain } from '@/lib'
-import BufferReader from '@/lib/encoding/buffer-reader'
-import Message from '@/p2p/commands/commands/message'
-import PingMessage from '@/p2p/commands/commands/ping'
-import RejectMessage from '@/p2p/commands/commands/reject'
-import VersionMessage from '@/p2p/commands/commands/version'
-import Messages from '@/p2p/commands/messages'
+import { IChain } from 'vipsinfo-lib/chain'
+import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
 
 const MAX_RECEIVE_BUFFER = 10000000
 export const status: { [key: string]: string } = {

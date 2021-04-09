@@ -1,8 +1,8 @@
-import Transaction from '@/lib/transaction'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@/p2p/commands/commands/message'
+} from '@p2p/commands/commands/message'
+import Transaction from 'vipsinfo-lib/transaction'
 
 export interface TxMessageOptions extends MessageOptions {
   transaction?: Transaction

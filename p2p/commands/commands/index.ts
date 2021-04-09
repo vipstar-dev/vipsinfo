@@ -1,38 +1,36 @@
-import AddrMessage, { AddrMessageOptions } from '@/p2p/commands/commands/addr'
-import BlockMessage, {
-  BlockMessageOptions,
-} from '@/p2p/commands/commands/block'
+import AddrMessage, { AddrMessageOptions } from '@p2p/commands/commands/addr'
+import BlockMessage, { BlockMessageOptions } from '@p2p/commands/commands/block'
 import FeeFilterMessage, {
   FeeFilterMessageOptions,
-} from '@/p2p/commands/commands/feefilter'
-import GetAddrMessage from '@/p2p/commands/commands/getaddr'
+} from '@p2p/commands/commands/feefilter'
+import GetAddrMessage from '@p2p/commands/commands/getaddr'
 import GetBlocksMessage, {
   GetBlocksMessageOptions,
-} from '@/p2p/commands/commands/getblocks'
+} from '@p2p/commands/commands/getblocks'
 import GetDataMessage, {
   GetDataMessageOptions,
-} from '@/p2p/commands/commands/getdata'
+} from '@p2p/commands/commands/getdata'
 import GetHeadersMessage, {
   GetHeadersMessageOptions,
-} from '@/p2p/commands/commands/getheaders'
+} from '@p2p/commands/commands/getheaders'
 import HeadersMessage, {
   HeadersMessageOptions,
-} from '@/p2p/commands/commands/headers'
-import InvMessage, { InvMessageOptions } from '@/p2p/commands/commands/inv'
-import MempoolMessage from '@/p2p/commands/commands/mempool'
-import { MessageOptions } from '@/p2p/commands/commands/message'
-import PingMessage, { PingMessageOptions } from '@/p2p/commands/commands/ping'
-import PongMessage, { PongMessageOptions } from '@/p2p/commands/commands/pong'
+} from '@p2p/commands/commands/headers'
+import InvMessage, { InvMessageOptions } from '@p2p/commands/commands/inv'
+import MempoolMessage from '@p2p/commands/commands/mempool'
+import { MessageOptions } from '@p2p/commands/commands/message'
+import PingMessage, { PingMessageOptions } from '@p2p/commands/commands/ping'
+import PongMessage, { PongMessageOptions } from '@p2p/commands/commands/pong'
 import RejectMessage, {
   RejectMessageOptions,
-} from '@/p2p/commands/commands/reject'
-import SendCmpctMessage from '@/p2p/commands/commands/sendcmpct'
-import SendHeadersMessage from '@/p2p/commands/commands/sendheaders'
-import TxMessage, { TxMessageOptions } from '@/p2p/commands/commands/tx'
-import VerackMessage from '@/p2p/commands/commands/verack'
+} from '@p2p/commands/commands/reject'
+import SendCmpctMessage from '@p2p/commands/commands/sendcmpct'
+import SendHeadersMessage from '@p2p/commands/commands/sendheaders'
+import TxMessage, { TxMessageOptions } from '@p2p/commands/commands/tx'
+import VerackMessage from '@p2p/commands/commands/verack'
 import VersionMessage, {
   VersionMessageOptions,
-} from '@/p2p/commands/commands/version'
+} from '@p2p/commands/commands/version'
 
 export type CommandNames =
   | 'addr'

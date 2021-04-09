@@ -73,6 +73,7 @@
     "uuid": "^3.3.3"
   },
   "workspaces": [
-    "lib/*"
+    "lib/*",
+    "p2p/*"
   ]
 }

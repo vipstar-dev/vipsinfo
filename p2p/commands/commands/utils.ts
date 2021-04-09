@@ -1,8 +1,7 @@
+import { InventoryConstructor } from '@p2p/commands/inventory'
 import { randomBytes } from 'crypto'
-
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
-import { InventoryConstructor } from '@/p2p/commands/inventory'
+import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
+import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
 
 export interface IpAddress {
   v4?: string

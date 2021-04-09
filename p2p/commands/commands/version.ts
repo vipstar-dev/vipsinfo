@@ -1,16 +1,16 @@
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@/p2p/commands/commands/message'
+} from '@p2p/commands/commands/message'
 import {
   AddressData,
   getNonce,
   parseAddress,
   writeAddress,
-} from '@/p2p/commands/commands/utils'
-import packageInfo from '@/package.json'
+} from '@p2p/commands/commands/utils'
+import packageInfo from '@p2p/package.json'
+import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
+import BufferWriter from 'vipsinfo-lib/encoding/buffer-writer'
 
 export interface VersionMessageOptions extends MessageOptions {
   protocolVersion?: number

@@ -1,9 +1,9 @@
-import BufferReader from '@/lib/encoding/buffer-reader'
 import Message, {
   IMessage,
   MessageOptions,
-} from '@/p2p/commands/commands/message'
-import { getNonce } from '@/p2p/commands/commands/utils'
+} from '@p2p/commands/commands/message'
+import { getNonce } from '@p2p/commands/commands/utils'
+import BufferReader from 'vipsinfo-lib/encoding/buffer-reader'
 
 export interface PongMessageOptions extends MessageOptions {
   nonce?: Buffer

@@ -1,0 +1,23 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@p2p/*": [
+        "./*"
+      ]
+    },
+    "declaration": true,
+    "typeRoots": [
+      "types"
+    ],
+    "outDir": "dist",
+    "noEmit": false
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "./dist"
+  ]
+}
