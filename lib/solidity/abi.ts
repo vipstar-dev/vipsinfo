@@ -210,4 +210,9 @@ function transformABIList(
 export const qrc20ABIs = transformABIList(qrc20List)
 export const qrc721ABIs = transformABIList(qrc721List)
 
-Object.assign(exports, { MethodABI, EventABI, qrc20ABIs, qrc721ABIs })
+export default {
+  MethodABI,
+  EventABI,
+  qrc20ABIs,
+  qrc721ABIs,
+}
