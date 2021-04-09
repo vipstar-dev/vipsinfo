@@ -2,7 +2,7 @@ import assert from 'assert'
 import LRU from 'lru-cache'
 import Sequelize, { ModelCtor, Optional } from 'sequelize'
 
-import Block, { IBlock } from '@/lib/block/block'
+import { Block, IBlock } from '@/lib'
 import { IBus } from '@/node/bus'
 import BlockModel, { BlockCreationAttributes } from '@/node/models/block'
 import HeaderModel from '@/node/models/header'

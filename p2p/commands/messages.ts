@@ -1,6 +1,4 @@
-import { IChain } from '@/lib'
-import { sha256d } from '@/lib/crypto/hash'
-import BufferReader from '@/lib/encoding/buffer-reader'
+import { BufferReader, IChain, sha256d } from '@/lib'
 import messageList, {
   CommandNames,
   Commands,

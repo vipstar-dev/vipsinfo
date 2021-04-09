@@ -1,7 +1,6 @@
 import { randomBytes } from 'crypto'
 
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
+import { BufferReader, BufferWriter } from '@/lib'
 import { InventoryConstructor } from '@/p2p/commands/inventory'
 
 export interface IpAddress {

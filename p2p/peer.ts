@@ -1,8 +1,7 @@
 import EventEmitter from 'events'
 import { Socket } from 'net'
 
-import { IChain } from '@/lib'
-import BufferReader from '@/lib/encoding/buffer-reader'
+import { BufferReader, IChain } from '@/lib'
 import Message from '@/p2p/commands/commands/message'
 import PingMessage from '@/p2p/commands/commands/ping'
 import RejectMessage from '@/p2p/commands/commands/reject'

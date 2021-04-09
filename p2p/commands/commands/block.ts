@@ -1,4 +1,4 @@
-import Block, { IBlock } from '@/lib/block/block'
+import { Block, IBlock } from '@/lib'
 import Message, {
   IMessage,
   MessageOptions,

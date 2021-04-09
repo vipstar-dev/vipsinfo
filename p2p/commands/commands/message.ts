@@ -1,8 +1,6 @@
 import assert from 'assert'
 
-import { IChain, sha256d } from '@/lib'
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
+import { BufferReader, BufferWriter, IChain, sha256d } from '@/lib'
 
 export interface MessageOptions {
   chain: IChain

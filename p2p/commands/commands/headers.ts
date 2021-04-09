@@ -1,6 +1,4 @@
-import Header from '@/lib/block/header'
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
+import { BufferReader, BufferWriter, Header } from '@/lib'
 import Message, {
   IMessage,
   MessageOptions,

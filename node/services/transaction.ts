@@ -7,10 +7,8 @@ import {
 } from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
 
-import { ITransaction, ITransactionInput, ITransactionOutput } from '@/lib'
-import Address from '@/lib/address'
-import Opcode from '@/lib/script/opcode'
-import OutputScript, {
+import {
+  Address,
   IContractOutputScript,
   IEVMContractCallBySenderScript,
   IEVMContractCallScript,
@@ -21,9 +19,14 @@ import OutputScript, {
   IPublicKeyHashOutputScript,
   IPublicKeyOutputScript,
   IScriptHashOutputScript,
+  ITransaction,
+  ITransactionInput,
+  ITransactionOutput,
   IWitnessV0KeyHashOutputScript,
   IWitnessV0ScriptHashOut,
-} from '@/lib/script/output'
+  Opcode,
+  OutputScript,
+} from '@/lib'
 import AddressModel, {
   AddressCreationAttributes,
   AddressModelAttributes,

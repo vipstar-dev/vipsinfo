@@ -1,8 +1,7 @@
 import assert from 'assert'
 import { ModelCtor, Op } from 'sequelize'
 
-import { IBlock } from '@/lib'
-import Header, { IHeader } from '@/lib/block/header'
+import { Header, IBlock, IHeader } from '@/lib'
 import { IBus } from '@/node/bus'
 import HeaderModel, { HeaderCreationAttributes } from '@/node/models/header'
 import { Services } from '@/node/node'

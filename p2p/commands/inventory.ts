@@ -1,5 +1,4 @@
-import BufferReader from '@/lib/encoding/buffer-reader'
-import BufferWriter from '@/lib/encoding/buffer-writer'
+import { BufferReader, BufferWriter } from '@/lib'
 
 export interface InventoryConstructor {
   type?: number

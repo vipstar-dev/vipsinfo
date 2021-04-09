@@ -1,7 +1,7 @@
 import { ModelCtor } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
-import Header from '@/lib/block/header'
+import { Header } from '@/lib'
 import Address from '@/node/models/address'
 import BalanceChange from '@/node/models/balance-change'
 import Block from '@/node/models/block'

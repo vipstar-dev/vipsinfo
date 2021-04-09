@@ -1,4 +1,4 @@
-import BufferReader from '@/lib/encoding/buffer-reader'
+import { BufferReader } from '@/lib'
 import Message, {
   IMessage,
   MessageOptions,

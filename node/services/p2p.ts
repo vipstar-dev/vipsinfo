@@ -1,21 +1,17 @@
 import LRU from 'lru-cache'
 
-import { IBlock } from '@/lib/block/block'
+import { Header, IBlock, IChain, Transaction } from '@/lib'
 import { Services } from '@/node/node'
 import Service, { BaseConfig, IService } from '@/node/services/base'
+import { Peer, Pool, PoolConstructor } from '@/p2p'
 import {
   InventoryConstructor,
   types as InvTypes,
 } from '@/p2p/commands/inventory'
 import Messages from '@/p2p/commands/messages'
-import Peer from '@/p2p/peer'
-import Pool, { PoolConstructor } from '@/p2p/pool'
 import Timeout = NodeJS.Timeout
 import EventEmitter from 'events'
 
-import { IChain } from '@/lib'
-import Header from '@/lib/block/header'
-import Transaction from '@/lib/transaction'
 import BlockMessage from '@/p2p/commands/commands/block'
 import GetDataMessage from '@/p2p/commands/commands/getdata'
 import { GetHeadersMessageOptions } from '@/p2p/commands/commands/getheaders'

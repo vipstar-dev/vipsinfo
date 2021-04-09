@@ -2,7 +2,7 @@ import assert from 'assert'
 import EventEmitter from 'events'
 import { Optional } from 'sequelize'
 
-import Chain, { chainType, IChain } from '@/lib/chain'
+import { Chain, chainType, IChain } from '@/lib'
 import Bus, { IBus } from '@/node/bus'
 import Logger, { ILogger } from '@/node/logger'
 import Base, {

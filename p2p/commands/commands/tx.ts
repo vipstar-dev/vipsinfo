@@ -1,4 +1,4 @@
-import Transaction from '@/lib/transaction'
+import { Transaction } from '@/lib'
 import Message, {
   IMessage,
   MessageOptions,
