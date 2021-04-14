@@ -672,6 +672,7 @@ class BlockService extends Service implements IBlockService {
       header = await HeaderModel.findByHash(rawBlock.hash, {
         attributes: ['height', 'stakePrevTxId', 'stakeOutputIndex'],
       })
+      if (this.reorging) return
     } while (!header)
     const isProofOfStake = header.isProofOfStake
     const minerId = (
