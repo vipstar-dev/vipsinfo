@@ -185,11 +185,10 @@ class MempoolService extends Service implements IMempoolService {
         }
         txos.push([item._id, input?.outputIndex as number])
       }
+      const txosString = txos.map((txo) => `(${txo[0]}, ${txo[1]})`).join(', ')
       const [{ count }] = await this.db.query(
         sql([
-          `SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN (${txos.join(
-            ', '
-          )})`,
+          `SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN (${txosString})`,
         ]),
         { type: QueryTypes.SELECT }
       )

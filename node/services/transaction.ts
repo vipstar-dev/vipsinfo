@@ -354,18 +354,19 @@ class TransactionService extends Service implements ITransactionService {
             { where: { transactionId: { [$in]: _ids } } }
           ),
         ])
+        const idsString = _ids.join('')
         await this.db?.query(
           sql([
             `UPDATE transaction_output output, transaction_input input
              SET output.input_height = ${block.height}
-             WHERE input.transaction_id IN ${_ids} AND output.transaction_id = input.output_id AND output.output_index = input.output_index`,
+             WHERE input.transaction_id IN (${idsString}) AND output.transaction_id = input.output_id AND output.output_index = input.output_index`,
           ])
         )
         await this.db?.query(
           sql([
             `UPDATE address, transaction_output output
              SET address.create_height = LEAST(address.create_height, ${block.height})
-             WHERE address._id = output.address_id AND output.transaction_id IN ${_ids}`,
+             WHERE address._id = output.address_id AND output.transaction_id IN (${idsString})`,
           ])
         )
       }
