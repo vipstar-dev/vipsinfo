@@ -611,18 +611,22 @@ class BlockService extends Service implements IBlockService {
       for (const service of this.node.getServicesByOrder()) {
         await service.onBlock(rawBlock)
       }
-      await this.__onBlock(rawBlock)
-      this.recentBlockHashes.set(
-        rawBlock.hash.toString('hex'),
-        rawBlock.header?.prevHash as Buffer
-      )
-      await this._setTip({
-        hash: rawBlock.hash,
-        height: rawBlock.height as number,
-      })
-      this.processingBlock = false
-      for (const subscription of this.subscriptions.block) {
-        subscription.emit('block/block', rawBlock)
+      const processedBlock = await this.__onBlock(rawBlock)
+      if (processedBlock) {
+        this.recentBlockHashes.set(
+          rawBlock.hash.toString('hex'),
+          rawBlock.header?.prevHash as Buffer
+        )
+        await this._setTip({
+          hash: rawBlock.hash,
+          height: rawBlock.height as number,
+        })
+        this.processingBlock = false
+        for (const subscription of this.subscriptions.block) {
+          subscription.emit('block/block', rawBlock)
+        }
+      } else {
+        this.processingBlock = false
       }
     } catch (err) {
       this.processingBlock = false
