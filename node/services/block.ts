@@ -520,8 +520,7 @@ class BlockService extends Service implements IBlockService {
         commonAncestorHeader
       )
       assert(
-        blocksToRemove.length > 0 &&
-          blocksToRemove.length <= this.recentBlockHashes.length,
+        blocksToRemove.length <= this.recentBlockHashes.length,
         'Block Service: the number of blocks to remove looks incorrect'
       )
       this.logger.warn(
