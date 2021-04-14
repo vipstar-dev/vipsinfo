@@ -692,7 +692,8 @@ class BlockService extends Service implements IBlockService {
           },
         ],
       })
-    )?.addressId as bigint
+    )?.addressId
+    if (!minerId || this.reorging) return
     return await this.Block?.create({
       hash: rawBlock.hash,
       height: header.height,
