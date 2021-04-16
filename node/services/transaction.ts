@@ -675,9 +675,6 @@ class TransactionService extends Service implements ITransactionService {
       filter = sql([`block_height = ${block.height}`])
     }
 
-    const t = await this.db?.transaction({
-      isolationLevel: SequelizeTransaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
-    })
     try {
       await this.db?.query(
         sql([
@@ -699,11 +696,7 @@ class TransactionService extends Service implements ITransactionService {
            LEFT JOIN transaction tx ON tx._id = list.transaction_id`,
         ])
       )
-      await t?.commit()
-    } catch (err) {
-      await t?.rollback()
-      throw err
-    }
+    } catch (e) {}
   }
 
   async processReceipts(
