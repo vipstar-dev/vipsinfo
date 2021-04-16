@@ -102,20 +102,6 @@ class TransactionService extends Service implements ITransactionService {
   private tip: ITip | undefined
   private synced: boolean = false
   private db: Sequelize | undefined
-  private Address: ModelCtor<AddressModel> | undefined
-  private Transaction: ModelCtor<TransactionModel> | undefined
-  private Witness: ModelCtor<WitnessModel> | undefined
-  private TransactionOutput: ModelCtor<TransactionOutputModel> | undefined
-  private TransactionInput: ModelCtor<TransactionInputModel> | undefined
-  private TransactionOutputMapping:
-    | ModelCtor<TransactionOutputMappingModel>
-    | undefined
-  private BalanceChange: ModelCtor<BalanceChangeModel> | undefined
-  private GasRefund: ModelCtor<GasRefundModel> | undefined
-  private ContractSpend: ModelCtor<ContractSpendModel> | undefined
-  private EVMReceipt: ModelCtor<EvmReceiptModel> | undefined
-  private EVMReceiptLog: ModelCtor<EvmReceiptLogModel> | undefined
-  private EVMReceiptMapping: ModelCtor<EvmReceiptMappingModel> | undefined
 
   static get dependencies(): Services[] {
     return ['block', 'db']
@@ -127,75 +113,44 @@ class TransactionService extends Service implements ITransactionService {
 
   async start(): Promise<void> {
     this.db = this.node.addedMethods.getDatabase?.()
-    const getModelFn = this.node.addedMethods.getModel
-    if (getModelFn) {
-      this.Address = getModelFn('address') as ModelCtor<AddressModel>
-      this.Transaction = getModelFn(
-        'transaction'
-      ) as ModelCtor<TransactionModel>
-      this.Witness = getModelFn('witness') as ModelCtor<WitnessModel>
-      this.TransactionOutput = getModelFn(
-        'transaction_output'
-      ) as ModelCtor<TransactionOutputModel>
-      this.TransactionInput = getModelFn(
-        'transaction_input'
-      ) as ModelCtor<TransactionInputModel>
-      this.TransactionOutputMapping = getModelFn(
-        'transaction_output_mapping'
-      ) as ModelCtor<TransactionOutputMappingModel>
-      this.BalanceChange = getModelFn(
-        'balance_change'
-      ) as ModelCtor<BalanceChangeModel>
-      this.GasRefund = getModelFn('gas_refund') as ModelCtor<GasRefundModel>
-      this.ContractSpend = getModelFn(
-        'contract_spend'
-      ) as ModelCtor<ContractSpendModel>
-      this.EVMReceipt = getModelFn('evm_receipt') as ModelCtor<EvmReceiptModel>
-      this.EVMReceiptLog = getModelFn(
-        'evm_receipt_log'
-      ) as ModelCtor<EvmReceiptLogModel>
-      this.EVMReceiptMapping = getModelFn(
-        'evm_receipt_mapping'
-      ) as ModelCtor<EvmReceiptMappingModel>
-      this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
-      const blockTip = this.node.addedMethods.getBlockTip?.()
-      if (this.tip && blockTip && this.tip.height > blockTip.height) {
-        this.tip = { height: blockTip.height, hash: blockTip.hash } as ITip
-      }
-      if (this.tip) {
-        await this.TransactionOutput.destroy({
-          where: { blockHeight: { [$gt]: this.tip?.height } },
-        })
-        await this.db?.query(
-          sql([
-            `UPDATE transaction_output output, transaction_input input
-           SET output.input_id = 0, output.input_index = 0xffffffff, output.input_height = NULL
-           WHERE output.transaction_id = input.output_id AND output.output_index = input.output_index AND input.block_height > ${this.tip?.height}`,
-          ])
-        )
-        await this.TransactionInput.destroy({
-          where: { blockHeight: { [$gt]: this.tip.height } },
-        })
-        await this.db?.query(
-          sql([
-            `DELETE tx, witness, receipt, log, refund, contract_spend, balance
-           FROM transaction tx
-           LEFT JOIN witness ON witness.transaction_id = tx.id
-           LEFT JOIN evm_receipt receipt ON receipt.transaction_id = tx._id
-           LEFT JOIN evm_receipt_log log ON log.receipt_id = receipt._id
-           LEFT JOIN gas_refund refund ON refund.transaction_id = tx.id
-           LEFT JOIN contract_spend ON contract_spend.source_id = tx.id
-           LEFT JOIN balance_change balance ON balance.transaction_id = tx._id
-           WHERE tx.block_height > ${this.tip.height}`,
-          ])
-        )
-        await this.Address.destroy({
-          where: { createHeight: { [$gt]: this.tip.height } },
-        })
-        await this.TransactionOutputMapping.destroy({ truncate: true })
-        await this.EVMReceiptMapping.destroy({ truncate: true })
-        await this.node.addedMethods.updateServiceTip?.(this.name, this.tip)
-      }
+    this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
+    const blockTip = this.node.addedMethods.getBlockTip?.()
+    if (this.tip && blockTip && this.tip.height > blockTip.height) {
+      this.tip = { height: blockTip.height, hash: blockTip.hash } as ITip
+    }
+    if (this.tip) {
+      await TransactionOutputModel.destroy({
+        where: { blockHeight: { [$gt]: this.tip?.height } },
+      })
+      await this.db?.query(
+        sql([
+          `UPDATE transaction_output output, transaction_input input
+         SET output.input_id = 0, output.input_index = 0xffffffff, output.input_height = NULL
+         WHERE output.transaction_id = input.output_id AND output.output_index = input.output_index AND input.block_height > ${this.tip?.height}`,
+        ])
+      )
+      await TransactionInputModel.destroy({
+        where: { blockHeight: { [$gt]: this.tip.height } },
+      })
+      await this.db?.query(
+        sql([
+          `DELETE tx, witness, receipt, log, refund, contract_spend, balance
+         FROM transaction tx
+         LEFT JOIN witness ON witness.transaction_id = tx.id
+         LEFT JOIN evm_receipt receipt ON receipt.transaction_id = tx._id
+         LEFT JOIN evm_receipt_log log ON log.receipt_id = receipt._id
+         LEFT JOIN gas_refund refund ON refund.transaction_id = tx.id
+         LEFT JOIN contract_spend ON contract_spend.source_id = tx.id
+         LEFT JOIN balance_change balance ON balance.transaction_id = tx._id
+         WHERE tx.block_height > ${this.tip.height}`,
+        ])
+      )
+      await AddressModel.destroy({
+        where: { createHeight: { [$gt]: this.tip.height } },
+      })
+      await TransactionOutputMappingModel.destroy({ truncate: true })
+      await EvmReceiptMappingModel.destroy({ truncate: true })
+      await this.node.addedMethods.updateServiceTip?.(this.name, this.tip)
     }
   }
 
@@ -229,19 +184,19 @@ class TransactionService extends Service implements ITransactionService {
          AND tx.index_in_block = 0`,
       ])
     )
-    await this.Transaction?.update(
+    await TransactionModel.update(
       { blockHeight: 0xffffffff, indexInBlock: 0xffffffff },
       { where: { blockHeight: { [$gt]: height } } }
     )
-    await this.TransactionOutput?.update(
+    await TransactionOutputModel.update(
       { blockHeight: 0xffffffff },
       { where: { blockHeight: { [$gt]: height } } }
     )
-    await this.EVMReceipt?.update(
+    await EvmReceiptModel.update(
       { blockHeight: 0xffffffff, indexInBlock: 0xffffffff },
       { where: { blockHeight: { [$gt]: height } } }
     )
-    await this.EVMReceiptLog?.destroy({
+    await EvmReceiptLogModel.destroy({
       where: { blockHeight: { [$gt]: height } },
     })
     await this.db?.query(
@@ -258,7 +213,7 @@ class TransactionService extends Service implements ITransactionService {
          WHERE balance.transaction_id = tx._id AND tx.block_height > ${height}`,
       ])
     )
-    await this.Address?.update(
+    await AddressModel.update(
       { createHeight: 0xffffffff },
       { where: { createHeight: { [$gt]: height } } }
     )
@@ -318,7 +273,7 @@ class TransactionService extends Service implements ITransactionService {
       block.height !== undefined
     ) {
       const mempoolTransactions: Pick<TransactionModel, '_id' | 'id'>[] =
-        (await this.Transaction?.findAll({
+        (await TransactionModel.findAll({
           where: {
             id: {
               /*
@@ -345,11 +300,11 @@ class TransactionService extends Service implements ITransactionService {
           ids.map((id: Buffer) => id.toString('hex'))
         )
         await Promise.all([
-          this.TransactionOutput?.update(
+          TransactionOutputModel.update(
             { blockHeight: block.height },
             { where: { transactionId: { [$in]: _ids } } }
           ),
-          this.TransactionInput?.update(
+          TransactionInputModel.update(
             { blockHeight: block.height },
             { where: { transactionId: { [$in]: _ids } } }
           ),
@@ -396,7 +351,7 @@ class TransactionService extends Service implements ITransactionService {
         newTransactions.push(tx)
         witnesses.push(...this.groupWitnesses(tx))
       }
-      await this.Transaction?.bulkCreate(txs, {
+      await TransactionModel.bulkCreate(txs, {
         updateOnDuplicate: ['blockHeight', 'indexInBlock'],
         validate: false,
       })
@@ -424,26 +379,28 @@ class TransactionService extends Service implements ITransactionService {
         })
         witnesses.push(...this.groupWitnesses(tx))
       }
-      await this.Transaction?.bulkCreate(txs, { validate: false })
+      await TransactionModel.bulkCreate(txs, { validate: false })
     }
-    await this.Witness?.bulkCreate(witnesses, { validate: false })
-    if (this.Transaction) {
-      const ids = (
-        await this.Transaction.findAll({
-          where: {
-            id: {
-              [$in]: newTransactions.map(
-                (tx: TransactionModel | ITransactionAndModelSetting) => tx.id
-              ),
-            },
+    for (const witness of witnesses) {
+      try {
+        await WitnessModel.create(witness, { validate: false })
+      } catch (e) {}
+    }
+    const ids = (
+      await TransactionModel.findAll({
+        where: {
+          id: {
+            [$in]: newTransactions.map(
+              (tx: TransactionModel | ITransactionAndModelSetting) => tx.id
+            ),
           },
-          attributes: ['_id'],
-          order: [['_id', 'ASC']],
-        })
-      ).map((tx: Pick<TransactionModel, '_id'>) => tx._id)
-      for (let i = 0; i < newTransactions.length; ++i) {
-        newTransactions[i]._id = ids[i]
-      }
+        },
+        attributes: ['_id'],
+        order: [['_id', 'ASC']],
+      })
+    ).map((tx: Pick<TransactionModel, '_id'>) => tx._id)
+    for (let i = 0; i < newTransactions.length; ++i) {
+      newTransactions[i]._id = ids[i]
     }
     return newTransactions
   }
@@ -554,19 +511,17 @@ class TransactionService extends Service implements ITransactionService {
       newAddressItems.push({ type, data, string, createHeight })
     }
 
-    if (this.Address) {
-      for (const { _id, type, data } of await this.Address.bulkCreate(
-        newAddressItems,
-        {
-          validate: false,
-        }
-      )) {
-        const key = `${data.toString('hex')}/${type}`
-        const item = addressMap.get(key)
-        if (item) {
-          for (const [index, outputIndex] of item.indices) {
-            addressIds[index][outputIndex] = _id
-          }
+    for (const { _id, type, data } of await AddressModel.bulkCreate(
+      newAddressItems,
+      {
+        validate: false,
+      }
+    )) {
+      const key = `${data.toString('hex')}/${type}`
+      const item = addressMap.get(key)
+      if (item) {
+        for (const [index, outputIndex] of item.indices) {
+          addressIds[index][outputIndex] = _id
         }
       }
     }
@@ -641,23 +596,26 @@ class TransactionService extends Service implements ITransactionService {
         })
       }
     }
-    if (this.TransactionInput && this.TransactionOutput && this.db) {
-      const promiseList: Promise<any>[] = [
-        this.TransactionOutput?.bulkCreate(outputTxos, { validate: false }),
-        this.TransactionInput?.bulkCreate(inputTxos, { validate: false }),
-      ]
+    if (this.db) {
+      for (const outputTxo of outputTxos) {
+        try {
+          await TransactionOutputModel.create(outputTxo, { validate: false })
+        } catch (e) {}
+      }
+      for (const inputTxo of inputTxos) {
+        try {
+          await TransactionInputModel.create(inputTxo, { validate: false })
+        } catch (e) {}
+      }
       if (mappings.length) {
-        promiseList.push(
-          this.db.query(
-            sql([
-              `INSERT INTO transaction_output_mapping (_id, input_transaction_id, input_index, output_transaction_id, output_index) VALUES ${mappings.join(
-                ', '
-              )}`,
-            ])
-          )
+        await this.db.query(
+          sql([
+            `INSERT INTO transaction_output_mapping (_id, input_transaction_id, input_index, output_transaction_id, output_index) VALUES ${mappings.join(
+              ', '
+            )}`,
+          ])
         )
       }
-      await Promise.all(promiseList)
       if (mappings.length) {
         await this.db.query(
           sql([
@@ -675,7 +633,7 @@ class TransactionService extends Service implements ITransactionService {
         isolationLevel: SequelizeTransaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
       })
       try {
-        await this.TransactionOutputMapping?.destroy({
+        await TransactionOutputMappingModel.destroy({
           where: { _id: mappingId },
           transaction: t,
         })
@@ -786,13 +744,13 @@ class TransactionService extends Service implements ITransactionService {
               | IEVMContractCallBySenderScript
               | IEVMContractCreateBySenderScript).senderData
           } else {
-            const transactionInput = await this.TransactionInput?.findOne({
+            const transactionInput = await TransactionInputModel.findOne({
               // @ts-ignore
               where: { transactionId: tx._id, inputIndex: 0 },
               attributes: [],
               include: [
                 {
-                  model: this.Address,
+                  model: AddressModel.scope(),
                   as: 'address',
                   required: true,
                   attributes: ['type', 'data'],
@@ -823,19 +781,14 @@ class TransactionService extends Service implements ITransactionService {
       }
     }
     if (receipts.length) {
-      await this.EVMReceipt?.bulkCreate(receipts, { validate: false })
+      await EvmReceiptModel.bulkCreate(receipts, { validate: false })
     }
   }
 
   async _processContracts(block: BlockObject): Promise<void> {
-    if (
-      this.Transaction &&
-      this.TransactionInput &&
-      this.TransactionOutput &&
-      block.header
-    ) {
+    if (block.header) {
       const transactionIds: bigint[] = (
-        await this.Transaction.findAll({
+        await TransactionModel.findAll({
           where: { blockHeight: block.height },
           attributes: ['_id'],
           order: [['indexInBlock', 'ASC']],
@@ -892,7 +845,7 @@ class TransactionService extends Service implements ITransactionService {
           }
         }
         if (contractSpends.length) {
-          await this.ContractSpend?.bulkCreate(contractSpends, {
+          await ContractSpendModel.bulkCreate(contractSpends, {
             validate: false,
           })
         }
@@ -955,13 +908,13 @@ class TransactionService extends Service implements ITransactionService {
               }
             )
           })
-          const refundTxos = await this.TransactionOutput.findAll({
+          const refundTxos = await TransactionOutputModel.findAll({
             where: {
               outputIndex: { [$gt]: block.header.isProofOfStake ? 1 : 0 },
             },
             attributes: ['outputIndex', 'value', 'addressId'],
             include: {
-              model: this.Transaction,
+              model: TransactionModel.scope(),
               as: 'transaction',
               required: true,
               where: {
@@ -975,12 +928,12 @@ class TransactionService extends Service implements ITransactionService {
             Pick<AddressCreationAttributes, '_id' | 'type' | 'data'>
           > = new Map(
             (
-              await this.TransactionInput.findAll({
+              await TransactionInputModel.findAll({
                 where: { inputIndex: 0 },
                 attributes: [],
                 include: [
                   {
-                    model: this.Transaction,
+                    model: TransactionModel.scope(),
                     as: 'transaction',
                     required: true,
                     where: {
@@ -993,7 +946,7 @@ class TransactionService extends Service implements ITransactionService {
                     attributes: ['id'],
                   },
                   {
-                    model: this.Address,
+                    model: AddressModel.scope(),
                     as: 'address',
                     required: true,
                     attributes: ['_id', 'type', 'data'],
@@ -1115,12 +1068,10 @@ class TransactionService extends Service implements ITransactionService {
             }
           }
         }
-        if (this.GasRefund && this.EVMReceiptMapping) {
-          await Promise.all([
-            this.GasRefund.bulkCreate(gasRefunds, { validate: false }),
-            this.EVMReceiptMapping.bulkCreate(receipts, { validate: false }),
-          ])
-        }
+        await Promise.all([
+          GasRefundModel.bulkCreate(gasRefunds, { validate: false }),
+          EvmReceiptMappingModel.bulkCreate(receipts, { validate: false }),
+        ])
         await this.db?.query(
           sql([
             `UPDATE evm_receipt receipt, evm_receipt_mapping mapping
@@ -1130,24 +1081,22 @@ class TransactionService extends Service implements ITransactionService {
              WHERE receipt.transaction_id = mapping.transaction_id AND receipt.output_index = mapping.output_index`,
           ])
         )
-        await this.EVMReceiptMapping?.destroy({ truncate: true })
-        if (this.EVMReceipt) {
-          const receiptIds = (
-            await this.EVMReceipt?.findAll({
-              where: { blockHeight: block.height },
-              attributes: ['_id'],
-              order: [
-                ['indexInBlock', 'ASC'],
-                ['transactionId', 'ASC'],
-                ['outputIndex', 'ASC'],
-              ],
-            })
-          ).map((receipt) => receipt._id)
-          for (const log of receiptLogs) {
-            log.receiptId = receiptIds[Number(log.receiptId)]
-          }
-          await this.EVMReceiptLog?.bulkCreate(receiptLogs, { validate: false })
+        await EvmReceiptMappingModel.destroy({ truncate: true })
+        const receiptIds = (
+          await EvmReceiptModel.findAll({
+            where: { blockHeight: block.height },
+            attributes: ['_id'],
+            order: [
+              ['indexInBlock', 'ASC'],
+              ['transactionId', 'ASC'],
+              ['outputIndex', 'ASC'],
+            ],
+          })
+        ).map((receipt) => receipt._id)
+        for (const log of receiptLogs) {
+          log.receiptId = receiptIds[Number(log.receiptId)]
         }
+        await EvmReceiptLogModel.bulkCreate(receiptLogs, { validate: false })
       }
     }
   }
@@ -1155,63 +1104,56 @@ class TransactionService extends Service implements ITransactionService {
   async removeReplacedTransactions(
     tx: TransactionModel | ITransactionAndModelSetting
   ): Promise<boolean | void> {
-    if (this.Transaction) {
-      const prevTxs: Pick<
-        TransactionModel,
-        '_id' | 'id'
-      >[] = await this.Transaction.findAll({
-        where: {
-          id: {
-            [$in]: tx.inputs.map(
-              (input: TransactionInputModel | ITransactionInput | undefined) =>
-                input && 'prevTxId' in input ? input.prevTxId : undefined
-            ),
-          },
+    const prevTxs: Pick<
+      TransactionModel,
+      '_id' | 'id'
+    >[] = await TransactionModel.findAll({
+      where: {
+        id: {
+          [$in]: tx.inputs.map(
+            (input: TransactionInputModel | ITransactionInput | undefined) =>
+              input && 'prevTxId' in input ? input.prevTxId : undefined
+          ),
         },
-        attributes: ['_id', 'id'],
+      },
+      attributes: ['_id', 'id'],
+    })
+    const inputTxos: (bigint | number)[][] = []
+    for (const input of tx.inputs) {
+      const prevTxId = (input as ITransactionInput).prevTxId || undefined
+      const item = prevTxs.find((tx) => {
+        return Buffer.compare(tx.id, prevTxId || Buffer.alloc(0)) === 0
       })
-      const inputTxos: (bigint | number)[][] = []
-      for (const input of tx.inputs) {
-        const prevTxId = (input as ITransactionInput).prevTxId || undefined
-        const item = prevTxs.find((tx) => {
-          return Buffer.compare(tx.id, prevTxId || Buffer.alloc(0)) === 0
-        })
-        if (!item) {
-          return false
-        }
-        if (input) {
-          inputTxos.push([item._id, input.outputIndex as number])
-        }
+      if (!item) {
+        return false
       }
-      if (this.db) {
-        const inputTxosString: string = inputTxos
-          .map((value: (number | bigint)[]) => `(${value[0]}, ${value[1]})`)
-          .join(', ')
-        const transactionsToRemove: bigint[] = (
-          await this.db.query<{ id: bigint }>(
-            sql([
-              `SELECT DISTINCT(input_id) AS id FROM transaction_output
-               WHERE (transaction_id, output_index) IN (${inputTxosString}) AND input_id > 0`,
-            ]),
-            { type: QueryTypes.SELECT }
-          )
-        ).map((tx: { id: bigint }) => tx.id)
-        for (const id of transactionsToRemove) {
-          await this._removeMempoolTransaction(id)
-        }
+      if (input) {
+        inputTxos.push([item._id, input.outputIndex as number])
+      }
+    }
+    if (this.db) {
+      const inputTxosString: string = inputTxos
+        .map((value: (number | bigint)[]) => `(${value[0]}, ${value[1]})`)
+        .join(', ')
+      const transactionsToRemove: bigint[] = (
+        await this.db.query<{ id: bigint }>(
+          sql([
+            `SELECT DISTINCT(input_id) AS id FROM transaction_output
+             WHERE (transaction_id, output_index) IN (${inputTxosString}) AND input_id > 0`,
+          ]),
+          { type: QueryTypes.SELECT }
+        )
+      ).map((tx: { id: bigint }) => tx.id)
+      for (const id of transactionsToRemove) {
+        await this._removeMempoolTransaction(id)
       }
     }
   }
 
   async _removeMempoolTransaction(id: bigint): Promise<void> {
-    if (
-      this.db &&
-      this.TransactionInput &&
-      this.TransactionOutput &&
-      this.BalanceChange
-    ) {
+    if (this.db) {
       const transactionsToRemove: bigint[] = (
-        await this.TransactionOutput.findAll({
+        await TransactionOutputModel.findAll({
           where: { transactionId: Number(id) },
           attributes: ['inputId'],
         })
@@ -1227,11 +1169,11 @@ class TransactionService extends Service implements ITransactionService {
         ])
       )
       await Promise.all([
-        this.TransactionOutput.destroy({
+        TransactionOutputModel.destroy({
           where: { transactionId: Number(id) },
         }),
-        this.TransactionInput.destroy({ where: { transactionId: Number(id) } }),
-        this.BalanceChange.destroy({ where: { transactionId: Number(id) } }),
+        TransactionInputModel.destroy({ where: { transactionId: Number(id) } }),
+        BalanceChangeModel.destroy({ where: { transactionId: Number(id) } }),
       ])
       await this.db.query(
         sql([

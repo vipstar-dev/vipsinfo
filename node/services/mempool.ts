@@ -1,4 +1,4 @@
-import { ModelCtor, Op, QueryTypes, Sequelize } from 'sequelize'
+import { Op, QueryTypes, Sequelize } from 'sequelize'
 
 import { ITransactionInput } from '@/lib'
 import { IBus } from '@/node/bus'
@@ -42,8 +42,6 @@ class MempoolService extends Service implements IMempoolService {
     | undefined
   private bus: IBus | undefined
   private db: Sequelize | undefined
-  private Transaction: ModelCtor<TransactionModel> | undefined
-  private Witness: ModelCtor<WitnessModel> | undefined
 
   constructor(options: BaseConfig) {
     super(options)
@@ -63,12 +61,10 @@ class MempoolService extends Service implements IMempoolService {
   // eslint-disable-next-line @typescript-eslint/require-await
   async start() {
     this.db = this.node.addedMethods.getDatabase?.()
-    const getModel = this.node.addedMethods.getModel
-    if (getModel) {
-      this.Transaction = getModel('transaction') as ModelCtor<TransactionModel>
-      this.Witness = getModel('witness') as ModelCtor<WitnessModel>
-    }
-    this.transactionProcessor = new AsyncQueue(this._onTransaction.bind(this))
+    this.transactionProcessor = new AsyncQueue(
+      (tx: TransactionModel | ITransactionAndModelSetting) =>
+        this._onTransaction(tx)
+    )
   }
 
   _startSubscriptions(): void {
@@ -123,10 +119,10 @@ class MempoolService extends Service implements IMempoolService {
       if (!(await this._validate(tx))) {
         return
       }
-      if (this.transaction && this.Transaction && this.Witness) {
+      if (this.transaction) {
         await this.transaction.removeReplacedTransactions(tx)
         tx._id = (
-          await this.Transaction.create({
+          await TransactionModel.create({
             id: tx.id,
             hash: tx.hash,
             version: tx.version as number,
@@ -140,7 +136,7 @@ class MempoolService extends Service implements IMempoolService {
         )._id
         const witnesses = this.transaction.groupWitnesses(tx)
         await Promise.all([
-          this.Witness.bulkCreate(witnesses, { validate: false }),
+          WitnessModel.bulkCreate(witnesses, { validate: false }),
           this.transaction.processTxos([tx]),
         ])
         await this.transaction.processBalanceChanges({ transactions: [tx] })
@@ -158,11 +154,11 @@ class MempoolService extends Service implements IMempoolService {
   async _validate(
     tx: TransactionModel | ITransactionAndModelSetting
   ): Promise<boolean | void> {
-    if (this.Transaction && this.db) {
+    if (this.db) {
       const prevTxs: Pick<
         TransactionModel,
         '_id' | 'id'
-      >[] = await this.Transaction.findAll({
+      >[] = await TransactionModel.findAll({
         where: {
           id: {
             [$in]: tx.inputs.map(

@@ -102,9 +102,6 @@ class HeaderService extends Service implements IHeaderService {
   }
 
   async start(): Promise<void> {
-    this.Header = this.node.addedMethods.getModel?.('header') as
-      | ModelCtor<HeaderModel>
-      | undefined
     this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
     this._adjustTipBackToCheckpoint()
     if (this.tip && this.tip.height === 0) {
@@ -137,8 +134,8 @@ class HeaderService extends Service implements IHeaderService {
         Buffer.compare(this.tip.hash, this.genesisHeader.hash) === 0,
         'Expected tip hash to be genesis hash, but it was not'
       )
-      await this.Header?.destroy({ truncate: true })
-      this.lastHeader = await this.Header?.create({
+      await HeaderModel.destroy({ truncate: true })
+      this.lastHeader = await HeaderModel.create({
         hash: this.genesisHeader.hash,
         height: 0,
         version: this.genesisHeader.version as number,
@@ -489,7 +486,7 @@ class HeaderService extends Service implements IHeaderService {
       blockCount >= 1,
       'Header Service: block count to getEndHash must be at least 1'
     )
-    if (this.tip && this.Header) {
+    if (this.tip) {
       const numResultsNeeded = Math.min(
         this.tip.height - tip.height,
         blockCount + 1
@@ -504,7 +501,7 @@ class HeaderService extends Service implements IHeaderService {
       }
       const startingHeight = tip.height + 1
       const results = (
-        await this.Header.findAll({
+        await HeaderModel.findAll({
           where: {
             height: {
               [$between]: [startingHeight, startingHeight + blockCount],
@@ -528,8 +525,8 @@ class HeaderService extends Service implements IHeaderService {
       'Header Service: getting last header synced at height:',
       this.tip?.height
     )
-    if (this.tip && this.Header) {
-      await this.Header.destroy({
+    if (this.tip) {
+      await HeaderModel.destroy({
         where: { height: { [$gt]: this.tip.height } },
       })
       const lastHeader = await HeaderModel.findByHeight(this.tip.height)

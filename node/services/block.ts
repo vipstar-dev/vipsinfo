@@ -1,6 +1,6 @@
 import assert from 'assert'
 import LRU from 'lru-cache'
-import Sequelize, { ModelCtor, Optional } from 'sequelize'
+import { Op, Optional } from 'sequelize'
 
 import { Block, IBlock } from '@/lib'
 import { IBus } from '@/node/bus'
@@ -20,7 +20,7 @@ import Timeout = NodeJS.Timeout
 import { Services } from '@/node/node'
 import { Log } from '@/rpc'
 
-const { gt: $gt, between: $between } = Sequelize.Op
+const { gt: $gt, between: $between } = Op
 
 interface BlockConfig extends BaseConfig {
   recentBlockHashesCount?: number
@@ -112,10 +112,6 @@ class BlockService extends Service implements IBlockService {
   private subscribedBlock: boolean = false
   private reportInterval: Timeout | undefined
   private getBlocksTimer: Timeout | undefined
-  private Header: ModelCtor<HeaderModel> | undefined
-  private Block: ModelCtor<BlockModel> | undefined
-  private Transaction: ModelCtor<TransactionModel> | undefined
-  private TransactionOutput: ModelCtor<TransactionOutputModel> | undefined
   private prevLogTime: number | undefined
   private prevLogHeight: number | undefined
 
@@ -160,7 +156,7 @@ class BlockService extends Service implements IBlockService {
 
   async _checkTip(): Promise<void> {
     this.logger.info('Block Service: checking the saved tip...')
-    if (this.Header && this.tip) {
+    if (this.tip) {
       const header =
         (await HeaderModel.findByHeight(this.tip.height)) ||
         this.header?.getLastHeader()
@@ -197,7 +193,7 @@ class BlockService extends Service implements IBlockService {
       this.logger.info('Block Service: retrieved all the headers of lookups')
       let block: BlockModel | null | undefined
       do {
-        block = await this.Block?.findOne({
+        block = await BlockModel.findOne({
           where: { hash },
           attributes: ['hash'],
         })
@@ -211,7 +207,7 @@ class BlockService extends Service implements IBlockService {
         const header:
           | HeaderModel
           | null
-          | undefined = await this.Header?.findOne({
+          | undefined = await HeaderModel.findOne({
           where: { height: --height },
           attributes: ['hash'],
         })
@@ -228,25 +224,13 @@ class BlockService extends Service implements IBlockService {
   }
 
   async start(): Promise<void> {
-    this.Header = this.node.addedMethods.getModel?.('header') as
-      | ModelCtor<HeaderModel>
-      | undefined
-    this.Block = this.node.addedMethods.getModel?.('block') as
-      | ModelCtor<BlockModel>
-      | undefined
-    this.Transaction = this.node.addedMethods.getModel?.('transaction') as
-      | ModelCtor<TransactionModel>
-      | undefined
-    this.TransactionOutput = this.node.addedMethods.getModel?.(
-      'transaction_output'
-    ) as ModelCtor<TransactionOutputModel> | undefined
     let tip: ITip | undefined = await this.node.addedMethods.getServiceTip?.(
       'block'
     )
     if (
       tip &&
       tip.height > 0 &&
-      !(await this.Block?.findOne({
+      !(await BlockModel.findOne({
         where: { height: tip.height },
         attributes: ['height'],
       }))
@@ -262,7 +246,7 @@ class BlockService extends Service implements IBlockService {
       this.tipResetNeeded = true
       return
     }
-    await this.Block?.destroy({ where: { height: { [$gt]: tip.height } } })
+    await BlockModel.destroy({ where: { height: { [$gt]: tip.height } } })
     if (this.header) {
       this.header.on('reorg', () => {
         this.reorging = true
@@ -277,9 +261,9 @@ class BlockService extends Service implements IBlockService {
 
   async _loadRecentBlockHashes(): Promise<void> {
     let hashes: Buffer[] = []
-    if (this.Block && this.tip) {
+    if (this.tip) {
       hashes = (
-        await this.Block.findAll({
+        await BlockModel.findAll({
           where: {
             height: {
               [$between]: [
@@ -304,18 +288,18 @@ class BlockService extends Service implements IBlockService {
   }
 
   async _getTimeSinceLastBlock(): Promise<string | void> {
-    if (this.Header && this.tip) {
+    if (this.tip) {
       const header: Pick<
         HeaderModel,
         'timestamp'
-      > | null = await this.Header.findOne({
+      > | null = await HeaderModel.findOne({
         where: { height: Math.max(this.tip.height - 1, 0) },
         attributes: ['timestamp'],
       })
       const tip: Pick<
         HeaderModel,
         'timestamp'
-      > | null = await this.Header.findOne({
+      > | null = await HeaderModel.findOne({
         where: { height: this.tip.height },
         attributes: ['timestamp'],
       })
@@ -341,7 +325,7 @@ class BlockService extends Service implements IBlockService {
   }
 
   async onReorg(height: number): Promise<void> {
-    await this.Block?.destroy({ where: { height: { [$gt]: height } } })
+    await BlockModel.destroy({ where: { height: { [$gt]: height } } })
   }
 
   async _onReorg(blocks: ITip[]): Promise<void> {
@@ -479,8 +463,8 @@ class BlockService extends Service implements IBlockService {
   async _findBlocksToRemove(commonHeader: ITip): Promise<ITip[]> {
     let hash: Buffer | undefined = this.tip?.hash
     const blocks: ITip[] = []
-    if (hash && this.Block) {
-      const block: Pick<BlockModel, 'height'> | null = await this.Block.findOne(
+    if (hash) {
+      const block: Pick<BlockModel, 'height'> | null = await BlockModel.findOne(
         {
           where: { hash },
           attributes: ['height'],
@@ -498,7 +482,7 @@ class BlockService extends Service implements IBlockService {
           const prevBlock: Pick<
             BlockModel,
             'hash'
-          > | null = await this.Block.findOne({
+          > | null = await BlockModel.findOne({
             where: { height: --height },
             attributes: ['hash'],
           })
@@ -567,7 +551,7 @@ class BlockService extends Service implements IBlockService {
     this.processingBlock = true
     try {
       if (
-        await this.Block?.findOne({
+        await BlockModel.findOne({
           where: { hash: rawBlock.hash },
           attributes: ['height'],
         })
@@ -679,12 +663,12 @@ class BlockService extends Service implements IBlockService {
     } while (!header)
     const isProofOfStake = header.isProofOfStake
     const minerId = (
-      await this.TransactionOutput?.findOne({
+      await TransactionOutputModel.findOne({
         where: { outputIndex: isProofOfStake ? 1 : 0 },
         attributes: ['addressId'],
         include: [
           {
-            model: this.Transaction,
+            model: TransactionModel.scope(),
             as: 'transaction',
             required: true,
             where: {
@@ -697,7 +681,7 @@ class BlockService extends Service implements IBlockService {
       })
     )?.addressId
     if (!minerId || this.reorging) return
-    return await this.Block?.create({
+    return await BlockModel.create({
       hash: rawBlock.hash,
       height: header.height,
       size: rawBlock.size,

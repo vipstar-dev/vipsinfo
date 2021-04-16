@@ -1,5 +1,5 @@
 import { rawDecodeResults, rawEncodeArgument } from 'ethereumjs-abi'
-import { ModelCtor, Op, Sequelize } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 
 import {
   Address,
@@ -81,18 +81,6 @@ export interface IContractService extends IService {
 class ContractService extends Service implements IContractService {
   private tip: ITip | undefined
   private db: Sequelize | undefined
-  private Address: ModelCtor<AddressModel> | undefined
-  private Transaction: ModelCtor<TransactionModel> | undefined
-  private TransactionInput: ModelCtor<TransactionInputModel> | undefined
-  private EVMReceipt: ModelCtor<EvmReceiptModel> | undefined
-  private EVMReceiptLog: ModelCtor<EvmReceiptLogModel> | undefined
-  private Contract: ModelCtor<ContractModel> | undefined
-  private ContractCode: ModelCtor<ContractCodeModel> | undefined
-  private ContractTag: ModelCtor<ContractTagModel> | undefined
-  private QRC20: ModelCtor<Qrc20Model> | undefined
-  private QRC20Balance: ModelCtor<Qrc20BalanceModel> | undefined
-  private QRC721: ModelCtor<Qrc721Model> | undefined
-  private QRC721Token: ModelCtor<Qrc721TokenModel> | undefined
 
   static get dependencies(): Services[] {
     return ['block', 'db', 'transaction']
@@ -104,29 +92,6 @@ class ContractService extends Service implements IContractService {
 
   async start(): Promise<void> {
     this.db = this.node.addedMethods.getDatabase?.()
-    const getModel = this.node.addedMethods.getModel
-    if (getModel) {
-      this.Address = getModel('address') as ModelCtor<AddressModel>
-      this.Transaction = getModel('transaction') as ModelCtor<TransactionModel>
-      this.TransactionInput = getModel(
-        'transaction_input'
-      ) as ModelCtor<TransactionInputModel>
-      this.EVMReceipt = getModel('evm_receipt') as ModelCtor<EvmReceiptModel>
-      this.EVMReceiptLog = getModel(
-        'evm_receipt_log'
-      ) as ModelCtor<EvmReceiptLogModel>
-      this.Contract = getModel('contract') as ModelCtor<ContractModel>
-      this.ContractCode = getModel(
-        'contract_code'
-      ) as ModelCtor<ContractCodeModel>
-      this.ContractTag = getModel('contract_tag') as ModelCtor<ContractTagModel>
-      this.QRC20 = getModel('qrc20') as ModelCtor<Qrc20Model>
-      this.QRC20Balance = getModel(
-        'qrc20_balance'
-      ) as ModelCtor<Qrc20BalanceModel>
-      this.QRC721 = getModel('qrc721') as ModelCtor<Qrc721Model>
-      this.QRC721Token = getModel('qrc721_token') as ModelCtor<Qrc721TokenModel>
-    }
     this.tip = await this.node.addedMethods.getServiceTip?.(this.name)
     const blockTip = this.node.addedMethods.getBlockTip?.()
     if (this.tip) {
@@ -150,7 +115,7 @@ class ContractService extends Service implements IContractService {
           if (baseCode) {
             const code = Buffer.from(baseCode, 'hex')
             const sha256sum = sha256(code)
-            await this.Contract?.create({
+            await ContractModel.create({
               address: dgpAddress,
               addressString: new Address({
                 type: Address.EVM_CONTRACT,
@@ -162,10 +127,10 @@ class ContractService extends Service implements IContractService {
               bytecodeSha256sum: sha256sum,
               // createHeight: 0,
             })
-            await this.ContractCode?.bulkCreate([{ sha256sum, code }], {
+            await ContractCodeModel.bulkCreate([{ sha256sum, code }], {
               ignoreDuplicates: true,
             })
-            await this.ContractTag?.create({
+            await ContractTagModel.create({
               contractAddress: dgpAddress,
               tag: 'dgp',
             })
@@ -199,19 +164,19 @@ class ContractService extends Service implements IContractService {
                   address: Pick<AddressModel, 'data'>
                 }
               | null
-              | undefined = await this.TransactionInput?.findOne({
+              | undefined = await TransactionInputModel.findOne({
               where: { inputIndex: 0 },
               attributes: [],
               include: [
                 {
-                  model: this.Transaction,
+                  model: TransactionModel.scope(),
                   as: 'transaction',
                   required: true,
                   where: { id: transaction.id },
                   attributes: [],
                 },
                 {
-                  model: this.Address,
+                  model: AddressModel.scope(),
                   as: 'address',
                   required: true,
                   attributes: ['data'],
@@ -280,12 +245,12 @@ class ContractService extends Service implements IContractService {
     const balanceChanges: Set<string> = new Set()
     const balanceChangeResults:
       | Pick<EvmReceiptLogModel, 'address' | 'topic2' | 'topic3'>[]
-      | undefined = await this.EVMReceiptLog?.findAll({
+      | undefined = await EvmReceiptLogModel.findAll({
       where: { topic1: TransferABI.id, topic3: { [$ne]: null }, topic4: null },
       attributes: ['address', 'topic2', 'topic3'],
       include: [
         {
-          model: this.EVMReceipt,
+          model: EvmReceiptModel.scope(),
           as: 'receipt',
           required: true,
           where: { blockHeight: { [$gt]: height } },
@@ -341,10 +306,10 @@ class ContractService extends Service implements IContractService {
       | undefined = await this.node.addedMethods
       .getRpcClient?.()
       ?.rpcMethods.listcontracts?.('1', (1e8).toString())
-    if (result && this.Contract) {
+    if (result) {
       const contractsToCreate: Set<string> = new Set(Object.keys(result))
       const originalContracts: string[] = (
-        await this.Contract.findAll({
+        await ContractModel.findAll({
           where: {},
           attributes: ['address'],
         })
@@ -383,7 +348,7 @@ class ContractService extends Service implements IContractService {
     address: Buffer,
     vm: 'evm' | 'x86'
   ): Promise<ContractModel | void> {
-    let contract = await this.Contract?.findOne({ where: { address } })
+    let contract = await ContractModel.findOne({ where: { address } })
     if (contract) {
       return contract
     }
@@ -442,14 +407,14 @@ class ContractService extends Service implements IContractService {
           ])
           contract.type = 'qrc721'
           await contract.save()
-          await this.ContractCode?.bulkCreate([{ sha256sum, code }], {
+          await ContractCodeModel.bulkCreate([{ sha256sum, code }], {
             ignoreDuplicates: true,
           })
-          await this.ContractTag?.create({
+          await ContractTagModel.create({
             contractAddress: address,
             tag: 'qrc721',
           })
-          await this.QRC721?.create({
+          await Qrc721Model?.create({
             contractAddress: address,
             name: name as Buffer,
             symbol: symbol as Buffer,
@@ -513,14 +478,14 @@ class ContractService extends Service implements IContractService {
           ])
           contract.type = 'qrc20'
           await contract.save()
-          await this.ContractCode?.bulkCreate([{ sha256sum, code }], {
+          await ContractCodeModel.bulkCreate([{ sha256sum, code }], {
             ignoreDuplicates: true,
           })
-          await this.ContractTag?.create({
+          await ContractTagModel.create({
             contractAddress: address,
             tag: 'qrc20',
           })
-          await this.QRC20?.create({
+          await Qrc20Model.create({
             contractAddress: address,
             name: name as Buffer,
             symbol: symbol as Buffer,
@@ -534,7 +499,7 @@ class ContractService extends Service implements IContractService {
       }
     } else {
       await contract.save()
-      await this.ContractCode?.bulkCreate([{ sha256sum, code }], {
+      await ContractCodeModel.bulkCreate([{ sha256sum, code }], {
         ignoreDuplicates: true,
       })
     }
@@ -663,7 +628,7 @@ class ContractService extends Service implements IContractService {
     }
     for (const addressString of totalSupplyChanges) {
       const address = Buffer.from(addressString, 'hex')
-      const contract = await this.Contract?.findOne({
+      const contract = await ContractModel?.findOne({
         where: {
           address,
           type: { [$in]: ['qrc20', 'qrc721'] },
@@ -679,12 +644,12 @@ class ContractService extends Service implements IContractService {
           continue
         }
         if (contract.type === 'qrc20') {
-          await this.QRC20?.update(
+          await Qrc20Model.update(
             { totalSupply },
             { where: { contractAddress: address } }
           )
         } else {
-          await this.QRC721?.update(
+          await Qrc721Model?.update(
             { totalSupply },
             { where: { contractAddress: address } }
           )
@@ -727,7 +692,7 @@ class ContractService extends Service implements IContractService {
       Boolean
     ) as Qrc20BalanceCreationAttributes[]
     if (filteredOperations.length) {
-      await this.QRC20Balance?.bulkCreate(filteredOperations, {
+      await Qrc20BalanceModel.bulkCreate(filteredOperations, {
         updateOnDuplicate: ['balance'],
         validate: false,
       })
@@ -744,7 +709,7 @@ class ContractService extends Service implements IContractService {
         holder,
       })
     }
-    await this.QRC721Token?.bulkCreate(operations, {
+    await Qrc721TokenModel.bulkCreate(operations, {
       updateOnDuplicate: ['holder'],
       validate: false,
     })
