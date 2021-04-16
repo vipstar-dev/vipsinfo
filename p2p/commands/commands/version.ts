@@ -48,7 +48,7 @@ class VersionMessage extends Message implements IVersionMessage {
     services = BigInt(13),
     nonce = getNonce(),
     timestamp = Math.floor(Date.now() / 1000),
-    subversion = `/vipsinfo:${packageInfo.version}/`,
+    subversion = `/VIPSTARCOIN Info Node:${packageInfo.version}/`,
     startHeight = 0,
     relay = true,
     ...options
