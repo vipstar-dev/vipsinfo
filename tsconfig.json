@@ -38,6 +38,7 @@
       "types"
     ],
     "rootDirs": [
+      "node",
       "lib",
       "p2p",
       "rpc"

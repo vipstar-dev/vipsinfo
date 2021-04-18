@@ -7,7 +7,7 @@
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore .",
     "build": "yarn clean && yarn compile",
     "clean": "rm -rf dist",
-    "compile": "tsc -p . && tsc-alias -p tsconfig.json",
+    "compile": "tsc -p . && tsc-alias -p tsconfig.json && cp -r types dist/",
     "build:live": "nodemon --ext js,ts,json --exec ts-node -r tsconfig-paths/register bin/vipsinfo-node.ts start"
   },
   "lint-staged": {
@@ -36,9 +36,7 @@
   },
   "homepage": "https://github.com/vipstar-dev/vipsinfo#readme",
   "files": [
-    "lib",
-    "p2p",
-    "rpc"
+    "dist"
   ],
   "devDependencies": {
     "@types/bluebird": "^3.5.33",
