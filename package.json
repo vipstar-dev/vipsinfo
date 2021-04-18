@@ -1,6 +1,6 @@
 {
   "name": "vipsinfo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "vipsinfo core node and libraries",
   "scripts": {
     "dev": "yarn build:live",
@@ -9,7 +9,7 @@
     "clean": "rm -rf dist",
     "compile": "tsc -p . && tsc-alias -p tsconfig.json && cp -r types dist/",
     "build:live": "nodemon --ext js,ts,json --exec ts-node -r tsconfig-paths/register bin/vipsinfo-node.ts start",
-    "publish": "yarn build && cd dist && npm publish"
+    "auto-publish": "yarn build && cd dist && npm publish"
   },
   "lint-staged": {
     "*.{js,ts}": [
