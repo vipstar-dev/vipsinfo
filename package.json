@@ -1,6 +1,6 @@
 {
   "name": "vipsinfo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "vipsinfo core node and libraries",
   "scripts": {
     "dev": "yarn build:live",
@@ -8,7 +8,8 @@
     "build": "yarn clean && yarn compile",
     "clean": "rm -rf dist",
     "compile": "tsc -p . && tsc-alias -p tsconfig.json && cp -r types dist/",
-    "build:live": "nodemon --ext js,ts,json --exec ts-node -r tsconfig-paths/register bin/vipsinfo-node.ts start"
+    "build:live": "nodemon --ext js,ts,json --exec ts-node -r tsconfig-paths/register bin/vipsinfo-node.ts start",
+    "publish": "yarn build && cd dist && npm publish"
   },
   "lint-staged": {
     "*.{js,ts}": [
@@ -36,7 +37,11 @@
   },
   "homepage": "https://github.com/vipstar-dev/vipsinfo#readme",
   "files": [
-    "dist"
+    "lib",
+    "node",
+    "p2p",
+    "rpc",
+    "types"
   ],
   "devDependencies": {
     "@types/bluebird": "^3.5.33",
