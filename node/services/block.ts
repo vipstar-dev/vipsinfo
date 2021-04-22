@@ -114,6 +114,7 @@ class BlockService extends Service implements IBlockService {
   private getBlocksTimer: Timeout | undefined
   private prevLogTime: number | undefined
   private prevLogHeight: number | undefined
+  private afterRegisterBlock: BlockObjectFromIBlock | undefined
 
   constructor(options: BlockConfig) {
     super(options)
@@ -575,6 +576,13 @@ class BlockService extends Service implements IBlockService {
       return
     }
     this.logger.debug('Block Service: new block:', block.hash.toString('hex'))
+    this.logger.debug(
+      'Block Service:',
+      'prev:',
+      block.header.prevHash?.toString('hex'),
+      'tip:',
+      this.tip?.hash.toString('hex')
+    )
     if (
       this.tip &&
       block.header?.prevHash &&
@@ -582,6 +590,23 @@ class BlockService extends Service implements IBlockService {
     ) {
       await this._saveBlock(block)
     } else {
+      if (
+        block.header.prevHash &&
+        this.afterRegisterBlock &&
+        Buffer.compare(this.afterRegisterBlock.hash, block.header.prevHash) ===
+          0
+      ) {
+        this.logger.debug('Block Service: Removing after register block...')
+        await this._saveBlock(this.afterRegisterBlock)
+        await this._saveBlock(block)
+        this.logger.debug('Block Service: After register block is removed.')
+        this.afterRegisterBlock = undefined
+      } else {
+        this.logger.debug(
+          'Block Service: After register block set. Detected reorg?'
+        )
+        this.afterRegisterBlock = block
+      }
       this.processingBlock = false
     }
   }
