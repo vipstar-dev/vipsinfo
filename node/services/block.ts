@@ -769,7 +769,7 @@ class BlockService extends Service implements IBlockService {
           await this._saveBlock(genesisBlock)
         }
         this.reportInterval = setInterval(
-          this._logProgress.bind(this),
+          () => this._logProgress(),
           5000
         ).unref()
         await this._sync()
