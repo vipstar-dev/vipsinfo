@@ -816,6 +816,9 @@ class BlockService extends Service implements IBlockService {
             })
             await this._syncBlock(block as BlockObjectFromIBlock)
           }
+        } else {
+          this.processingBlock = false
+          this.emit('synced')
         }
       }
     } catch (err) {
