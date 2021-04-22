@@ -4,6 +4,7 @@ import {
   DataType,
   Default,
   ForeignKey,
+  HasMany,
   HasOne,
   Model,
   PrimaryKey,
@@ -12,6 +13,7 @@ import {
 } from 'sequelize-typescript'
 
 import Block from '@/node/models/block'
+import Transaction from '@/node/models/transaction'
 
 export interface HeaderModelAttributes {
   hash: Buffer
@@ -28,6 +30,7 @@ export interface HeaderModelAttributes {
   stakeOutputIndex: number
   signature: Buffer
   block: Block
+  transactions: Transaction[]
   chainwork: bigint
   isProofOfStake: boolean
   difficulty: number
@@ -36,7 +39,7 @@ export interface HeaderModelAttributes {
 export interface HeaderCreationAttributes
   extends Optional<
     HeaderModelAttributes,
-    'prevHash' | 'block' | 'isProofOfStake' | 'difficulty'
+    'prevHash' | 'block' | 'transactions' | 'isProofOfStake' | 'difficulty'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -106,6 +109,9 @@ export default class Header extends Model<
 
   @HasOne(() => Block)
   block!: Block
+
+  @HasMany(() => Transaction)
+  transactions!: Transaction[]
 
   static findByHeight<M extends Header>(
     height: number,

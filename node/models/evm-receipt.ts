@@ -13,8 +13,11 @@ import {
 } from 'sequelize-typescript'
 
 import { addressTypeMap, addressTypes } from '@/node/models/address'
+import Contract from '@/node/models/contract'
 import EvmReceiptLog from '@/node/models/evm-receipt-log'
+import Header from '@/node/models/header'
 import Transaction from '@/node/models/transaction'
+import TransactionOutput from '@/node/models/transaction-output'
 
 export interface EvmReceiptModelAttributes {
   _id: bigint
@@ -30,10 +33,16 @@ export interface EvmReceiptModelAttributes {
   exceptedMessage: string
   transaction: Transaction
   logs: EvmReceiptLog[]
+  header: Header
+  output: TransactionOutput
+  contract: Contract
 }
 
 export interface EvmReceiptCreationAttributes
-  extends Optional<EvmReceiptModelAttributes, '_id' | 'transaction' | 'logs'> {}
+  extends Optional<
+    EvmReceiptModelAttributes,
+    '_id' | 'transaction' | 'logs' | 'header' | 'output' | 'contract'
+  > {}
 
 @Table({
   tableName: 'evm_receipt',
@@ -51,6 +60,7 @@ export default class EvmReceipt extends Model<
   _id!: bigint
 
   @ForeignKey(() => Transaction)
+  @ForeignKey(() => TransactionOutput)
   @Unique('transaction')
   @Column(DataType.BIGINT.UNSIGNED)
   transactionId!: bigint
@@ -59,6 +69,7 @@ export default class EvmReceipt extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   outputIndex!: number
 
+  @ForeignKey(() => Header)
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
 
@@ -86,6 +97,7 @@ export default class EvmReceipt extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   gasUsed!: number
 
+  @ForeignKey(() => Contract)
   @Column(DataType.STRING(20).BINARY)
   contractAddress!: Buffer
 
@@ -100,4 +112,13 @@ export default class EvmReceipt extends Model<
 
   @HasMany(() => EvmReceiptLog)
   logs!: EvmReceiptLog[]
+
+  @BelongsTo(() => Header)
+  header!: Header
+
+  @BelongsTo(() => TransactionOutput)
+  output!: TransactionOutput
+
+  @BelongsTo(() => Contract)
+  contract!: Contract
 }

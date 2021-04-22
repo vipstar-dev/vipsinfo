@@ -11,7 +11,10 @@ import {
   Table,
 } from 'sequelize-typescript'
 
+import Contract from '@/node/models/contract'
 import EvmReceipt from '@/node/models/evm-receipt'
+import Qrc20 from '@/node/models/qrc20'
+import Qrc721 from '@/node/models/qrc721'
 
 export interface EvmReceiptLogModelAttributes {
   _id: bigint
@@ -25,10 +28,16 @@ export interface EvmReceiptLogModelAttributes {
   topic4: Buffer | null
   data: Buffer
   receipt: EvmReceipt
+  contract: Contract
+  qrc20: Qrc20
+  qrc721: Qrc721
 }
 
 export interface EvmReceiptLogCreationAttributes
-  extends Optional<EvmReceiptLogModelAttributes, '_id' | 'receipt'> {}
+  extends Optional<
+    EvmReceiptLogModelAttributes,
+    '_id' | 'receipt' | 'contract' | 'qrc20' | 'qrc721'
+  > {}
 
 @Table({
   tableName: 'evm_receipt_log',
@@ -55,6 +64,9 @@ export default class EvmReceiptLog extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
 
+  @ForeignKey(() => Qrc20)
+  @ForeignKey(() => Qrc721)
+  @ForeignKey(() => Contract)
   @Column(DataType.STRING(32).BINARY)
   address!: Buffer
 
@@ -79,4 +91,13 @@ export default class EvmReceiptLog extends Model<
 
   @BelongsTo(() => EvmReceipt)
   receipt!: EvmReceipt
+
+  @BelongsTo(() => Contract)
+  contract!: Contract
+
+  @BelongsTo(() => Qrc20, { targetKey: 'contractAddress' })
+  qrc20!: Qrc20
+
+  @BelongsTo(() => Qrc721, { targetKey: 'contractAddress' })
+  qrc721!: Qrc721
 }

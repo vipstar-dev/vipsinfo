@@ -19,11 +19,16 @@ export interface GasRefundModelAttributes {
   refundId: bigint
   refundIndex: number
   transaction: Transaction
+  refundToTransaction: Transaction
+  refund: TransactionOutput
   refundTo: TransactionOutput
 }
 
 export interface GasRefundCreationAttributes
-  extends Optional<GasRefundModelAttributes, 'transaction' | 'refundTo'> {}
+  extends Optional<
+    GasRefundModelAttributes,
+    'transaction' | 'refundToTransaction' | 'refund' | 'refundTo'
+  > {}
 
 @Table({
   tableName: 'gas_refund',
@@ -37,6 +42,7 @@ export default class GasRefund extends Model<
 > {
   @PrimaryKey
   @ForeignKey(() => Transaction)
+  @ForeignKey(() => TransactionOutput)
   @Column(DataType.BIGINT.UNSIGNED)
   transactionId!: bigint
 
@@ -45,6 +51,7 @@ export default class GasRefund extends Model<
   outputIndex!: number
 
   @Unique('refund')
+  @ForeignKey(() => Transaction)
   @ForeignKey(() => TransactionOutput)
   @Column(DataType.BIGINT.UNSIGNED)
   refundId!: bigint
@@ -55,6 +62,12 @@ export default class GasRefund extends Model<
 
   @BelongsTo(() => Transaction)
   transaction!: Transaction
+
+  @BelongsTo(() => Transaction)
+  refundToTransaction!: Transaction
+
+  @BelongsTo(() => Transaction)
+  refund!: TransactionOutput
 
   @BelongsTo(() => TransactionOutput)
   refundTo!: TransactionOutput

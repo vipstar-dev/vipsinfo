@@ -10,6 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import Address from '@/node/models/address'
+import Header from '@/node/models/header'
 import Transaction from '@/node/models/transaction'
 
 export interface BalanceChangeModelAttributes {
@@ -20,10 +21,14 @@ export interface BalanceChangeModelAttributes {
   value: bigint
   transaction: Transaction
   address: Address
+  header: Header
 }
 
 export interface BalanceChangeCreationAttributes
-  extends Optional<BalanceChangeModelAttributes, 'transaction' | 'address'> {}
+  extends Optional<
+    BalanceChangeModelAttributes,
+    'transaction' | 'address' | 'header'
+  > {}
 
 @Table({
   tableName: 'balance_change',
@@ -40,6 +45,7 @@ export default class BalanceChange extends Model<
   @Column(DataType.BIGINT.UNSIGNED)
   transactionId!: bigint
 
+  @ForeignKey(() => Header)
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
 
@@ -59,4 +65,7 @@ export default class BalanceChange extends Model<
 
   @BelongsTo(() => Address)
   address!: Address
+
+  @BelongsTo(() => Header)
+  header!: Header
 }

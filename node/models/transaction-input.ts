@@ -11,6 +11,7 @@ import {
 
 import Address from '@/node/models/address'
 import Transaction from '@/node/models/transaction'
+import TransactionOutput from '@/node/models/transaction-output'
 
 export interface TransactionInputModelAttributes {
   transactionId: bigint
@@ -24,12 +25,19 @@ export interface TransactionInputModelAttributes {
   outputIndex: number
   transaction: Transaction
   address: Address
+  inputTransaction: Transaction
+  outputTransaction: Transaction
+  output: TransactionOutput
 }
 
 export interface TransactionInputCreationAttributes
   extends Optional<
     TransactionInputModelAttributes,
-    'transaction' | 'address'
+    | 'transaction'
+    | 'address'
+    | 'inputTransaction'
+    | 'outputTransaction'
+    | 'output'
   > {}
 
 @Table({
@@ -67,15 +75,26 @@ export default class TransactionInput extends Model<
   @Column(DataType.BIGINT.UNSIGNED)
   addressId!: bigint
 
+  @ForeignKey(() => Transaction)
+  @ForeignKey(() => TransactionOutput)
   @Column(DataType.BIGINT.UNSIGNED)
   outputId!: bigint
 
   @Column(DataType.INTEGER.UNSIGNED)
   outputIndex!: number
 
-  @BelongsTo(() => Transaction)
+  @BelongsTo(() => Transaction, 'transactionId')
   transaction!: Transaction
 
   @BelongsTo(() => Address)
   address!: Address
+
+  @BelongsTo(() => Transaction, 'transactionId')
+  inputTransaction!: Transaction
+
+  @BelongsTo(() => Transaction, 'outputId')
+  outputTransaction!: Transaction
+
+  @BelongsTo(() => TransactionOutput, 'outputId')
+  output!: TransactionOutput
 }

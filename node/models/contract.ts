@@ -11,8 +11,11 @@ import {
   Table,
 } from 'sequelize-typescript'
 
+import Address from '@/node/models/address'
 import ContractCode from '@/node/models/contract-code'
 import ContractTag from '@/node/models/contract-tag'
+import EvmReceipt from '@/node/models/evm-receipt'
+import EvmReceiptLog from '@/node/models/evm-receipt-log'
 import Qrc20 from '@/node/models/qrc20'
 import Qrc20Balance from '@/node/models/qrc20-balance'
 import Qrc721 from '@/node/models/qrc721'
@@ -26,11 +29,14 @@ export interface ContractModelAttributes {
   bytecodeSha256sum: Buffer
   description: string
   code: ContractCode
-  tag: ContractTag[]
+  tags: ContractTag[]
   qrc20: Qrc20
   qrc20Balances: Qrc20Balance[]
   qrc721: Qrc721
   qrc721Tokens: Qrc721Token[]
+  originalAddress: Address
+  evmReceipts: EvmReceipt[]
+  evmLogs: EvmReceiptLog[]
 }
 
 export interface ContractCreationAttributes
@@ -39,11 +45,14 @@ export interface ContractCreationAttributes
     | 'type'
     | 'description'
     | 'code'
-    | 'tag'
+    | 'tags'
     | 'qrc20'
     | 'qrc20Balances'
     | 'qrc721'
     | 'qrc721Tokens'
+    | 'originalAddress'
+    | 'evmReceipts'
+    | 'evmLogs'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -76,7 +85,7 @@ export default class Contract extends Model<
   code!: ContractCode
 
   @HasMany(() => ContractTag)
-  tag!: ContractTag[]
+  tags!: ContractTag[]
 
   @HasOne(() => Qrc20)
   qrc20!: Qrc20
@@ -89,4 +98,13 @@ export default class Contract extends Model<
 
   @HasMany(() => Qrc721Token)
   qrc721Tokens!: Qrc721Token[]
+
+  @HasOne(() => Address)
+  originalAddress!: Address
+
+  @HasMany(() => EvmReceipt)
+  evmReceipts!: EvmReceipt[]
+
+  @HasMany(() => EvmReceiptLog)
+  evmLogs!: EvmReceiptLog[]
 }

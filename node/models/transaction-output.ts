@@ -11,8 +11,11 @@ import {
   Table,
 } from 'sequelize-typescript'
 
+import Address from '@/node/models/address'
+import EvmReceipt from '@/node/models/evm-receipt'
 import GasRefund from '@/node/models/gas-refund'
 import Transaction from '@/node/models/transaction'
+import TransactionInput from '@/node/models/transaction-input'
 
 export interface TransactionOutputModelAttributes {
   transactionId: bigint
@@ -27,12 +30,25 @@ export interface TransactionOutputModelAttributes {
   inputHeight: number | null
   transaction: Transaction
   refund: GasRefund
+  refundTo: GasRefund
+  outputTransaction: Transaction
+  inputTransaction: Transaction
+  input: TransactionInput
+  address: Address
+  evmReceipt: EvmReceipt
 }
 
 export interface TransactionOutputCreationAttributes
   extends Optional<
     TransactionOutputModelAttributes,
-    'transaction' | 'refund'
+    | 'transaction'
+    | 'refund'
+    | 'refundTo'
+    | 'outputTransaction'
+    | 'inputTransaction'
+    | 'input'
+    | 'address'
+    | 'evmReceipt'
   > {}
 
 @Table({
@@ -63,12 +79,15 @@ export default class TransactionOutput extends Model<
   @Column(DataType.BIGINT)
   value!: bigint
 
+  @ForeignKey(() => Address)
   @Column(DataType.BIGINT.UNSIGNED)
   addressId!: bigint
 
   @Column(DataType.BOOLEAN)
   isStake!: boolean
 
+  @ForeignKey(() => Transaction)
+  @ForeignKey(() => TransactionInput)
   @Column(DataType.BIGINT.UNSIGNED)
   inputId!: bigint
 
@@ -79,9 +98,27 @@ export default class TransactionOutput extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   inputHeight!: number | null
 
-  @BelongsTo(() => Transaction)
+  @BelongsTo(() => Transaction, 'transactionId')
   transaction!: Transaction
 
-  @HasOne(() => GasRefund)
+  @HasOne(() => GasRefund, 'refundId')
+  refundTo!: GasRefund
+
+  @HasOne(() => GasRefund, 'transactionId')
   refund!: GasRefund
+
+  @BelongsTo(() => Transaction, 'transactionId')
+  outputTransaction!: Transaction
+
+  @BelongsTo(() => Transaction, 'inputId')
+  inputTransaction!: Transaction
+
+  @BelongsTo(() => TransactionInput, 'inputId')
+  input!: TransactionInput
+
+  @BelongsTo(() => Address, 'addressId')
+  address!: Address
+
+  @HasOne(() => EvmReceipt)
+  evmReceipt!: EvmReceipt
 }

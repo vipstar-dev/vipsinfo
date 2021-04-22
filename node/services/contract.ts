@@ -416,8 +416,8 @@ class ContractService extends Service implements IContractService {
           })
           await Qrc721Model?.create({
             contractAddress: address,
-            name: name as Buffer,
-            symbol: symbol as Buffer,
+            name: (name as Buffer).toString(),
+            symbol: (symbol as Buffer).toString(),
             totalSupply,
           })
         } catch (err) {
@@ -487,11 +487,11 @@ class ContractService extends Service implements IContractService {
           })
           await Qrc20Model.create({
             contractAddress: address,
-            name: name as Buffer,
-            symbol: symbol as Buffer,
+            name: (name as Buffer).toString(),
+            symbol: (symbol as Buffer).toString(),
             decimals: Number(decimals),
             totalSupply,
-            version: version as Buffer,
+            version: (version as Buffer).toString(),
           })
         } catch (err) {
           await contract.save()

@@ -18,6 +18,7 @@ import Block from '@/node/models/block'
 import ContractSpend from '@/node/models/contract-spend'
 import EvmReceipt from '@/node/models/evm-receipt'
 import GasRefund from '@/node/models/gas-refund'
+import Header from '@/node/models/header'
 import TransactionInput from '@/node/models/transaction-input'
 import TransactionOutput from '@/node/models/transaction-output'
 import Witness from '@/node/models/witness'
@@ -42,6 +43,8 @@ export interface TransactionModelAttributes {
   contractSpendSource: ContractSpend
   contractSpendDests: ContractSpend[]
   evmReceipts: EvmReceipt[]
+  refundToTransaction: GasRefund
+  header: Header
 }
 
 export interface TransactionCreationAttributes
@@ -57,6 +60,8 @@ export interface TransactionCreationAttributes
     | 'contractSpendSource'
     | 'contractSpendDests'
     | 'evmReceipts'
+    | 'refundToTransaction'
+    | 'header'
   > {}
 
 @Table({ freezeTableName: true, underscored: true, timestamps: false })
@@ -85,6 +90,7 @@ export default class Transaction extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   lockTime!: number
 
+  @ForeignKey(() => Header)
   @ForeignKey(() => Block)
   @Column(DataType.INTEGER.UNSIGNED)
   blockHeight!: number
@@ -98,10 +104,10 @@ export default class Transaction extends Model<
   @Column(DataType.INTEGER.UNSIGNED)
   weight!: number
 
-  @HasMany(() => TransactionInput)
+  @HasMany(() => TransactionInput, 'transactionId')
   inputs!: TransactionInput[]
 
-  @HasMany(() => TransactionOutput)
+  @HasMany(() => TransactionOutput, 'transactionId')
   outputs!: TransactionOutput[]
 
   @BelongsTo(() => Block)
@@ -113,7 +119,7 @@ export default class Transaction extends Model<
   @HasMany(() => BalanceChange)
   balanceChanges!: BalanceChange[]
 
-  @HasMany(() => GasRefund)
+  @HasMany(() => GasRefund, 'transactionId')
   refunds!: GasRefund[]
 
   @HasOne(() => ContractSpend, 'sourceId')
@@ -124,4 +130,10 @@ export default class Transaction extends Model<
 
   @HasMany(() => EvmReceipt)
   evmReceipts!: EvmReceipt[]
+
+  @HasOne(() => GasRefund, 'refundId')
+  refundToTransaction!: GasRefund
+
+  @BelongsTo(() => Header)
+  header!: Header
 }
