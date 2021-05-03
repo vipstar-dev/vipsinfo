@@ -47,7 +47,7 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
 
 type sqlArgs = string | number | bigint | Buffer | any[] | Object
 
-export function sql(strings: string[], ...args: sqlArgs[]): string {
+export function sql(strings: TemplateStringsArray, ...args: sqlArgs[]): string {
   const buffer: string[] = []
   for (let i = 0; i < args.length; ++i) {
     buffer.push(strings[i].replace(/\s+/g, ' '), transformSQLArg(args[i]))

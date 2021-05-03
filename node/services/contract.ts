@@ -276,22 +276,18 @@ class ContractService extends Service implements IContractService {
       await this._updateBalances(balanceChanges)
     }
     await this.db?.query(
-      sql([
-        `INSERT INTO qrc721_token
+      sql`INSERT INTO qrc721_token
          SELECT log.address AS contract_address, log.topic4 AS token_id, RIGHT(log.topic2, 20) AS holder
          FROM evm_receipt receipt, evm_receipt_log log
          INNER JOIN (
            SELECT address, topic4, MIN(_id) AS _id FROM evm_receipt_log
-           WHERE topic4 IS NOT NULL AND topic1 = X'${TransferABI.id.toString(
-             'hex'
-           )}'
+           WHERE topic4 IS NOT NULL AND topic1 = ${TransferABI.id}
            GROUP BY address, topic4
          ) results ON log._id = results._id
-         WHERE receipt._id = log.receipt_id AND receipt.block_height > ${height} AND log.topic2 != X'${Buffer.alloc(
-          32
-        ).toString('hex')}'
-        ON DUPLICATE KEY UPDATE holder = VALUES(holder)`,
-      ])
+         WHERE receipt._id = log.receipt_id AND receipt.block_height > ${height} AND log.topic2 != ${Buffer.alloc(
+        32
+      )}
+        ON DUPLICATE KEY UPDATE holder = VALUES(holder)`
     )
   }
 
@@ -326,16 +322,14 @@ class ContractService extends Service implements IContractService {
       }
       if (contractsToRemove.length) {
         await this.db?.query(
-          sql([
-            `DELETE contract, tag, qrc20, qrc20_balance, qrc721, qrc721_token
+          sql`DELETE contract, tag, qrc20, qrc20_balance, qrc721, qrc721_token
              FROM contract
              LEFT JOIN contract_tag tag ON tag.contract_address = contract.address
              LEFT JOIN qrc20 ON qrc20.contract_address = contract.address
              LEFT JOIN qrc20_balance ON qrc20_balance.contract_address = contract.address
              LEFT JOIN qrc721 ON qrc721.contract_address = contract.address
              LEFT JOIN qrc721_token ON qrc721_token.contract_address = contract.address
-             WHERE contract.address IN (${contractsToRemove.join(', ')})`,
-          ])
+             WHERE contract.address IN ${contractsToRemove}`
         )
       }
       for (const address of contractsToCreate) {
@@ -565,11 +559,13 @@ class ContractService extends Service implements IContractService {
           return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
         })
       } else {
+        /*
         this.logger.error(
           'Contract Service:',
           'batchCallMethods found excepted:',
           `${excepted.join(', ')}`
         )
+         */
       }
     }
   }
