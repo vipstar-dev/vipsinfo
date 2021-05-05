@@ -28,7 +28,7 @@ export interface RpcClientConfig {
   port?: number
   user?: string
   password?: string
-  protocol?: string
+  protocol?: 'http' | 'https'
   disableAgent?: boolean
 }
 
