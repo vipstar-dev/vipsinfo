@@ -355,7 +355,7 @@ const callspec: { [key in callspecTypes]: string } = {
   callcontract: 'str',
   estimatesmartfee: 'int',
   getcontractcode: 'str',
-  getdgpinfo: 'str',
+  getdgpinfo: '',
   getstorage: 'str',
   gettransactionreceipt: 'str',
   listcontracts: 'int int',
