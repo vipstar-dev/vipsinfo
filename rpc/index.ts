@@ -71,6 +71,29 @@ export interface EstimateSmartFeeResult {
   feerate?: number
 }
 
+export interface GetBlockchainInfoResult {
+  chain: string
+  blocks: number
+  headers: number
+  bestblockhash: string
+  difficulty: number
+  moneysupply: number
+  mediantime: number
+  verificationprogress: number
+  initialblockdownload: boolean
+  chainwork: string
+  size_on_disk: string
+  pruned: false
+  softforks: {
+    [key in 'bip34' | 'bip66' | 'bip65' | 'csv' | 'segwit']: {
+      type: string
+      active: boolean
+      height: number
+    }
+  }
+  warnings: string
+}
+
 export interface GetDgpInfoResult {
   maxblocksize: number
   mingasprice: number
@@ -128,6 +151,11 @@ interface rpcMethods {
       toString: () => string
     }[]
   ) => Promise<string> | void
+  getblockchaininfo: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<GetBlockchainInfoResult> | void
   getdgpinfo: (
     ...args: {
       toString: () => string
@@ -169,6 +197,7 @@ export type callspecTypes =
   | 'callcontract'
   | 'estimatesmartfee'
   | 'getcontractcode'
+  | 'getblockchaininfo'
   | 'getdgpinfo'
   | 'getstorage'
   | 'gettransactionreceipt'
@@ -355,6 +384,7 @@ const callspec: { [key in callspecTypes]: string } = {
   callcontract: 'str',
   estimatesmartfee: 'int',
   getcontractcode: 'str',
+  getblockchaininfo: '',
   getdgpinfo: '',
   getstorage: 'str',
   gettransactionreceipt: 'str',
