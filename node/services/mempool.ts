@@ -181,7 +181,9 @@ class MempoolService extends Service implements IMempoolService {
         }
         txos.push([item._id, input?.outputIndex as number])
       }
-      const [{ count }] = await this.db.query(
+      const [
+        { count },
+      ] = await this.db.query(
         sql`SELECT COUNT(*) AS count FROM transaction_output WHERE (transaction_id, output_index) IN ${txos}`,
         { type: QueryTypes.SELECT }
       )
