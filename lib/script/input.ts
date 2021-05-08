@@ -465,4 +465,4 @@ class ContractSpendScript extends InputScript implements IInputScript {
   }
 }
 
-export default InputScript
+export default Object.assign(InputScript, TYPES)
