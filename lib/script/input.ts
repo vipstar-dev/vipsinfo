@@ -103,7 +103,7 @@ class InputScript extends Script implements IInputScript {
       witness: Buffer[]
       isCoinbase: boolean
     }
-  ): InputScript {
+  ): IInputScript {
     if (isCoinbase) {
       return new CoinbaseScript([{ code: -1, buffer }], scriptPubKey, witness)
     }
