@@ -32,7 +32,7 @@ export interface RpcClientConfig {
   disableAgent?: boolean
 }
 
-export interface QtumPpcRequest {
+export interface VipsPpcRequest {
   jsonrpc?: string
   method: string
   params: (string | number | boolean | object)[]
@@ -120,7 +120,7 @@ export interface ListContractsResult {
   account: number
 }
 
-export type QtumRpcResult =
+export type VipsRpcResult =
   | CallContractResult
   | EstimateSmartFeeResult
   | GetDgpInfoResult
@@ -129,8 +129,8 @@ export type QtumRpcResult =
   | string[]
   | string
 
-export interface QtumPpcResponse {
-  result: QtumRpcResult
+export interface VipsPpcResponse {
+  result: VipsRpcResult
   error: {
     code: number
     message: string
@@ -210,7 +210,7 @@ class RpcClient {
   private user: string = 'user'
   private password: string = 'password'
   private protocol: typeof http | typeof https | null = null
-  public batchedCalls: QtumPpcRequest[] | null = null
+  public batchedCalls: VipsPpcRequest[] | null = null
   private readonly disableAgent: boolean = false
   private readonly log: loggerObject | null = null
   public rejectUnauthorized: undefined
@@ -235,7 +235,7 @@ class RpcClient {
     this.generateRPCMethods()
   }
 
-  rpc<R extends QtumRpcResult>(_request: QtumPpcRequest): Promise<R> {
+  rpc<R extends VipsRpcResult>(_request: VipsPpcRequest): Promise<R> {
     const request: string = JSON.stringify(_request)
     const auth: string = Buffer.from(`${this.user}:${this.password}`).toString(
       'base64'
@@ -259,27 +259,31 @@ class RpcClient {
         res.on('end', () => {
           if (res.statusCode === 401) {
             reject(
-              new Error(`Qtum JSON-RPC: Connection Rejected: 401 Unauthorized`)
+              new Error(
+                `VIPSTARCOIN JSON-RPC: Connection Rejected: 401 Unauthorized`
+              )
             )
           } else if (res.statusCode === 403) {
             reject(
-              new Error(`Qtum JSON-RPC: Connection Rejected: 403 Forbidden`)
+              new Error(
+                `VIPSTARCOIN JSON-RPC: Connection Rejected: 403 Forbidden`
+              )
             )
           } else if (
             res.statusCode === 500 &&
             buffer.toString() === 'Work queue depth exceeded'
           ) {
             const exceededError: Error &
-              Partial<QtumPpcResponse['error']> = new Error(
-              `Qtum JSON-RPC: ${buffer}`
+              Partial<VipsPpcResponse['error']> = new Error(
+              `VIPSTARCOIN JSON-RPC: ${buffer}`
             )
             exceededError.code = 429
             reject(exceededError)
           } else {
             try {
-              const parsedBuffer: QtumPpcResponse = JSON.parse(
+              const parsedBuffer: VipsPpcResponse = JSON.parse(
                 Buffer.concat(buffer).toString()
-              ) as QtumPpcResponse
+              ) as VipsPpcResponse
               if (parsedBuffer.error) {
                 reject(parsedBuffer.error)
               } else {
@@ -293,7 +297,9 @@ class RpcClient {
               }
               reject(
                 new Error(
-                  `Qtum JSON-RPC: Error Parsing JSON: ${(err as Error).message}`
+                  `VIPSTARCOIN JSON-RPC: Error Parsing JSON: ${
+                    (err as Error).message
+                  }`
                 )
               )
             }
@@ -302,7 +308,9 @@ class RpcClient {
       })
       if (req) {
         req.on('error', (err) =>
-          reject(new Error(`Qtum JSON-RPC: Request Error: ${err.message}`))
+          reject(
+            new Error(`VIPSTARCOIN JSON-RPC: Request Error: ${err.message}`)
+          )
         )
         req.setHeader('Content-Length', request.length)
         req.setHeader('Content-Type', 'application/json')
@@ -313,11 +321,11 @@ class RpcClient {
     })
   }
 
-  batch<R extends QtumRpcResult>(batchCallback: () => void): Promise<R>[] {
+  batch<R extends VipsRpcResult>(batchCallback: () => void): Promise<R>[] {
     this.batchedCalls = []
     batchCallback()
     try {
-      return this.batchedCalls.map(async (batchRequest: QtumPpcRequest) => {
+      return this.batchedCalls.map(async (batchRequest: VipsPpcRequest) => {
         return await this.rpc<R>(batchRequest)
       })
     } finally {
@@ -332,7 +340,7 @@ class RpcClient {
       baseArgs: callTypes[]
     ): (
       ...args: (string | { toString: () => string })[]
-    ) => Promise<QtumRpcResult> | void {
+    ) => Promise<VipsRpcResult> | void {
       const fixedArgs: (string | number | boolean | object)[] = []
       return function (...args: { toString: () => string }[] | string[]) {
         if (baseArgs.includes('int')) {
