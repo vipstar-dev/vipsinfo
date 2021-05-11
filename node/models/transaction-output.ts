@@ -78,7 +78,7 @@ export default class TransactionOutput extends Model<
 
   @Column(DataType.BIGINT)
   get value(): bigint {
-    const value = this.getDataValue('value')
+    const value = this.getDataValue('value') || 0
     return BigInt(value)
   }
 
