@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "chain": "mainnet",
   "services": [
     "db",
@@ -21,7 +21,7 @@
         "host": "localhost",
         "port": 31916,
         "user": "user",
-        "password": "password"
+        "password": "pass"
       }
     },
     "p2p": {
