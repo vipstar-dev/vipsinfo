@@ -77,7 +77,15 @@ export default class TransactionOutput extends Model<
   blockHeight!: number
 
   @Column(DataType.BIGINT)
-  value!: bigint
+  get value(): bigint {
+    const value = this.getDataValue('value')
+    return BigInt(value)
+  }
+
+  set value(value: bigint) {
+    // @ts-ignore
+    this.setDataValue('value', value.toString())
+  }
 
   @ForeignKey(() => Address)
   @Column(DataType.BIGINT.UNSIGNED)
