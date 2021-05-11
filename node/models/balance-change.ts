@@ -58,7 +58,15 @@ export default class BalanceChange extends Model<
   addressId!: number
 
   @Column(DataType.BIGINT)
-  value!: bigint
+  get value(): bigint {
+    const value = this.getDataValue('value')
+    return BigInt(value)
+  }
+
+  set value(value: bigint) {
+    // @ts-ignore
+    this.setDataValue('value', value.toString())
+  }
 
   @BelongsTo(() => Transaction)
   transaction!: Transaction
