@@ -57,7 +57,7 @@ class ServerService extends Service implements IServerService {
   }
 
   _onConnection(socket: socketio.Server): void {
-    socket.emit('tip', this.node.addedMethods.getBlockTip)
+    socket.emit('tip', this.node.addedMethods.getBlockTip?.())
   }
 
   _onBlock(block: ITip): void {
