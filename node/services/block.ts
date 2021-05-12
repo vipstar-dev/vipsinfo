@@ -250,7 +250,15 @@ class BlockService extends Service implements IBlockService {
     await BlockModel.destroy({ where: { height: { [$gt]: tip.height } } })
     if (this.header) {
       this.header.on('reorg', () => {
-        this.reorging = true
+        const lastHeaderHeight = this.header?.getLastHeader()?.height
+        if (
+          this.reorging &&
+          this.tip &&
+          lastHeaderHeight !== undefined &&
+          this.tip.height > lastHeaderHeight - 2000
+        ) {
+          this.reorging = true
+        }
       })
       this.header.on('reorg complete', () => {
         this.reorging = false
