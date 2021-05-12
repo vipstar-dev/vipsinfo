@@ -982,7 +982,7 @@ class TransactionService extends Service implements ITransactionService {
                 if (refundValue) {
                   const txoIndex = refundTxos.findIndex(
                     (txo) =>
-                      txo.value == refundValue && txo.addressId == refunder?._id
+                      txo.value == refundValue || txo.addressId == refunder?._id
                   )
                   if (txoIndex === -1) {
                     this.logger.error(
