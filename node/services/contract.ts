@@ -544,8 +544,13 @@ class ContractService extends Service implements IContractService {
       const results = await Promise.all(batchFunc()).catch((reason) => {
         this.logger.error('callcontract rpc call is failed.', `${reason}`)
         void sleep(5000)
-        this.logger.info('Retry callcontract rpc call...')
-        return Promise.all(batchFunc())
+        this.logger.info('Retry callcontract rpc call...(one)')
+        return Promise.all(batchFunc()).catch((reason) => {
+          this.logger.error('callcontract rpc call is failed.', `${reason}`)
+          void sleep(10000)
+          this.logger.info('Retry callcontract rpc call...(two)')
+          return Promise.all(batchFunc())
+        })
       })
       const excepted: string[] = []
       results.map((result) => {

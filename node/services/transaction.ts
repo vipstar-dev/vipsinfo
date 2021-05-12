@@ -841,8 +841,16 @@ class TransactionService extends Service implements ITransactionService {
               `${reason}`
             )
             void sleep(5000)
-            this.logger.info('Retry getransactionreceipt rpc call...')
-            return Promise.all(batchFunc())
+            this.logger.info('Retry getransactionreceipt rpc call...(one)')
+            return Promise.all(batchFunc()).catch((reason) => {
+              this.logger.error(
+                'getransactionreceipt rpc call is failed.',
+                `${reason}`
+              )
+              void sleep(10000)
+              this.logger.info('Retry getransactionreceipt rpc call...(two)')
+              return Promise.all(batchFunc())
+            })
           })
           block.receipts = []
           blockReceipts.map((receipts: GetTransactionReceiptResult[]) => {
