@@ -341,8 +341,8 @@ class RpcClient {
     ): (
       ...args: (string | { toString: () => string })[]
     ) => Promise<VipsRpcResult> | void {
-      const fixedArgs: (string | number | boolean | object)[] = []
       return function (...args: { toString: () => string }[] | string[]) {
+        const fixedArgs: (string | number | boolean | object)[] = []
         if (baseArgs.includes('int')) {
           for (let i = 0; i < args.length; i++) {
             fixedArgs[i] = types.int(args[i] as string)
