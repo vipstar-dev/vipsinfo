@@ -72,7 +72,9 @@ export interface IContractService extends IService {
       abi: IMethodABI
       args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<(rawDecodeResults | rawDecodeResults[])[][] | undefined>
+  ): Promise<
+    ((rawDecodeResults | rawDecodeResults[])[] | undefined)[] | undefined
+  >
   _processReceipts(block: BlockObject): Promise<void>
   _updateBalances(balanceChanges: Set<string>): Promise<void>
   _updateTokenHolders(transfers: Map<string, Buffer>): Promise<void>
@@ -395,9 +397,9 @@ class ContractService extends Service implements IContractService {
         const [nameResult, symbolResult, totalSupplyResult] = results
         try {
           const [name, symbol, totalSupply] = await Promise.all([
-            nameResult[0],
-            symbolResult[0],
-            BigInt(totalSupplyResult[0].toString()),
+            (nameResult as rawDecodeResults[])[0],
+            (symbolResult as rawDecodeResults[])[0],
+            BigInt((totalSupplyResult as rawDecodeResults[])[0].toString()),
           ])
           contract.type = 'qrc721'
           await contract.save()
@@ -462,13 +464,13 @@ class ContractService extends Service implements IContractService {
         try {
           let version
           try {
-            version = versionResult[0]
+            version = (versionResult as rawDecodeResults[])[0]
           } catch (err) {}
           const [name, symbol, decimals, totalSupply] = await Promise.all([
-            nameResult[0],
-            symbolResult[0],
-            decimalsResult[0].toString(),
-            BigInt(totalSupplyResult[0].toString()),
+            (nameResult as rawDecodeResults[])[0],
+            (symbolResult as rawDecodeResults[])[0],
+            (decimalsResult as rawDecodeResults[])[0].toString(),
+            BigInt((totalSupplyResult as rawDecodeResults[])[0].toString()),
           ])
           contract.type = 'qrc20'
           await contract.save()
@@ -485,7 +487,7 @@ class ContractService extends Service implements IContractService {
             symbol: (symbol as Buffer).toString(),
             decimals: Number(decimals),
             totalSupply,
-            version: (version as Buffer).toString(),
+            version: version ? (version as Buffer).toString() : null,
           })
         } catch (err) {
           await contract.save()
@@ -527,7 +529,9 @@ class ContractService extends Service implements IContractService {
       abi: IMethodABI
       args?: (rawEncodeArgument | rawEncodeArgument[])[]
     }[]
-  ): Promise<(rawDecodeResults | rawDecodeResults[])[][] | undefined> {
+  ): Promise<
+    ((rawDecodeResults | rawDecodeResults[])[] | undefined)[] | undefined
+  > {
     const client = this.node.addedMethods.getRpcClient?.()
     if (client) {
       const batchFunc = () =>
@@ -554,24 +558,21 @@ class ContractService extends Service implements IContractService {
       })
       const excepted: string[] = []
       results.map((result) => {
-        if (result.executionResult.excepted !== 'None')
-          excepted.push(result.executionResult.excepted)
+        excepted.push(result.executionResult.excepted)
       })
-      if (excepted.length === 0) {
-        return results.map((result, index) => {
-          const { abi } = callList[index]
-          const { executionResult } = result
+      return results.map((result, index) => {
+        const { abi } = callList[index]
+        const { executionResult } = result
+        if (excepted[index] === 'None') {
           return abi.decodeOutputs(Buffer.from(executionResult.output, 'hex'))
-        })
-      } else {
-        /*
-        this.logger.error(
-          'Contract Service:',
-          'batchCallMethods found excepted:',
-          `${excepted.join(', ')}`
-        )
-         */
-      }
+        } else {
+          this.logger.debug(
+            'Contract Service:',
+            'batchCallMethods found excepted:',
+            `${excepted[index]}`
+          )
+        }
+      })
     }
   }
 
@@ -679,7 +680,7 @@ class ContractService extends Service implements IContractService {
       newBalanceChanges.map(({ contract, address }, index) => {
         try {
           if (result) {
-            const [balance] = result[index]
+            const [balance] = (result as rawDecodeResults[][])[index]
             return {
               contractAddress: Buffer.from(contract, 'hex'),
               address: Buffer.from(address, 'hex'),
