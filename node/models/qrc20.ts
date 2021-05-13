@@ -43,7 +43,8 @@ export default class Qrc20 extends Model<
 
   @Column(DataType.BLOB)
   get name(): string {
-    return this.getDataValue('name').toString()
+    const name = this.getDataValue('name') || ''
+    return name.toString()
   }
 
   set name(name: string) {
@@ -53,7 +54,8 @@ export default class Qrc20 extends Model<
 
   @Column(DataType.BLOB)
   get symbol(): string {
-    return this.getDataValue('symbol').toString()
+    const symbol = this.getDataValue('symbol') || ''
+    return symbol.toString()
   }
 
   set symbol(symbol: string) {
