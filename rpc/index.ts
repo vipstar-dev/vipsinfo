@@ -94,6 +94,22 @@ export interface GetBlockchainInfoResult {
   warnings: string
 }
 
+export interface GetDelegationInfoForAddressResult {
+  staker: string
+  fee: number
+  blockHeight: number
+  PoD: string
+  verified: boolean
+}
+
+export interface GetDelegationsForStakerResult {
+  delegate: string
+  staker: string
+  fee: number
+  blockHeight: number
+  PoD: string
+}
+
 export interface GetDgpInfoResult {
   maxblocksize: number
   mingasprice: number
@@ -156,6 +172,16 @@ interface rpcMethods {
       toString: () => string
     }[]
   ) => Promise<GetBlockchainInfoResult> | void
+  getdelegationinfoforaddress: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<GetDelegationInfoForAddressResult> | void
+  getdelegationsforstaker: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<GetDelegationsForStakerResult[]> | void
   getdgpinfo: (
     ...args: {
       toString: () => string
@@ -198,6 +224,8 @@ export type callspecTypes =
   | 'estimatesmartfee'
   | 'getcontractcode'
   | 'getblockchaininfo'
+  | 'getdelegationinfoforaddress'
+  | 'getdelegationsforstaker'
   | 'getdgpinfo'
   | 'getstorage'
   | 'gettransactionreceipt'
@@ -393,6 +421,8 @@ const callspec: { [key in callspecTypes]: string } = {
   estimatesmartfee: 'int',
   getcontractcode: 'str',
   getblockchaininfo: '',
+  getdelegationinfoforaddress: 'str',
+  getdelegationsforstaker: 'str',
   getdgpinfo: '',
   getstorage: 'str',
   gettransactionreceipt: 'str',
