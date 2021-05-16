@@ -5,4 +5,4 @@
 [Deploy documentation](./doc/deploy.md)
 
 ## What's this?
-This is VIPSTARCOIN Explorer core(node). This software is what rewrited [qtuminfo](https://github.com/qtumproject/qtuminfo) by TypeScript.
+This is VIPSTARCOIN Explorer core(node). This software is what rewrote [qtuminfo](https://github.com/qtumproject/qtuminfo) by TypeScript.
