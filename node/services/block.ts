@@ -605,17 +605,18 @@ class BlockService extends Service implements IBlockService {
           0
       ) {
         this.logger.debug('Block Service: Removing after register block...')
+        const afterRegistersPrev = this.afterRegisterBlock.header
+          .prevHash as Buffer
         if (
           this.tip &&
-          Buffer.compare(
-            this.afterRegisterBlock.header.prevHash as Buffer,
-            this.tip.hash
-          ) === 0
+          Buffer.compare(afterRegistersPrev, this.tip.hash) !== 0
         ) {
+          this.processingBlock = false
+          this.blocksInQueue = 0
+          await this.onHeaders()
+        } else {
           await this._saveBlock(this.afterRegisterBlock)
           await this._saveBlock(block)
-        } else {
-          this.logger.debug('Reorg process was failed...?')
         }
         this.afterRegisterBlock = undefined
         this.logger.debug('Block Service: After register block is removed.')
