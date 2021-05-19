@@ -290,6 +290,15 @@ class HeaderService extends Service implements IHeaderService {
         )
         for (const header of transformedHeaders) {
           if (this.lastHeader && header.prevHash) {
+            if (
+              Buffer.compare(this.lastHeader.hash, header.prevHash) !== 0 &&
+              Buffer.compare(
+                this.genesisHeader?.hash as Buffer,
+                header.prevHash
+              ) === 0
+            ) {
+              return
+            }
             assert(
               Buffer.compare(this.lastHeader.hash, header.prevHash) === 0,
               `headers not in order: ${this.lastHeader.hash.toString(
