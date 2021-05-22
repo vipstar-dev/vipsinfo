@@ -138,6 +138,6 @@ export default class Header extends Model<
     function getTargetDifficulty(bits: number): number {
       return (bits & 0xffffff) * 2 ** (((bits >>> 24) - 3) << 3)
     }
-    return getTargetDifficulty(0x1d00ffff) / getTargetDifficulty(this.bits)
+    return getTargetDifficulty(0x1f00ffff) / getTargetDifficulty(this.bits)
   }
 }
