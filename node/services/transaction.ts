@@ -410,11 +410,14 @@ class TransactionService extends Service implements ITransactionService {
       ) {
         addressIds[index].push(BigInt(0))
         const address = Address.fromScript(
-          ((tx as ITransactionAndModelSetting).outputs?.[outputIndex]
-            ?.scriptPubKey ||
-            OutputScript.fromBuffer(
-              (tx as TransactionModel).outputs[outputIndex].scriptPubKey
-            )) as
+          (Buffer.isBuffer(
+            (tx as TransactionModel).outputs[outputIndex].scriptPubKey
+          )
+            ? OutputScript.fromBuffer(
+                (tx as TransactionModel).outputs[outputIndex].scriptPubKey
+              )
+            : (tx as ITransactionAndModelSetting).outputs?.[outputIndex]
+                ?.scriptPubKey) as
             | IPublicKeyOutputScript
             | IPublicKeyHashOutputScript
             | IScriptHashOutputScript
@@ -513,9 +516,11 @@ class TransactionService extends Service implements ITransactionService {
         outputTxos.push({
           transactionId: tx._id as bigint,
           outputIndex,
-          scriptPubKey:
-            (output as TransactionOutputModel).scriptPubKey ||
-            ((output as ITransactionOutput).scriptPubKey?.toBuffer() as Buffer),
+          scriptPubKey: Buffer.isBuffer(
+            (output as TransactionOutputModel).scriptPubKey
+          )
+            ? (output as TransactionOutputModel).scriptPubKey
+            : ((output as ITransactionOutput).scriptPubKey?.toBuffer() as Buffer),
           blockHeight: tx.blockHeight as number,
           value: output?.value || BigInt(0),
           addressId: addressIds[index][outputIndex],
@@ -670,65 +675,69 @@ class TransactionService extends Service implements ITransactionService {
         ++outputIndex
       ) {
         const output = tx.outputs[outputIndex]
-        const outputScriptPubKey: IOutputScript | undefined =
-          (output?.scriptPubKey as IOutputScript | undefined) ||
-          OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
-        if (
-          [
-            OutputScript.EVM_CONTRACT_CREATE,
-            OutputScript.EVM_CONTRACT_CREATE_SENDER,
-            OutputScript.EVM_CONTRACT_CALL,
-            OutputScript.EVM_CONTRACT_CALL_SENDER,
-          ].includes(outputScriptPubKey.type)
-        ) {
-          let senderType: string | null = null
-          let senderData: Buffer | undefined
-          const hasOpSender = [
-            OutputScript.EVM_CONTRACT_CREATE_SENDER,
-            OutputScript.EVM_CONTRACT_CALL_SENDER,
-          ].includes(outputScriptPubKey.type)
-          if (hasOpSender) {
-            senderType = AddressModel.getType(
-              (outputScriptPubKey as
+        const outputScriptPubKey: IOutputScript | undefined = Buffer.isBuffer(
+          output?.scriptPubKey
+        )
+          ? OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
+          : output?.scriptPubKey
+        if (outputScriptPubKey) {
+          if (
+            [
+              OutputScript.EVM_CONTRACT_CREATE,
+              OutputScript.EVM_CONTRACT_CREATE_SENDER,
+              OutputScript.EVM_CONTRACT_CALL,
+              OutputScript.EVM_CONTRACT_CALL_SENDER,
+            ].includes(outputScriptPubKey.type)
+          ) {
+            let senderType: string | null = null
+            let senderData: Buffer | undefined
+            const hasOpSender = [
+              OutputScript.EVM_CONTRACT_CREATE_SENDER,
+              OutputScript.EVM_CONTRACT_CALL_SENDER,
+            ].includes(outputScriptPubKey.type)
+            if (hasOpSender) {
+              senderType = AddressModel.getType(
+                (outputScriptPubKey as
+                  | IEVMContractCallBySenderScript
+                  | IEVMContractCreateBySenderScript).senderType as number
+              )
+              senderData = (outputScriptPubKey as
                 | IEVMContractCallBySenderScript
-                | IEVMContractCreateBySenderScript).senderType as number
-            )
-            senderData = (outputScriptPubKey as
-              | IEVMContractCallBySenderScript
-              | IEVMContractCreateBySenderScript).senderData
-          } else {
-            const transactionInput = await TransactionInputModel.findOne({
-              // @ts-ignore
-              where: { transactionId: tx._id, inputIndex: 0 },
-              attributes: [],
-              include: [
-                {
-                  model: AddressModel.scope(),
-                  as: 'address',
-                  required: true,
-                  attributes: ['type', 'data'],
-                },
-              ],
-            })
-            if (transactionInput) {
-              const { address: refunder } = transactionInput
-              senderType = refunder.type
-              senderData = refunder.data
+                | IEVMContractCreateBySenderScript).senderData
+            } else {
+              const transactionInput = await TransactionInputModel.findOne({
+                // @ts-ignore
+                where: { transactionId: tx._id, inputIndex: 0 },
+                attributes: [],
+                include: [
+                  {
+                    model: AddressModel.scope(),
+                    as: 'address',
+                    required: true,
+                    attributes: ['type', 'data'],
+                  },
+                ],
+              })
+              if (transactionInput) {
+                const { address: refunder } = transactionInput
+                senderType = refunder.type
+                senderData = refunder.data
+              }
             }
-          }
-          if (senderData) {
-            receipts.push({
-              transactionId: tx._id as bigint,
-              outputIndex,
-              blockHeight: tx.blockHeight as number,
-              indexInBlock: tx.indexInBlock as number,
-              senderType,
-              senderData,
-              gasUsed: 0,
-              contractAddress: Buffer.alloc(20),
-              excepted: '',
-              exceptedMessage: '',
-            })
+            if (senderData) {
+              receipts.push({
+                transactionId: tx._id as bigint,
+                outputIndex,
+                blockHeight: tx.blockHeight as number,
+                indexInBlock: tx.indexInBlock as number,
+                senderType,
+                senderData,
+                gasUsed: 0,
+                contractAddress: Buffer.alloc(20),
+                excepted: '',
+                exceptedMessage: '',
+              })
+            }
           }
         }
       }
@@ -787,9 +796,10 @@ class TransactionService extends Service implements ITransactionService {
                     OutputScript.EVM_CONTRACT_CALL,
                     OutputScript.EVM_CONTRACT_CALL_SENDER,
                   ].includes(
-                    (output?.scriptPubKey as IOutputScript | undefined)?.type ||
-                      OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
-                        .type
+                    (Buffer.isBuffer(output?.scriptPubKey)
+                      ? OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
+                          .type
+                      : output?.scriptPubKey?.type) as string
                   )
               )
             ) {
@@ -947,10 +957,12 @@ class TransactionService extends Service implements ITransactionService {
                   OutputScript.EVM_CONTRACT_CALL,
                   OutputScript.EVM_CONTRACT_CALL_SENDER,
                 ].includes(
-                  (tx as ITransaction).outputs?.[i]?.scriptPubKey?.type ||
-                    OutputScript.fromBuffer(
-                      (tx as TransactionModel).outputs[i].scriptPubKey
-                    ).type
+                  (Buffer.from((tx as TransactionModel).outputs[i].scriptPubKey)
+                    ? OutputScript.fromBuffer(
+                        (tx as TransactionModel).outputs[i].scriptPubKey
+                      ).type
+                    : (tx as ITransaction).outputs?.[i]?.scriptPubKey
+                        ?.type) as string
                 )
               ) {
                 indices.push(i)
@@ -967,11 +979,11 @@ class TransactionService extends Service implements ITransactionService {
                 log: logs,
               } = blockReceipts[index][i]
               if (gasUsed) {
-                const { gasLimit, gasPrice } = ((output as ITransactionOutput)
-                  .scriptPubKey ||
-                  OutputScript.fromBuffer(
-                    (output as TransactionOutputModel).scriptPubKey
-                  )) as
+                const { gasLimit, gasPrice } = (Buffer.isBuffer(
+                  output?.scriptPubKey
+                )
+                  ? OutputScript.fromBuffer(output?.scriptPubKey as Buffer)
+                  : output?.scriptPubKey) as
                   | IEVMContractCreateScript
                   | IEVMContractCreateBySenderScript
                   | IEVMContractCallScript
