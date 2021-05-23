@@ -197,7 +197,7 @@ class CoinbaseScript extends InputScript implements ICoinbaseScript {
   }
 
   toString(): string {
-    if (this.parsedChunks) {
+    if (this.parsedChunks?.length) {
       const chunks: (string | number)[] = this.parsedChunks.map(
         ({ code, buffer }) => {
           if (buffer) {
