@@ -957,7 +957,9 @@ class TransactionService extends Service implements ITransactionService {
                   OutputScript.EVM_CONTRACT_CALL,
                   OutputScript.EVM_CONTRACT_CALL_SENDER,
                 ].includes(
-                  (Buffer.from((tx as TransactionModel).outputs[i].scriptPubKey)
+                  (Buffer.isBuffer(
+                    (tx as TransactionModel).outputs[i].scriptPubKey
+                  )
                     ? OutputScript.fromBuffer(
                         (tx as TransactionModel).outputs[i].scriptPubKey
                       ).type
