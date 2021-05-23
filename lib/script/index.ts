@@ -41,7 +41,7 @@ class Script implements IScript {
     try {
       while (!reader.finished) {
         const code: number | undefined = reader.readUInt8()
-        if (code) {
+        if (code !== undefined) {
           if (code > 0 && code < Opcode.OP_PUSHDATA1) {
             const buf = reader.read(code)
             chunks.push({ code, buffer: buf })
