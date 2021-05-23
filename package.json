@@ -1,6 +1,6 @@
 {
   "name": "vipsinfo",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "vipsinfo core node and libraries",
   "scripts": {
     "dev": "yarn build:live",
