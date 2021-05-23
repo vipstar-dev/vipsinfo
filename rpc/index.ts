@@ -116,6 +116,29 @@ export interface GetDgpInfoResult {
   blockgaslimit: number
 }
 
+export interface GetNetworkInfoResult {
+  version: number
+  subversion: string
+  protocolversion: number
+  localservices: string
+  localservicesnames: string[]
+  localrelay: boolean
+  timeoffset: number
+  networkactive: boolean
+  connections: number
+  networks: {
+    name: 'ipv4' | 'ipv6' | 'onion'
+    limited: boolean
+    reachable: boolean
+    proxy: string
+    proxy_randomize_credentials: boolean
+  }[]
+  relayfee: number
+  incrementalfee: number
+  localaddresses: any[]
+  warnings: string
+}
+
 export interface GetTransactionReceiptResult {
   blockHash: string
   blockNumber: number
@@ -139,7 +162,9 @@ export interface ListContractsResult {
 export type VipsRpcResult =
   | CallContractResult
   | EstimateSmartFeeResult
+  | GetBlockchainInfoResult
   | GetDgpInfoResult
+  | GetNetworkInfoResult
   | GetTransactionReceiptResult[]
   | ListContractsResult
   | string[]
@@ -187,6 +212,11 @@ interface rpcMethods {
       toString: () => string
     }[]
   ) => Promise<GetDgpInfoResult> | void
+  getnetworkinfo: (
+    ...args: {
+      toString: () => string
+    }[]
+  ) => Promise<GetNetworkInfoResult> | void
   getstorage: (
     ...args: {
       toString: () => string
@@ -227,6 +257,7 @@ export type callspecTypes =
   | 'getdelegationinfoforaddress'
   | 'getdelegationsforstaker'
   | 'getdgpinfo'
+  | 'getnetworkinfo'
   | 'getstorage'
   | 'gettransactionreceipt'
   | 'listcontracts'
@@ -424,6 +455,7 @@ const callspec: { [key in callspecTypes]: string } = {
   getdelegationinfoforaddress: 'str',
   getdelegationsforstaker: 'str',
   getdgpinfo: '',
+  getnetworkinfo: '',
   getstorage: 'str',
   gettransactionreceipt: 'str',
   listcontracts: 'int int',
