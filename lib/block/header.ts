@@ -173,12 +173,20 @@ class Header implements IHeader {
   }
 
   get difficulty(): number {
-    function getTargetDifficulty(bits: number): number {
-      return (bits & 0xffffff) * 2 ** (((bits >>> 24) - 3) << 3)
+    const bits = this.bits || 0
+    let nShift = (bits >> 24) & 0xff
+    let dDiff = 0x0000ffff / (bits & 0x00ffffff)
+
+    while (nShift < 29) {
+      dDiff *= 256.0
+      nShift++
     }
-    return (
-      getTargetDifficulty(GENESIS_BITS) / getTargetDifficulty(this.bits || 0)
-    )
+    while (nShift > 29) {
+      dDiff /= 256.0
+      nShift--
+    }
+
+    return dDiff
   }
 }
 

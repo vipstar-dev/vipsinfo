@@ -135,9 +135,18 @@ export default class Header extends Model<
   }
 
   get difficulty(): number {
-    function getTargetDifficulty(bits: number): number {
-      return (bits & 0xffffff) * 2 ** (((bits >>> 24) - 3) << 3)
+    let nShift = (this.bits >> 24) & 0xff
+    let dDiff = 0x0000ffff / (this.bits & 0x00ffffff)
+
+    while (nShift < 29) {
+      dDiff *= 256.0
+      nShift++
     }
-    return getTargetDifficulty(0x1f00ffff) / getTargetDifficulty(this.bits)
+    while (nShift > 29) {
+      dDiff /= 256.0
+      nShift--
+    }
+
+    return dDiff
   }
 }
