@@ -30,9 +30,9 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
 
   process(): void {
     this.running = true
-    const wating = this.waiting.pop()
-    if (wating) {
-      const { data, callback } = wating
+    const waiting = this.waiting.pop()
+    if (waiting) {
+      const { data, callback } = waiting
       this.fn?.(data).then((data: any) => {
         callback(null, data)
         if (this.waiting.length) {
