@@ -319,6 +319,9 @@ class BlockService extends Service implements IBlockService {
   }
 
   _queueBlock(block: IBlock): void {
+    if (this.initialSync) {
+      return
+    }
     ++this.blocksInQueue
     this.blockProcessor?.push(block, (...err: (string | number | null)[]) => {
       void new Promise((resolve, reject) => {
