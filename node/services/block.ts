@@ -392,8 +392,10 @@ class BlockService extends Service implements IBlockService {
     return new Promise((_resolve, _reject) => {
       const interval = setInterval(() => {
         void new Promise<void>((resolve, reject) => {
-          if (this.blocksInQueue === 0) {
+          if (this.blocksInQueue <= 0) {
             clearInterval(interval)
+            this.blocksInQueue = 0
+            this.blockProcessor?.cleanUpQueue()
             this._removeAllSubscriptions()
             try {
               void this._checkTip()
@@ -616,6 +618,7 @@ class BlockService extends Service implements IBlockService {
         ) {
           this.processingBlock = false
           this.blocksInQueue = 0
+          this.blockProcessor?.cleanUpQueue()
           await this.onHeaders()
         } else {
           await this._saveBlock(this.afterRegisterBlock)

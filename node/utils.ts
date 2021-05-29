@@ -4,6 +4,7 @@ export type errCallback = (...err: (string | number | null)[]) => void
 
 export interface IAsyncQueue<T> {
   length: number
+  cleanUpQueue(): void
   push(data: T, callback: errCallback): void
   process(): void
 }
@@ -19,6 +20,10 @@ class AsyncQueue<T, K> implements IAsyncQueue<T> {
 
   get length(): number {
     return this.waiting.length
+  }
+
+  cleanUpQueue(): void {
+    this.waiting = []
   }
 
   push(data: T, callback: errCallback): void {
