@@ -15,6 +15,7 @@ export * from '@/lib/transaction'
 export * from '@/lib/transaction/input'
 export * from '@/lib/transaction/output'
 export * from '@/lib/solidity/abi'
+export * from '@/lib/xpub'
 
 import Address from '@/lib/address'
 import Block from '@/lib/block/block'
