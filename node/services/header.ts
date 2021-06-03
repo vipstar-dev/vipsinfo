@@ -297,6 +297,7 @@ class HeaderService extends Service implements IHeaderService {
                 header.prevHash
               ) === 0
             ) {
+              await this._onHeadersSave()
               return
             }
             assert(
