@@ -189,7 +189,7 @@ class Node extends EventEmitter {
     this.emit('ready')
   }
 
-  async stop() {
+  async stop(restart: boolean = false) {
     if (this.stopping) {
       return
     }
@@ -207,10 +207,14 @@ class Node extends EventEmitter {
         }
       }
       this.logger.info('Halted')
-      process.exit(0)
+      if (!restart) {
+        process.exit(0)
+      }
     } catch (err) {
       this.logger.error('Failed to stop services:', err)
-      process.exit(1)
+      if (!restart) {
+        process.exit(1)
+      }
     }
   }
 }

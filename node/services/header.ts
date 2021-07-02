@@ -8,7 +8,7 @@ import { Services } from '@/node/node'
 import Service, { BaseConfig, IService } from '@/node/services/base'
 import { ITip } from '@/node/services/db'
 import { IP2PService } from '@/node/services/p2p'
-import AsyncQueue, { caluculateRemainingTime } from '@/node/utils'
+import AsyncQueue, { caluculateRemainingTime, sleep } from '@/node/utils'
 
 const { gt: $gt, between: $between } = Op
 
@@ -297,7 +297,9 @@ class HeaderService extends Service implements IHeaderService {
                 header.prevHash
               ) === 0
             ) {
-              await this._onHeadersSave()
+              await this.node.stop(true)
+              await sleep(10000)
+              await this.node.start()
               return
             }
             assert(
